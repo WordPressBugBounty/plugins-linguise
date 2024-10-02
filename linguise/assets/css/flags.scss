@@ -1,0 +1,176 @@
+@mixin rounded_flags {
+  .linguise_flag_af {background-image: url(../images/flags-rounded/af.svg)}
+  .linguise_flag_am {background-image: url(../images/flags-rounded/am.svg)}
+  .linguise_flag_ar {background-image: url(../images/flags-rounded/ar.svg)}
+  .linguise_flag_az {background-image: url(../images/flags-rounded/az.svg)}
+  .linguise_flag_bg {background-image: url(../images/flags-rounded/bg.svg)}
+  .linguise_flag_bn {background-image: url(../images/flags-rounded/bn.svg)}
+  .linguise_flag_bs {background-image: url(../images/flags-rounded/bs.svg)}
+  .linguise_flag_ca {background-image: url(../images/flags-rounded/ca.svg)}
+  .linguise_flag_cs {background-image: url(../images/flags-rounded/cs.svg)}
+  .linguise_flag_cy {background-image: url(../images/flags-rounded/cy.svg)}
+  .linguise_flag_da {background-image: url(../images/flags-rounded/da.svg)}
+  .linguise_flag_de {background-image: url(../images/flags-rounded/de.svg)}
+  .linguise_flag_de-at, .linguise_flag_de_at {background-image: url(../images/flags-rounded/de-at.svg)}
+  .linguise_flag_el {background-image: url(../images/flags-rounded/el.svg)}
+  .linguise_flag_en-us, .linguise_flag_en_us, .linguise_flag_en {background-image: url(../images/flags-rounded/en-us.svg)}
+  .linguise_flag_en-gb, .linguise_flag_en_gb {background-image: url(../images/flags-rounded/en-gb.svg)}
+  .linguise_flag_eo {background-image: url(../images/flags-rounded/eo.svg)}
+  .linguise_flag_es {background-image: url(../images/flags-rounded/es.svg)}
+  .linguise_flag_es-mx, .linguise_flag_es_mx {background-image: url(../images/flags-rounded/es-mx.svg)}
+  .linguise_flag_es-pu, .linguise_flag_es_pu {background-image: url(../images/flags-rounded/es-pu.svg)}
+  .linguise_flag_et {background-image: url(../images/flags-rounded/et.svg)}
+  .linguise_flag_fa {background-image: url(../images/flags-rounded/fa.svg)}
+  .linguise_flag_fi {background-image: url(../images/flags-rounded/fi.svg)}
+  .linguise_flag_fr {background-image: url(../images/flags-rounded/fr.svg)}
+  .linguise_flag_ga {background-image: url(../images/flags-rounded/ga.svg)}
+  .linguise_flag_gu {background-image: url(../images/flags-rounded/gu.svg)}
+  .linguise_flag_ha {background-image: url(../images/flags-rounded/ha.svg)}
+  .linguise_flag_he {background-image: url(../images/flags-rounded/he.svg)}
+  .linguise_flag_hi {background-image: url(../images/flags-rounded/hi.svg)}
+  .linguise_flag_hr {background-image: url(../images/flags-rounded/hr.svg)}
+  .linguise_flag_ht {background-image: url(../images/flags-rounded/ht.svg)}
+  .linguise_flag_hu {background-image: url(../images/flags-rounded/hu.svg)}
+  .linguise_flag_hy {background-image: url(../images/flags-rounded/hy.svg)}
+  .linguise_flag_id {background-image: url(../images/flags-rounded/id.svg)}
+  .linguise_flag_ig {background-image: url(../images/flags-rounded/ig.svg)}
+  .linguise_flag_is {background-image: url(../images/flags-rounded/is.svg)}
+  .linguise_flag_it {background-image: url(../images/flags-rounded/it.svg)}
+  .linguise_flag_ja {background-image: url(../images/flags-rounded/ja.svg)}
+  .linguise_flag_kk {background-image: url(../images/flags-rounded/kk.svg)}
+  .linguise_flag_km {background-image: url(../images/flags-rounded/km.svg)}
+  .linguise_flag_ku {background-image: url(../images/flags-rounded/ku.svg)}
+  .linguise_flag_ko {background-image: url(../images/flags-rounded/ko.svg)}
+  .linguise_flag_lb {background-image: url(../images/flags-rounded/lb.svg)}
+  .linguise_flag_lo {background-image: url(../images/flags-rounded/lo.svg)}
+  .linguise_flag_lt {background-image: url(../images/flags-rounded/lt.svg)}
+  .linguise_flag_lv {background-image: url(../images/flags-rounded/lv.svg)}
+  .linguise_flag_mg {background-image: url(../images/flags-rounded/mg.svg)}
+  .linguise_flag_mi {background-image: url(../images/flags-rounded/mi.svg)}
+  .linguise_flag_mk {background-image: url(../images/flags-rounded/mk.svg)}
+  .linguise_flag_ml {background-image: url(../images/flags-rounded/ml.svg)}
+  .linguise_flag_mn {background-image: url(../images/flags-rounded/mn.svg)}
+  .linguise_flag_mr {background-image: url(../images/flags-rounded/mr.svg)}
+  .linguise_flag_ms {background-image: url(../images/flags-rounded/ms.svg)}
+  .linguise_flag_mt {background-image: url(../images/flags-rounded/mt.svg)}
+  .linguise_flag_ne {background-image: url(../images/flags-rounded/ne.svg)}
+  .linguise_flag_nl {background-image: url(../images/flags-rounded/nl.svg)}
+  .linguise_flag_no {background-image: url(../images/flags-rounded/no.svg)}
+  .linguise_flag_pa {background-image: url(../images/flags-rounded/pa.svg)}
+  .linguise_flag_pl {background-image: url(../images/flags-rounded/pl.svg)}
+  .linguise_flag_ps {background-image: url(../images/flags-rounded/ps.svg)}
+  .linguise_flag_pt {background-image: url(../images/flags-rounded/pt.svg)}
+  .linguise_flag_pt-br, .linguise_flag_pt_br {background-image: url(../images/flags-rounded/pt-br.svg)}
+  .linguise_flag_ro {background-image: url(../images/flags-rounded/ro.svg)}
+  .linguise_flag_ru {background-image: url(../images/flags-rounded/ru.svg)}
+  .linguise_flag_sk {background-image: url(../images/flags-rounded/sk.svg)}
+  .linguise_flag_sl {background-image: url(../images/flags-rounded/sl.svg)}
+  .linguise_flag_sm {background-image: url(../images/flags-rounded/sm.svg)}
+  .linguise_flag_sq {background-image: url(../images/flags-rounded/sq.svg)}
+  .linguise_flag_sr {background-image: url(../images/flags-rounded/sr.svg)}
+  .linguise_flag_su {background-image: url(../images/flags-rounded/su.svg)}
+  .linguise_flag_sv {background-image: url(../images/flags-rounded/sv.svg)}
+  .linguise_flag_sw {background-image: url(../images/flags-rounded/sw.svg)}
+  .linguise_flag_ta {background-image: url(../images/flags-rounded/ta.svg)}
+  .linguise_flag_te {background-image: url(../images/flags-rounded/te.svg)}
+  .linguise_flag_tg {background-image: url(../images/flags-rounded/tg.svg)}
+  .linguise_flag_th {background-image: url(../images/flags-rounded/th.svg)}
+  .linguise_flag_tr {background-image: url(../images/flags-rounded/tr.svg)}
+  .linguise_flag_uk {background-image: url(../images/flags-rounded/uk.svg)}
+  .linguise_flag_ur {background-image: url(../images/flags-rounded/ur.svg)}
+  .linguise_flag_vi {background-image: url(../images/flags-rounded/vi.svg)}
+  .linguise_flag_zh-cn {background-image: url(../images/flags-rounded/zh-cn.svg)}
+  .linguise_flag_zh-tw {background-image: url(../images/flags-rounded/zh-tw.svg)}
+  .linguise_flag_zu {background-image: url(../images/flags-rounded/zu.svg)}
+  .linguise_flag_hmn {background-image: url(../images/flags-rounded/hmn.svg)}
+}
+
+@mixin rectangular_flags {
+  .linguise_flag_af {background-image: url(../images/flags-rectangular/af.svg)}
+  .linguise_flag_eo {background-image: url(../images/flags-rectangular/eo.svg)}
+  .linguise_flag_kn {background-image: url(../images/flags-rectangular/kn.svg)}
+  .linguise_flag_ku {background-image: url(../images/flags-rectangular/ku.svg)}
+  .linguise_flag_ps {background-image: url(../images/flags-rectangular/ps.svg)}
+  .linguise_flag_hmn {background-image: url(../images/flags-rectangular/hmn.svg)}
+  .linguise_flag_mr {background-image: url(../images/flags-rectangular/mr.svg)}
+  .linguise_flag_pa {background-image: url(../images/flags-rectangular/pa.svg)}
+  .linguise_flag_am {background-image: url(../images/flags-rectangular/am.svg)}
+  .linguise_flag_ar {background-image: url(../images/flags-rectangular/ar.svg)}
+  .linguise_flag_az {background-image: url(../images/flags-rectangular/az.svg)}
+  .linguise_flag_az {background-image: url(../images/flags-rectangular/az.svg)}
+  .linguise_flag_bg {background-image: url(../images/flags-rectangular/bg.svg)}
+  .linguise_flag_bn {background-image: url(../images/flags-rectangular/bn.svg)}
+  .linguise_flag_bs {background-image: url(../images/flags-rectangular/bs.svg)}
+  .linguise_flag_ca {background-image: url(../images/flags-rectangular/ca.svg)}
+  .linguise_flag_cs {background-image: url(../images/flags-rectangular/cs.svg)}
+  .linguise_flag_cy {background-image: url(../images/flags-rectangular/cy.svg)}
+  .linguise_flag_da {background-image: url(../images/flags-rectangular/da.svg)}
+  .linguise_flag_de {background-image: url(../images/flags-rectangular/de.svg)}
+  .linguise_flag_de-at, .linguise_flag_de_at {background-image: url(../images/flags-rectangular/de-at.svg)}
+  .linguise_flag_el {background-image: url(../images/flags-rectangular/el.svg)}
+  .linguise_flag_en-us, .linguise_flag_en_us, .linguise_flag_en {background-image: url(../images/flags-rectangular/en-us.svg)}
+  .linguise_flag_en-gb, .linguise_flag_en_gb {background-image: url(../images/flags-rectangular/en-gb.svg)}
+  .linguise_flag_es {background-image: url(../images/flags-rectangular/es.svg)}
+  .linguise_flag_es-mx, .linguise_flag_es_mx {background-image: url(../images/flags-rectangular/es-mx.svg)}
+  .linguise_flag_es-pu, .linguise_flag_es_pu {background-image: url(../images/flags-rectangular/es-pu.svg)}
+  .linguise_flag_et {background-image: url(../images/flags-rectangular/et.svg)}
+  .linguise_flag_fa {background-image: url(../images/flags-rectangular/fa.svg)}
+  .linguise_flag_fi {background-image: url(../images/flags-rectangular/fi.svg)}
+  .linguise_flag_fr {background-image: url(../images/flags-rectangular/fr.svg)}
+  .linguise_flag_ga {background-image: url(../images/flags-rectangular/ga.svg)}
+  .linguise_flag_gu {background-image: url(../images/flags-rectangular/gu.svg)}
+  .linguise_flag_ha {background-image: url(../images/flags-rectangular/ha.svg)}
+  .linguise_flag_he {background-image: url(../images/flags-rectangular/he.svg)}
+  .linguise_flag_hi {background-image: url(../images/flags-rectangular/hi.svg)}
+  .linguise_flag_hr {background-image: url(../images/flags-rectangular/hr.svg)}
+  .linguise_flag_ht {background-image: url(../images/flags-rectangular/ht.svg)}
+  .linguise_flag_hu {background-image: url(../images/flags-rectangular/hu.svg)}
+  .linguise_flag_hy {background-image: url(../images/flags-rectangular/hy.svg)}
+  .linguise_flag_id {background-image: url(../images/flags-rectangular/id.svg)}
+  .linguise_flag_ig {background-image: url(../images/flags-rectangular/ig.svg)}
+  .linguise_flag_is {background-image: url(../images/flags-rectangular/is.svg)}
+  .linguise_flag_it {background-image: url(../images/flags-rectangular/it.svg)}
+  .linguise_flag_ja {background-image: url(../images/flags-rectangular/ja.svg)}
+  .linguise_flag_kk {background-image: url(../images/flags-rectangular/kk.svg)}
+  .linguise_flag_km {background-image: url(../images/flags-rectangular/km.svg)}
+  .linguise_flag_ko {background-image: url(../images/flags-rectangular/ko.svg)}
+  .linguise_flag_lb {background-image: url(../images/flags-rectangular/lb.svg)}
+  .linguise_flag_lo {background-image: url(../images/flags-rectangular/lo.svg)}
+  .linguise_flag_lt {background-image: url(../images/flags-rectangular/lt.svg)}
+  .linguise_flag_lv {background-image: url(../images/flags-rectangular/lv.svg)}
+  .linguise_flag_mg {background-image: url(../images/flags-rectangular/mg.svg)}
+  .linguise_flag_mi {background-image: url(../images/flags-rectangular/mi.svg)}
+  .linguise_flag_mk {background-image: url(../images/flags-rectangular/mk.svg)}
+  .linguise_flag_ml {background-image: url(../images/flags-rectangular/ml.svg)}
+  .linguise_flag_mn {background-image: url(../images/flags-rectangular/mn.svg)}
+  .linguise_flag_ms {background-image: url(../images/flags-rectangular/ms.svg)}
+  .linguise_flag_mt {background-image: url(../images/flags-rectangular/mt.svg)}
+  .linguise_flag_ne {background-image: url(../images/flags-rectangular/ne.svg)}
+  .linguise_flag_nl {background-image: url(../images/flags-rectangular/nl.svg)}
+  .linguise_flag_no {background-image: url(../images/flags-rectangular/no.svg)}
+  .linguise_flag_pl {background-image: url(../images/flags-rectangular/pl.svg)}
+  .linguise_flag_pt {background-image: url(../images/flags-rectangular/pt.svg)}
+  .linguise_flag_pt-br, .linguise_flag_pt_br {background-image: url(../images/flags-rectangular/pt-br.svg)}
+  .linguise_flag_ro {background-image: url(../images/flags-rectangular/ro.svg)}
+  .linguise_flag_ru {background-image: url(../images/flags-rectangular/ru.svg)}
+  .linguise_flag_sk {background-image: url(../images/flags-rectangular/sk.svg)}
+  .linguise_flag_sl {background-image: url(../images/flags-rectangular/sl.svg)}
+  .linguise_flag_sm {background-image: url(../images/flags-rectangular/sm.svg)}
+  .linguise_flag_sq {background-image: url(../images/flags-rectangular/sq.svg)}
+  .linguise_flag_sr {background-image: url(../images/flags-rectangular/sr.svg)}
+  .linguise_flag_su {background-image: url(../images/flags-rectangular/su.svg)}
+  .linguise_flag_sv {background-image: url(../images/flags-rectangular/sv.svg)}
+  .linguise_flag_sw {background-image: url(../images/flags-rectangular/sw.svg)}
+  .linguise_flag_ta {background-image: url(../images/flags-rectangular/ta.svg)}
+  .linguise_flag_te {background-image: url(../images/flags-rectangular/te.svg)}
+  .linguise_flag_tg {background-image: url(../images/flags-rectangular/tg.svg)}
+  .linguise_flag_th {background-image: url(../images/flags-rectangular/th.svg)}
+  .linguise_flag_tr {background-image: url(../images/flags-rectangular/tr.svg)}
+  .linguise_flag_uk {background-image: url(../images/flags-rectangular/uk.svg)}
+  .linguise_flag_ur {background-image: url(../images/flags-rectangular/ur.svg)}
+  .linguise_flag_vi {background-image: url(../images/flags-rectangular/vi.svg)}
+  .linguise_flag_zh-cn {background-image: url(../images/flags-rectangular/zh-cn.svg)}
+  .linguise_flag_zh-tw {background-image: url(../images/flags-rectangular/zh-tw.svg)}
+  .linguise_flag_zu {background-image: url(../images/flags-rectangular/zu.svg)}
+}
+

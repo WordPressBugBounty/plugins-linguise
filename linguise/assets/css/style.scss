@@ -1,0 +1,462 @@
+/*# sourceMappingURL=style.css.map */
+@use "flags";
+.linguise_switcher {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  outline: 0 !important;
+  li a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  ul {
+    list-style: none !important;;
+    margin: 0;
+    padding: 0;
+  }
+  .lccaret {
+    margin-left: 5px;
+    transition: transform 0.2s linear;
+    display: flex;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  span.linguise_language_icon {
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    vertical-align: middle;
+    box-shadow: 3px 3px 6px #bfbfbf;
+    border-radius: 24px;
+    opacity: 0.8;
+    cursor: pointer;
+    & + .linguise_lang_name {
+      margin-left: 10px;
+    }
+  }
+  &.linguise_flag_rectangular {
+    span.linguise_language_icon {
+      border-radius: 0;
+      background-size: 100% auto;
+      background-position: center;
+    }
+  }
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.rtl {
+  .linguise_switcher {
+    span.linguise_language_icon {
+      margin-left:12px;
+    }
+  }
+  .linguise_parent_menu_item{
+    &:hover {
+      >.linguise_switcher_sub {
+        right:4px;
+      }
+    }
+  }
+}
+
+#linguise_popup, .linguise_switcher {
+  @include flags.rounded_flags;
+}
+
+#linguise_popup.linguise_flag_rectangular, .linguise_switcher.linguise_flag_rectangular {
+  @include flags.rectangular_flags;
+}
+
+.linguise_parent_menu_item {
+  position: relative;
+  &.linguise_parent_menu_item_side_by_side {
+    >a {
+      display: none !important;
+    }
+  }
+  .side_by_side_lang_list {
+    display: flex;
+    a {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+
+  .linguise_switcher_sub {
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    display: none;
+    z-index: 99;
+    background: #fff;
+    padding: 0;
+    box-shadow: 3px 3px 6px #bfbfbf;
+    margin: 0;
+
+    &.many_languages {
+      height: 300px;
+      overflow-y: auto;
+    }
+
+    &::-webkit-scrollbar {
+      width: 1px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #999;
+    }
+
+    li {
+      margin: 0;
+      display: flex;
+      line-height: unset;
+      padding: 10px;
+      border-bottom: #eee 1px solid;
+      a {
+        display: flex !important;
+        border-bottom: 0;
+        padding: 0 !important;
+      }
+    }
+  }
+  span.linguise_language_icon {
+     vertical-align: middle;
+  }
+  &:hover {
+    >.linguise_switcher_sub {
+      display: flex !important;
+      flex-direction: column;
+      min-width: max-content;
+      .linguise_lang_name {
+        line-height: 30px;
+      }
+    }
+  }
+}
+
+.linguise_switcher_popup {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.linguise_switcher_dropdown {
+  border: 0;
+  display: inline-block;
+  border-radius: 4px;
+  li {
+    border-bottom: #eee 1px solid;
+    font-size: 14px;
+    &.linguise_current {
+      width: fit-content;
+      font-size: 14px;
+      margin: 0;
+      position: relative;
+
+      &.enabled_language_name {
+        min-width: 155px;
+      }
+
+      &:hover {
+        >ul {
+          visibility: visible;
+          opacity: 1;
+        }
+        .lccaret {
+          transform: rotate(360deg);
+
+          &.top {
+            transform: rotate(180deg);
+          }
+        }
+      }
+
+      .linguise_current_lang {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 10px;
+        cursor: pointer;
+        border: #eee 1px solid;
+      }
+    }
+  }
+  ul {
+    width: 100%;
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin: 0;
+    background-color: #fff;
+    padding: 0;
+    border-radius: 4px;
+    z-index: 999;
+    box-shadow: 2px 3px 6px 0 rgb(0 0 0 / 16%);
+    box-sizing: border-box;
+    transition: visibility 0s, opacity 0.2s linear;
+
+    &.many_languages {
+      height: 300px;
+      overflow-y: auto;
+    }
+
+    &::-webkit-scrollbar {
+      width: 1px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #999;
+    }
+
+    li {
+      margin: 0;
+      padding: 10px;
+      &:hover {
+        background: #eee;
+      }
+    }
+  }
+}
+
+.linguise_switcher_side_by_side {
+  list-style: none !important;;
+  margin: 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  li {
+    margin: 10px !important;
+    float: left;
+    padding: 0;
+  }
+}
+
+.linguise_preview .linguise_switcher_side_by_side {
+  width: 100%;
+}
+
+#linguise_background {
+  z-index: 9998;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(163, 163, 163, 0.28);
+}
+.linguise_lang_name{
+  cursor: pointer;
+  vertical-align: middle;
+}
+.linguise_current > .linguise_lang_name {
+  color: #999;
+}
+
+#linguise_popup_container {
+  position: fixed;
+  z-index: 999999;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateY(-50%) translateX(-50%);
+  -ms-transform: translateY(-50%) translate(-50%);
+  transform: translateY(-50%) translate(-50%);
+
+  &.show_linguise_popup_container {
+
+    #linguise_popup {
+      -webkit-transform: scale(1);
+      -ms-transform: scale(1);
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  #linguise_popup {
+    width: 100%;
+    min-width: 320px;
+    background-color: #FFF;
+    padding: 20px;
+    border-radius: 4px;
+    -webkit-transform: scale(0.7);
+    -ms-transform: scale(0.7);
+    transform: scale(0.7);
+    opacity: 0;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
+
+    p {
+      margin: 10px 0;
+    }
+    ul {
+      list-style-type: none !important;
+      margin: 0;
+      padding: 0;
+      columns: 3;
+      -webkit-columns: 3;
+      -moz-columns: 3;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    li {
+      list-style-type: none !important;
+      line-height: 24px;
+      padding: 10px 0 10px 0px;
+      flex: 0 0 33%;
+      a {
+        text-decoration: none;
+      }
+      .linguise_flags {
+        height: 24px;
+        width: 24px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
+        box-shadow: 3px 3px 6px #bfbfbf;
+        border-radius: 24px;
+        opacity: 0.8;
+        cursor: pointer;
+        background-size: contain;
+      }
+      .linguise_lang_name {
+        vertical-align: middle;
+        cursor: pointer;
+      }
+      &:hover {
+        span {
+          opacity: 1;
+        }
+      }
+    }
+    li.linguise_current {
+      a {
+        font-weight: bold;
+        text-shadow: 2px 2px 2px #bfbfbf;
+      }
+    }
+    .linguise_switcher {
+      opacity: 0.8;
+      li {
+        &:hover {
+          background-color: #f7f7f7;
+        }
+        a {
+          &:hover {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+    .close {
+      display: block;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-image: url(../images/close.png);
+      width: 20px;
+      height: 20px;
+    }
+    &.linguise_flag_rectangular {
+      ul {
+        li {
+          .linguise_flags {
+            border-radius: 0;
+            background-size: 100% auto;
+            background-position: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+/*
+ * Fix for BeTheme menu
+ */
+#Top_bar .menu li.linguise_switcher a span.linguise_language_icon,
+#Top_bar .menu li.linguise_switcher a span.linguise_lang_name {
+  display: inline-block;
+  padding: 0;
+}
+#Top_bar .menu li.linguise_switcher a span.linguise_language_icon {
+  margin-left: 20px;
+}
+#Top_bar .menu li.linguise_switcher a span.linguise_lang_name {
+  padding-right: 20px;
+}
+
+@media screen and (max-width: 720px) {
+  #linguise_popup {
+    li {
+      flex: 0 0 50% !important;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #linguise_popup {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+    width: auto;
+    overflow: scroll;
+  }
+}
+@media screen and (max-width: 500px) {
+  .linguise_switcher_dropdown {
+    li.linguise_current {
+      &:hover {
+        >ul.many_languages {
+          display: block;
+          width: auto;
+        }
+      }
+    }
+  }
+
+  #linguise_popup {
+    ul {
+      columns: 2;
+      -webkit-columns: 2;
+      -moz-columns: 2;
+    }
+  }
+}
+@media screen and (max-width: 400px) {
+  #linguise_popup {
+    ul {
+      columns: 1;
+      -webkit-columns: 1;
+      -moz-columns: 1;
+    }
+  }
+}
+
+/**
+ * Fix for elementor mobile sandwich
+ */
+@media (max-width: 1024px) {
+  .elementor-nav-menu--dropdown {
+    li:hover,a:hover {
+      & >.linguise_lang_name {
+        color: #fff !important;
+      }
+    }
+    .linguise_parent_menu_item .linguise_switcher_sub {
+      position: initial;
+
+      li a {
+        width: 100%;
+      }
+    }
+  }
+}
