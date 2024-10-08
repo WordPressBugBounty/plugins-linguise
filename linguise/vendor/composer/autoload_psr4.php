@@ -8,8 +8,8 @@ $baseDir = dirname($vendorDir);
 return array(
     'TypistTech\\Imposter\\Plugin\\' => array($vendorDir . '/typisttech/imposter-plugin/src'),
     'TypistTech\\Imposter\\' => array($vendorDir . '/typisttech/imposter/src'),
-    'Symfony\\Polyfill\\Php72\\' => array($vendorDir . '/symfony/polyfill-php72'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
+    'Symfony\\Polyfill\\Intl\\Normalizer\\' => array($vendorDir . '/symfony/polyfill-intl-normalizer'),
     'Symfony\\Polyfill\\Intl\\Idn\\' => array($vendorDir . '/symfony/polyfill-intl-idn'),
     'Linguise\\Script\\Core\\' => array($vendorDir . '/linguise/script-php/src'),
 );

@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.12
+ * Version:2.0.14
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -44,7 +44,7 @@ if (!$curlInstalled || !$phpVersionOk) {
     return;
 }
 
-define('LINGUISE_VERSION', '2.0.10');
+define('LINGUISE_VERSION', '2.0.14');
 define('LINGUISE_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('LINGUISE_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -379,7 +379,7 @@ add_action('parse_query', function ($query_object) {
         }
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.10');
+            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.14');
         }
 
         include_once('vendor' . DIRECTORY_SEPARATOR . 'autoload.php');

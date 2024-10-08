@@ -4,12 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitaafceeb82e229a52ac233411ee470a82
+class ComposerStaticInit1ff3c1f766e286a20d166f5e8bdcf992
 {
     public static $files = array (
-        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '25072dd6e2470089de65ae7bf11d3109' => __DIR__ . '/..' . '/symfony/polyfill-php72/bootstrap.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -20,8 +20,8 @@ class ComposerStaticInitaafceeb82e229a52ac233411ee470a82
         ),
         'S' => 
         array (
-            'Symfony\\Polyfill\\Php72\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
             'Symfony\\Polyfill\\Intl\\Idn\\' => 26,
         ),
         'L' => 
@@ -39,13 +39,13 @@ class ComposerStaticInitaafceeb82e229a52ac233411ee470a82
         array (
             0 => __DIR__ . '/..' . '/typisttech/imposter/src',
         ),
-        'Symfony\\Polyfill\\Php72\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-php72',
-        ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
         ),
         'Symfony\\Polyfill\\Intl\\Idn\\' => 
         array (
@@ -81,8 +81,12 @@ class ComposerStaticInitaafceeb82e229a52ac233411ee470a82
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Updater' => __DIR__ . '/..' . '/linguise/script-php/src/Updater.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Url' => __DIR__ . '/..' . '/linguise/script-php/src/Url.php',
         'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Idn\\Idn' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/Idn.php',
+        'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Idn\\Info' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/Info.php',
+        'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Idn\\Resources\\unidata\\DisallowedRanges' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/Resources/unidata/DisallowedRanges.php',
+        'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Idn\\Resources\\unidata\\Regex' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/Resources/unidata/Regex.php',
+        'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Normalizer.php',
         'Linguise\\Vendor\\Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
-        'Linguise\\Vendor\\Symfony\\Polyfill\\Php72\\Php72' => __DIR__ . '/..' . '/symfony/polyfill-php72/Php72.php',
+        'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'TypistTech\\Imposter\\ArrayUtil' => __DIR__ . '/..' . '/typisttech/imposter/src/ArrayUtil.php',
         'TypistTech\\Imposter\\Config' => __DIR__ . '/..' . '/typisttech/imposter/src/Config.php',
         'TypistTech\\Imposter\\ConfigCollection' => __DIR__ . '/..' . '/typisttech/imposter/src/ConfigCollection.php',
@@ -108,9 +112,9 @@ class ComposerStaticInitaafceeb82e229a52ac233411ee470a82
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitaafceeb82e229a52ac233411ee470a82::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitaafceeb82e229a52ac233411ee470a82::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitaafceeb82e229a52ac233411ee470a82::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1ff3c1f766e286a20d166f5e8bdcf992::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1ff3c1f766e286a20d166f5e8bdcf992::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit1ff3c1f766e286a20d166f5e8bdcf992::$classMap;
 
         }, null, ClassLoader::class);
     }
