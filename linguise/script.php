@@ -7,7 +7,7 @@ if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
 }
 
 if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-    define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.14');
+    define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.15');
 }
 
 ini_set('display_errors', false);
