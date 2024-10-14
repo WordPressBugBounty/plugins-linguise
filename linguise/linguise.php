@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.15
+ * Version:2.0.16
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -44,7 +44,7 @@ if (!$curlInstalled || !$phpVersionOk) {
     return;
 }
 
-define('LINGUISE_VERSION', '2.0.15');
+define('LINGUISE_VERSION', '2.0.16');
 define('LINGUISE_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('LINGUISE_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -235,7 +235,7 @@ if (wp_doing_ajax()) {
 
 // fixme: should not be a global script variable
 $languages_names = \Linguise\WordPress\Helper::getLanguagesInfos();
-
+include_once plugin_dir_path(__FILE__) . 'src' . DIRECTORY_SEPARATOR .'constants.php';
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'install.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'switcher.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php');
@@ -379,7 +379,7 @@ add_action('parse_query', function ($query_object) {
         }
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.15');
+            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.16');
         }
 
         include_once('vendor' . DIRECTORY_SEPARATOR . 'autoload.php');

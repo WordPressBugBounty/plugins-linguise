@@ -58,7 +58,7 @@ if ($linguise_options['woocommerce_emails_translation']) {
         }
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.15');
+            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.16');
         }
 
         include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -163,7 +163,7 @@ if (!empty($_GET['linguise_language']) && $_GET['linguise_language'] !== $lingui
         }
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.15');
+            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.16');
         }
 
         include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -322,3 +322,143 @@ add_action('wp_loaded', function () {
     wp_enqueue_script('linguise_woocommerce_cart_fragments');
     wp_add_inline_script('linguise_woocommerce_cart_fragments', $script);
 });
+
+/**
+ * Check if klarna checkout was activate
+ *
+ * @return boolean
+ */
+function linguise_woo_is_klarna_active()
+{
+    if (!is_plugin_active('klarna-checkout-for-woocommerce/klarna-checkout-for-woocommerce.php')) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Map linguise language with Klarna Checkout lang.
+ * https://docs.klarna.com/klarna-checkout/additional-resources/available-languages/
+ *
+ * @param string $linguiseLang String language code
+ *
+ * @return string
+ */
+function linguise_woo_get_klarna_language($linguiseLang)
+{
+    // linguise X Klarna lang
+    $mapLanguages = [
+        'da' => 'da', // Danish
+        'nl' => 'nl', // Dutch
+        'en' => 'en', // English
+        'fi' => 'fi', // Finish
+        'fr' => 'fr', // French
+        'de' => 'de', // German
+        'it' => 'it', // Italian
+        'no' => 'nb', // Norwegian (Bokmål)
+        'pl' => 'pl', // Polish
+        'pt' => 'pt', // Portuguese
+        'es' => 'es', // Spanish
+        'sv' => 'sv', // Swedish
+    ];
+
+    // fallback, use klarna language
+    if (!array_key_exists($linguiseLang, $mapLanguages)) {
+        return false;
+    }
+
+    return $mapLanguages[$linguiseLang];
+}
+
+add_filter('kco_locale', function ($locale) {
+    if (!linguise_woo_is_klarna_active()) {
+        return $locale;
+    }
+    
+    $language = WPHelper::getLanguage();
+    
+    // fallback, use Klarna language
+    if (!$language) {
+        return $locale;
+    }
+
+    $klarnaLanguage = linguise_woo_get_klarna_language($language);
+
+    if (!$klarnaLanguage) {
+        return $locale;
+    }
+
+    return $klarnaLanguage;
+}, 1);
+
+add_filter('kco_additional_checkboxes', function ($additional_checkboxes) {
+    if (!linguise_woo_is_klarna_active()) {
+        return $additional_checkboxes;
+    }
+
+    foreach ($additional_checkboxes as $index => $checkbox) {
+        if ($checkbox['id'] === 'terms_and_conditions') {
+            $content = '<html><head></head><body>';
+            $content .= $additional_checkboxes[$index]['text'];
+            $content .= '</body></html>';
+
+            $language = WPHelper::getLanguage();
+
+            if ($language === null) {
+                return $additional_checkboxes;
+            }
+            
+            $klarnaLanguage = linguise_woo_get_klarna_language($language);
+            // language is not supported by klarna, do not tranlate,let it as is
+            if (!$klarnaLanguage) {
+                return $additional_checkboxes;
+            }
+
+            include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+
+            linguiseInitializeConfiguration();
+
+            $options = linguiseGetOptions();
+            Configuration::getInstance()->set('token', $options['token']);
+
+            $boundary = new Boundary();
+            $request = Request::getInstance();
+
+            $boundary->addPostFields('version', Processor::$version);
+            $boundary->addPostFields('url', $request->getBaseUrl());
+            $boundary->addPostFields('language', $language); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action
+            $boundary->addPostFields('requested_path', '/');
+            $boundary->addPostFields('content', $content);
+            $boundary->addPostFields('token', Configuration::getInstance()->get('token'));
+            $boundary->addPostFields('ip', Helper::getIpAddress());
+            $boundary->addPostFields('response_code', 200);
+            $boundary->addPostFields('user_agent', !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
+
+            $ch = curl_init();
+
+            list($translated_content, $response_code) = Translation::getInstance()->_translate($ch, $boundary);
+
+            if (!$translated_content || $response_code !== 200) {
+                // We failed to translate
+                return $additional_checkboxes;
+            }
+
+            curl_close($ch);
+
+            $result = json_decode($translated_content);
+            
+            preg_match('/<body>(.*)<\/body>/s', $result->content, $matches);
+            
+            if (!$matches) {
+                return $additional_checkboxes;
+            }
+
+            $additional_checkboxes[$index]['text'] = $matches[1];
+
+            break;
+        }
+    }
+
+    return $additional_checkboxes;
+}, 1);
