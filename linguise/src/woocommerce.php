@@ -58,7 +58,7 @@ if ($linguise_options['woocommerce_emails_translation']) {
         }
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.16');
+            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.17');
         }
 
         include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -163,7 +163,7 @@ if (!empty($_GET['linguise_language']) && $_GET['linguise_language'] !== $lingui
         }
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.16');
+            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.17');
         }
 
         include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
