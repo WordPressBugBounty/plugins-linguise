@@ -6,10 +6,6 @@ if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
     define('LINGUISE_SCRIPT_TRANSLATION', true);
 }
 
-if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-    define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.17');
-}
-
 ini_set('display_errors', false);
 
 require_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');

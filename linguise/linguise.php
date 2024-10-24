@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.17
+ * Version:2.0.18
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -18,6 +18,7 @@ use Linguise\Vendor\Linguise\Script\Core\Database;
 defined('ABSPATH') || die('');
 
 include_once('src/Helper.php');
+include_once plugin_dir_path(__FILE__) . 'src' . DIRECTORY_SEPARATOR .'constants.php';
 
 // Check plugin requirements
 $curlInstalled = function_exists('curl_version');
@@ -44,7 +45,6 @@ if (!$curlInstalled || !$phpVersionOk) {
     return;
 }
 
-define('LINGUISE_VERSION', '2.0.17');
 define('LINGUISE_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('LINGUISE_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -143,7 +143,8 @@ function linguiseInitializeConfiguration()
     // Set base directory to Wordpress root
     Configuration::getInstance()->set('base_dir', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
 
-    $token = Database::getInstance()->retrieveWordpressOption('token', $_SERVER['HTTP_HOST']);
+    $host = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : wp_parse_url(site_url(), PHP_URL_HOST);
+    $token = Database::getInstance()->retrieveWordpressOption('token', $host);
 
     // Data folder in script folder
     $data_folder_in_script_folder = __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR . md5('data' . $token);
@@ -235,7 +236,7 @@ if (wp_doing_ajax()) {
 
 // fixme: should not be a global script variable
 $languages_names = \Linguise\WordPress\Helper::getLanguagesInfos();
-include_once plugin_dir_path(__FILE__) . 'src' . DIRECTORY_SEPARATOR .'constants.php';
+
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'install.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'switcher.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php');
@@ -376,10 +377,6 @@ add_action('parse_query', function ($query_object) {
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
             define('LINGUISE_SCRIPT_TRANSLATION', 1);
-        }
-
-        if (!defined('LINGUISE_SCRIPT_TRANSLATION_VERSION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION_VERSION', 'wordpress_plugin/2.0.17');
         }
 
         include_once('vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
