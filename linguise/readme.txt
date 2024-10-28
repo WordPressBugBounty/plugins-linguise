@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.6
-Stable tag:2.0.18
+Stable tag:2.0.19
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +101,10 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.0.19 =
+- Fix: Dynamic translation should ignore live editor
+- Fix: Cache get wiped on dynamic translation
+
 = 2.0.18 =
 - Fix: PHP Error on WP CRON 
 
