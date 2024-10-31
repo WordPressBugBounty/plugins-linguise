@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.20
+ * Version:2.0.21
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -457,6 +457,10 @@ function linguiseFirstHook()
     if (!defined('WP_ROCKET_WHITE_LABEL_FOOTPRINT')) {
         define('WP_ROCKET_WHITE_LABEL_FOOTPRINT', true);
     }
+
+    // Reset $wp_rewrite to avoid issues with WP-Rocket
+    // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- This is a WP Global variable override
+    $GLOBALS['wp_rewrite'] = new \WP_Rewrite();
 
     include_once('script.php');
 }
