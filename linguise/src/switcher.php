@@ -162,8 +162,11 @@ add_action('init', function () use ($languages_names) {
 
     add_action('linguise_load_scripts', function ($config) {
         global $linguise_scripts;
-    
-        if (!$linguise_scripts) {
+
+        // do not load translate script for bricks edit page
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action
+        $isWpBrickEditPage = array_key_exists('bricks', $_GET) ? $_GET['bricks'] : false;
+        if (!$linguise_scripts && !$isWpBrickEditPage) {
             wp_enqueue_script('linguise_switcher', plugin_dir_url(dirname(__FILE__)) . '/assets/js/front.bundle.js', array(), LINGUISE_VERSION);
             wp_enqueue_style('linguise_switcher', plugin_dir_url(dirname(__FILE__)) . '/assets/css/front.bundle.css', array(), LINGUISE_VERSION);
 
