@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.24
+ * Version:2.0.26
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -227,6 +227,11 @@ function linguiseGetConfiguration()
 
 if (wp_doing_ajax()) {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
+    if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'bookingpress_front_save_appointment_booking') {
+        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
+    }
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
     if (empty($_REQUEST['action']) || strpos($_REQUEST['action'], 'wc_emailer') === false) {
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'debug.php');
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'cache.php');
@@ -243,7 +248,7 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'fron
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/browser_language.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'elementor.php');
-
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
 
