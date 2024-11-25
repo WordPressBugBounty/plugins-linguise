@@ -6,6 +6,61 @@ defined('LINGUISE_SCRIPT_TRANSLATION') or die();
 
 class CurlRequest
 {
+    /**
+     * Reads JSON input from the request body, and seeks back to the start after reading.
+     *
+     * Include fixes for https://github.com/php/php-src/issues/9441
+     *
+     * @return array|null|false Decoded JSON, null if no JSON, false if fail to read
+     */
+    private function readJSONInput()
+    {
+        if (isset($_SERVER['HTTP_CONTENT_TYPE']) && strpos($_SERVER['HTTP_CONTENT_TYPE'], 'application/json') === 0) {
+            $stream = fopen('php://input', 'r');
+
+            // Check if it's seeked already.
+            $pos = ftell($stream);
+            if ($pos === 0) {
+                // read to the end
+                $memory = stream_get_contents($stream);
+                if ($memory === false) {
+                    // fail to read
+                    fclose($stream);
+                    return false;
+                }
+
+                // Seek back to the start for further processing by other scripts
+                fseek($stream, 0);
+            } else {
+                // Seeked already, move back to start
+                $success = fseek($stream, 0);
+                if ($success !== 0) {
+                    // fail to seek
+                    return false;
+                }
+
+                $memory = stream_get_contents($stream);
+                if ($memory === false) {
+                    // fail to read, seek back to original $pos
+                    fseek($stream, $pos);
+                    fclose($stream);
+                    return false;
+                }
+
+                // Seek back to the original position
+                fseek($stream, $pos);
+            }
+
+            fclose($stream);
+            $decoded_json = json_decode($memory, true);
+            if ($decoded_json !== null) {
+                return $decoded_json;
+            }
+
+            return null;
+        }
+    }
+
     public function makeRequest()
     {
         session_write_close(); // Make sure to close session that could prevent curl to timeout
@@ -61,6 +116,14 @@ class CurlRequest
                 // fallback for empty HTTP_CONTENT_TYPE variable
                 $post_fields = http_build_query($post_fields);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+            } else if (!count($post_fields) && isset($_SERVER['HTTP_CONTENT_TYPE']) && strpos($_SERVER['HTTP_CONTENT_TYPE'], 'application/json') === 0) {
+                // handling for JSON content type, check if the $post_fields is empty and if the content type is application/json(; charset=UTF-8)
+                $json_data = $this->readJSONInput();
+                if (!empty($json_data)) {
+                    // Valid JSON
+                    $post_fields = json_encode($json_data);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+                }
             }
             //fixme: handle x-www-form-urlencoded  form-data and raw https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
         }
@@ -146,7 +209,8 @@ class CurlRequest
         $content_type = $response->getHeader('Content-Type');
         $content_type = explode(';', $content_type)[0];
 
-        if ($response_code === 200 && $content_type === 'application/json') {
+        // Check if JSON response (include utf-8 charset)
+        if ($response_code === 200 && strpos($content_type, 'application/json') === 0) {
             $response->setResponseCode($response_code);
             $response->setContent($body);
             $response->end();
