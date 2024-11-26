@@ -77,7 +77,7 @@ class LinguiseBrowserLanguage
             return;
         }
 
-        $base = rtrim(linguiseForceRelativeUrl(site_url()), '/');
+        $base = rtrim(linguiseForceRelativeUrl(linguiseGetSite()), '/');
         $original_path = rtrim(substr(rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'), strlen($base)), '/');
         $protocol = 'http';
         if (strpos($home_url, 'https') === 0) {

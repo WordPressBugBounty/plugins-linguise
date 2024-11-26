@@ -49,7 +49,9 @@ add_action('init', function () use ($languages_names) {
         $trailing_slashes = '';
     }
 
-    $base = rtrim(linguiseForceRelativeUrl(site_url()), '/');
+    $site_url = linguiseGetSite();
+
+    $base = rtrim(linguiseForceRelativeUrl($site_url), '/');
     $config = array_merge(
         [
             'languages' => $language_list,
@@ -67,9 +69,9 @@ add_action('init', function () use ($languages_names) {
 
     if (!empty($linguise_options['alternate_link'])) {
         $scheme = !empty($_SERVER['HTTPS']) ? 'https' : 'http';
-        $host = parse_url(site_url(), PHP_URL_HOST);
+        $host = parse_url($site_url, PHP_URL_HOST);
         $path = $config['original_path'];
-        $query = parse_url(site_url(), PHP_URL_QUERY);
+        $query = parse_url($site_url, PHP_URL_QUERY);
         $alternates = $language_list;
         $alternates['x-default'] = 'x-default';
 

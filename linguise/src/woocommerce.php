@@ -235,7 +235,8 @@ if (!empty($_GET['linguise_language']) && $_GET['linguise_language'] !== $lingui
     add_filter('woocommerce_update_order_review_fragments', 'linguiseUpdateWooCommerceFragments', 1000, 1);
     add_filter('woocommerce_add_to_cart_fragments', 'linguiseUpdateWooCommerceFragments', 1000, 1);
     add_filter('woocommerce_get_return_url', function ($url, $order) {
-        $siteUrl = site_url();
+        // TODO: Need testing
+        $siteUrl = linguiseGetSite();
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action, also $_GET['linguise_language'] is verified previously
         return preg_replace('/^' . preg_quote($siteUrl, '/') . '/', $siteUrl . '/' . $_GET['linguise_language'], $url);
     }, 10, 2);
@@ -247,7 +248,8 @@ if (!empty($_GET['linguise_language']) && $_GET['linguise_language'] !== $lingui
             return $url;
         }
 
-        $siteUrl = site_url();
+        // TODO: Need testing
+        $siteUrl = linguiseGetSite();
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action, also $_GET['linguise_language'] is verified previously
         return preg_replace('/^' . preg_quote($siteUrl, '/') . '/', $siteUrl . '/' . $_GET['linguise_language'], $url);
     }, 10, 4);

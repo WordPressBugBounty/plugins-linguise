@@ -101,7 +101,7 @@ foreach ($languages_names as $language_code => $language) {
                         'linguise'
                     ),
                     '<a href="https://dashboard.linguise.com/account/register" target="_blank">' . esc_html__('Register an account', 'linguise') . '</a>',
-                    '<strong>' . esc_html(get_site_url()) . '</strong>'
+                    '<strong>' . esc_html(linguiseGetSite()) . '</strong>'
                 );
                 ?>
         </p>

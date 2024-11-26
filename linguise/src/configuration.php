@@ -106,7 +106,7 @@ class LinguiseConfiguration
             if ($old_options['token'] !== $token && $token !== '') {
                 $args  = array(
                     'method'              => 'GET',
-                    'headers'             => array('Referer' => site_url(), 'authorization' => $token)
+                    'headers'             => array('Referer' => linguiseGetSite(), 'authorization' => $token)
                 );
 
                 $result =  wp_remote_get($config_api_url, $args);
@@ -128,7 +128,7 @@ class LinguiseConfiguration
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
                         $errors[] = [
                             'type' => 'error',
-                            'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), site_url()),
+                            'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), linguiseGetSite()),
                         ];
                     } else {
                         $errors[] = [
@@ -157,7 +157,7 @@ class LinguiseConfiguration
             if ($dynamic_translations['enabled'] === 1 && empty($dynamic_translations['public_key']) && !$token_changed && $token !== '') {
                 $args  = array(
                     'method'              => 'GET',
-                    'headers'             => array('Referer' => site_url(), 'authorization' => $token)
+                    'headers'             => array('Referer' => linguiseGetSite(), 'authorization' => $token)
                 );
 
                 $result =  wp_remote_get($config_api_url, $args);
@@ -172,7 +172,7 @@ class LinguiseConfiguration
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
                         $errors[] = [
                             'type' => 'error',
-                            'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), site_url()),
+                            'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), linguiseGetSite()),
                         ];
                     } else {
                         $errors[] = [

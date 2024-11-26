@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.29
+ * Version:2.0.30
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -55,6 +55,24 @@ register_activation_hook(__FILE__, function () {
 });
 
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'install.php');
+
+/**
+ * Return the site URL, or the site URL with the given path.
+ *
+ * Wraps `home_url` if exists, otherwise use `site_url`.
+ *
+ * @param string $path The path to add to the site URL.
+ * @param string|null $scheme The scheme to use (http or https).
+ *
+ * @return string
+ */
+function linguiseGetSite($path = '', $scheme = \null)
+{
+    if (function_exists('home_url')) {
+        return home_url($path, $scheme);
+    }
+    return site_url($path, $scheme);
+}
 
 /**
  * Get options
@@ -143,7 +161,7 @@ function linguiseInitializeConfiguration()
     // Set base directory to Wordpress root
     Configuration::getInstance()->set('base_dir', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
 
-    $host = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : wp_parse_url(site_url(), PHP_URL_HOST);
+    $host = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : wp_parse_url(linguiseGetSite(), PHP_URL_HOST);
     $token = Database::getInstance()->retrieveWordpressOption('token', $host);
 
     // Data folder in script folder
@@ -389,7 +407,7 @@ add_action('parse_query', function ($query_object) {
         Configuration::getInstance()->set('cms', 'wordpress');
         Configuration::getInstance()->set('token', $options['token']);
 
-        $translation = \Linguise\Vendor\Linguise\Script\Core\Translation::getInstance()->translateJson(['search' => $raw_search], site_url(), $linguise_original_language, '/');
+        $translation = \Linguise\Vendor\Linguise\Script\Core\Translation::getInstance()->translateJson(['search' => $raw_search], linguiseGetSite(), $linguise_original_language, '/');
 
         if (empty($translation->search)) {
             return;
@@ -434,7 +452,7 @@ function linguiseFirstHook()
 
     include_once('vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-    $base_dir = site_url('', 'relative');
+    $base_dir = linguiseGetSite('', 'relative');
     $path = substr($_SERVER['REQUEST_URI'], strlen($base_dir));
 
     $path = parse_url('https://localhost/' . ltrim($path, '/'), PHP_URL_PATH);

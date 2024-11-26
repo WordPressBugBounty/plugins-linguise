@@ -46,7 +46,12 @@ class Request
             $this->base_directory = \JUri::getInstance()->root(true);
         } elseif (defined('ABSPATH') && function_exists('site_url')) {
             // We are in a WordPress installation
-            $this->base_directory = site_url( '', 'relative');
+            if (function_exists('home_url')) {
+                // When home_url exist, use it as it give better and correct result
+                $this->base_directory = home_url( '', 'relative' );
+            } else {
+                $this->base_directory = site_url( '', 'relative' );
+            }
         } elseif (in_array(Configuration::getInstance()->get('cms'), ['laravel', 'magento'])) {
             // We are in a Laravel or Magento installation
             $this->base_directory = '';
@@ -153,5 +158,4 @@ class Request
 
         return $this->getProtocol() . '://' . $this->getHostname() . $this->getBaseDir() . rtrim($non_translated_url, '/') . $this->getTrailingSlashes() . $this->getQuery(true);
     }
-
 }
