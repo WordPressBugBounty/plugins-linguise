@@ -64,8 +64,10 @@ add_action('wp_ajax_linguise_disable_debug', function () {
 
     check_admin_referer('_linguise_nonce_');
 
+    linguiseSwitchMainSite();
     $options = linguiseGetOptions();
     $options['debug'] = false;
     update_option('linguise_options', $options);
+    linguiseRestoreMultisite();
     wp_send_json_success('Debug disabled!');
 });

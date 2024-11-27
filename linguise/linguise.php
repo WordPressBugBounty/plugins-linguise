@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.30
+ * Version:2.0.31
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -57,11 +57,57 @@ register_activation_hook(__FILE__, function () {
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'install.php');
 
 /**
+ * Check if we are in subfolders multisite
+ *
+ * @return boolean
+ */
+function linguiseIsMultisiteFolder()
+{
+    // Is multisite subdomains mode or subfolders mode
+    $linguise_multisite_subdomains = defined('SUBDOMAIN_INSTALL') && SUBDOMAIN_INSTALL;
+
+    return is_multisite() && !$linguise_multisite_subdomains;
+}
+
+/**
+ * Switch Linguise to use main site information
+ *
+ * This will only switch if we are in subfolders multisite
+ *
+ * Remember to use linguiseRestoreMultisite() after
+ *
+ * @return void
+ */
+function linguiseSwitchMainSite()
+{
+    // Multisite compatible with subfolders install
+    if (linguiseIsMultisiteFolder()) {
+        $main_site = get_main_site_id(get_current_network_id());
+
+        switch_to_blog($main_site);
+    }
+}
+
+/**
+ * Restore Multisite
+ *
+ * This will only restore if we are in subfolders multisite
+ *
+ * @return void
+ */
+function linguiseRestoreMultisite()
+{
+    if (linguiseIsMultisiteFolder()) {
+        restore_current_blog();
+    }
+}
+
+/**
  * Return the site URL, or the site URL with the given path.
  *
  * Wraps `home_url` if exists, otherwise use `site_url`.
  *
- * @param string $path The path to add to the site URL.
+ * @param string      $path   The path to add to the site URL.
  * @param string|null $scheme The scheme to use (http or https).
  *
  * @return string
@@ -132,12 +178,20 @@ function linguiseGetOptions()
         // empty array that will be filled with the expert mode options
         'expert_mode' => [],
     );
+
+    // Switch to main site
+    linguiseSwitchMainSite();
+
     $options = get_option('linguise_options');
     if (!empty($options) && is_array($options)) {
         $options = array_merge($defaults, $options);
     } else {
         $options = $defaults;
     }
+
+    // Restore multisite
+    linguiseRestoreMultisite();
+
     return $options;
 }
 
@@ -161,6 +215,10 @@ function linguiseInitializeConfiguration()
     // Set base directory to Wordpress root
     Configuration::getInstance()->set('base_dir', realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
 
+    // Switch to main site
+    linguiseSwitchMainSite();
+
+    // Get token
     $host = array_key_exists('HTTP_HOST', $_SERVER) ? $_SERVER['HTTP_HOST'] : wp_parse_url(linguiseGetSite(), PHP_URL_HOST);
     $token = Database::getInstance()->retrieveWordpressOption('token', $host);
 
@@ -226,6 +284,8 @@ function linguiseInitializeConfiguration()
     foreach ($options['expert_mode'] as $key => $value) {
         Configuration::getInstance()->set($key, $value);
     }
+
+    linguiseRestoreMultisite();
 }
 
 /**

@@ -26,9 +26,11 @@ add_action('wp_ajax_linguise_clear_cache', function () {
     Configuration::getInstance()->set('cms', 'wordpress');
     Configuration::getInstance()->set('base_dir', realpath(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR  . '..' . DIRECTORY_SEPARATOR  . '..') . DIRECTORY_SEPARATOR);
 
+    linguiseSwitchMainSite();
     $token = Database::getInstance()->retrieveWordpressOption('token', $_SERVER['HTTP_HOST']);
     Configuration::getInstance()->set('token', $token);
     Configuration::getInstance()->set('data_dir', wp_upload_dir()['basedir'] . DIRECTORY_SEPARATOR . 'linguise'. DIRECTORY_SEPARATOR . md5('data' . $token));
+    linguiseRestoreMultisite();
 
     Cache::getInstance()->clearAll();
 });

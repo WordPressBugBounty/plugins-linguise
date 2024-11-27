@@ -86,7 +86,9 @@ class Helper
      */
     public static function isTranslatableLanguage($language)
     {
+        linguiseSwitchMainSite();
         $linguise_options = get_option('linguise_options');
+        linguiseRestoreMultisite();
 
         return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);
     }

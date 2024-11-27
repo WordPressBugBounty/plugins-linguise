@@ -49,7 +49,9 @@ add_action('init', function () use ($languages_names) {
         $trailing_slashes = '';
     }
 
+    linguiseSwitchMainSite();
     $site_url = linguiseGetSite();
+    linguiseRestoreMultisite();
 
     $base = rtrim(linguiseForceRelativeUrl($site_url), '/');
     $config = array_merge(
@@ -61,7 +63,6 @@ add_action('init', function () use ($languages_names) {
         ],
         $linguise_options
     );
-    
 
     // Remove content we don't want to share
     // fixme: we should remove all config which is not actually used

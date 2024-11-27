@@ -43,6 +43,18 @@ $validConfiguration['api_port'] = [
     'key' => 'api_port'
 ];
 
+$is_multsite_and_not_main = false;
+if (is_multisite()) {
+    $current_network_id = get_current_network_id();
+    $main_site_id = get_main_site_id($current_network_id);
+    $current_blog_id = get_current_blog_id();
+    $is_multsite_and_not_main = $main_site_id !== $current_blog_id;
+}
+
+linguiseSwitchMainSite();
+$wp_main_site = admin_url('admin.php?page=linguise&ling_mode=expert');
+linguiseRestoreMultisite();
+
 /**
  * Convert key to "word"-like
  *
@@ -58,6 +70,22 @@ function keyToWord($key)
 ?>
 
 <div class="linguise-main-wrapper" style="visibility: hidden">
+<?php if ($is_multsite_and_not_main) : ?>
+    <div class="linguise-multisite-backdrop">
+        <!-- multisite warning -->
+        <div class="linguise-multisite-wrapper">
+            <div class="linguise-multisite-text">
+                <?php echo esc_html__('Please modify Linguise settings in the main site.', 'linguise'); ?>
+            </div>
+            <!-- Button to go back to main site -->
+            <div class="debug-button-wrapper">
+                <a href="<?php echo esc_url($wp_main_site); ?>" class="linguise-button blue-button waves-effect waves-light small-radius small-button linguise-button-multisite">
+                    <?php echo esc_html__('Go back', 'linguise'); ?>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
     <div class="linguise-left-panel-toggle">
         <i class="dashicons dashicons-leftright linguise-left-panel-toggle-icon"></i>
     </div>
