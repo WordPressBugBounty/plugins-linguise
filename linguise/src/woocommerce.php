@@ -115,6 +115,15 @@ if ($linguise_options['woocommerce_emails_translation']) {
 if (!empty($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE']) && $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'] !== $linguise_options['default_language'] && in_array($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'], $linguise_options['enabled_languages'])) {
     add_filter('woocommerce_ajax_get_endpoint', function ($endpoint, $request) {
         if ($request === 'checkout') {
+            /**
+             * Compability for FunnelKit checkout
+             *
+             * @see https://wordpress.org/plugins/funnel-builder/
+             */
+            if (is_plugin_active('funnel-builder/funnel-builder.php')) {
+                return add_query_arg('linguise_language', $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'], $endpoint);
+            }
+
             return str_replace('checkout', 'checkout&linguise_language=' . $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'], $endpoint);
         }
         return str_replace('%%endpoint%%', '%%endpoint%%&linguise_language=' . $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'], $endpoint);
