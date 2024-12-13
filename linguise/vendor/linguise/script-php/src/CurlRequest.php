@@ -77,31 +77,7 @@ class CurlRequest
             $post_fields = array();
             if (!empty($_FILES)) {
                 foreach ($_FILES as $file_name => $file_value) {
-
-                    // Check if this a multiple file upload with the same name
-                    if (is_array($file_value['name'])) {
-                        foreach ($file_value['name'] as $index => $file_name_value) {
-                            if(!$file_value['tmp_name'][$index]){
-                                continue;
-                            }
-
-                            $post_fields[$file_name . '[' . $index . ']'] = curl_file_create(
-                                realpath($file_value['tmp_name'][$index]),
-                                $file_value['type'][$index],
-                                $file_name_value
-                            );
-                        }
-                    } else {
-                        if(!$file_value['tmp_name']){
-                            continue;
-                        }
-
-                        $post_fields[$file_name] = curl_file_create(
-                            realpath($file_value['tmp_name']),
-                            $file_value['type'],
-                            $file_value['name']
-                        );
-                    }
+                    $post_fields[$file_name] = '@' . realpath($file_value['tmp_name']) . ';filename=' . $file_value['name'] . ';type=' . $file_value['type'];
                 }
             }
 
@@ -118,13 +94,13 @@ class CurlRequest
                     $post_fields = http_build_query($post_fields);
                 } elseif (strpos($_SERVER['HTTP_CONTENT_TYPE'], 'multipart/form-data') === 0) {
                     $boundary = new Boundary();
+                    foreach ($post_fields as $post_field_name => $post_field_value) {
+                        $boundary->addPostFields($post_field_name, $post_field_value);
+                    }
+                    $post_fields = $boundary->getContent();
                     $input_headers[] = 'Content-Type: multipart/form-data; boundary=' . $boundary->getBoundary();
                 }
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-            } else if(count($post_fields) && isset($_SERVER['CONTENT_TYPE']) ) {
-                if (array_key_exists('CONTENT_TYPE', $_SERVER) && strpos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') === 0) {
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-                }
             } else if (count($post_fields)) {
                 // fallback for empty HTTP_CONTENT_TYPE variable
                 $post_fields = http_build_query($post_fields);
