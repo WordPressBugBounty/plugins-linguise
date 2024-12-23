@@ -202,6 +202,8 @@ class CurlRequest
         if ($response_code === 200 && strpos($content_type, 'application/json') === 0) {
             $response->setResponseCode($response_code);
             $response->setContent($body);
+            // So in Configuration[Local] we can modify JSON response if we want.
+            Hook::trigger('onJsonResponse');
             $response->end();
         }
 
