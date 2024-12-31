@@ -67,6 +67,7 @@ class CurlRequest
         $ch = curl_init();
         $input_headers = array();
 
+        $skip_content_type = false;
         if (in_array($_SERVER['REQUEST_METHOD'], array('POST', 'PUT'))) {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 curl_setopt($ch, CURLOPT_POST, true);
@@ -75,11 +76,6 @@ class CurlRequest
             }
 
             $post_fields = array();
-            if (!empty($_FILES)) {
-                foreach ($_FILES as $file_name => $file_value) {
-                    $post_fields[$file_name] = '@' . realpath($file_value['tmp_name']) . ';filename=' . $file_value['name'] . ';type=' . $file_value['type'];
-                }
-            }
 
             if (!empty($_POST)) {
                 foreach ($_POST as $post_name => $post_value) {
@@ -87,25 +83,59 @@ class CurlRequest
                 }
             }
 
-            if (count($post_fields) && isset($_SERVER['HTTP_CONTENT_TYPE'])) {
-                if ($_SERVER['HTTP_CONTENT_TYPE'] === 'application/json') {
+            $content_type = isset($_SERVER['HTTP_CONTENT_TYPE']) ? $_SERVER['HTTP_CONTENT_TYPE'] : (isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '');
+            if (isset($_SERVER['CONTENT_TYPE']) && !isset($_SERVER['HTTP_CONTENT_TYPE']) && !empty($content_type)) {
+                // Set HTTP_CONTENT_TYPE
+                $_SERVER['HTTP_CONTENT_TYPE'] = $content_type;
+            }
+
+            if (count($post_fields) && !empty($content_type)) {
+                if (strpos($content_type, 'application/json') === 0) {
                     $post_fields = json_encode($post_fields);
-                } elseif ($_SERVER['HTTP_CONTENT_TYPE'] === 'application/x-www-form-urlencoded') {
+                } elseif (strpos($content_type, 'application/x-www-form-urlencoded') === 0) {
                     $post_fields = http_build_query($post_fields);
-                } elseif (strpos($_SERVER['HTTP_CONTENT_TYPE'], 'multipart/form-data') === 0) {
+                } elseif (strpos($content_type, 'multipart/form-data') === 0) {
                     $boundary = new Boundary();
                     foreach ($post_fields as $post_field_name => $post_field_value) {
                         $boundary->addPostFields($post_field_name, $post_field_value);
                     }
+
+                    // Add file here
+                    if (!empty($_FILES)) {
+                        foreach ($_FILES as $file_name => $file_value) {
+                            if (is_array($file_value['name'])) {
+                                foreach ($file_value['name'] as $index => $file_name_value) {
+                                    if (!$file_value['tmp_name'][$index]) {
+                                        continue;
+                                    }
+        
+                                    $boundary->addPostFile(
+                                        $file_name . '[' . $index . ']',
+                                        $file_value['tmp_name'][$index],
+                                        $file_name_value,
+                                        $file_value['type'][$index]
+                                    );
+                                }
+                            } else {
+                                if (!$file_value['tmp_name']) {
+                                    continue;
+                                }
+
+                                $boundary->addPostFile($file_name, $file_value['tmp_name'], $file_name, $file_value['type']);
+                            }
+                        }
+                    }
+
                     $post_fields = $boundary->getContent();
                     $input_headers[] = 'Content-Type: multipart/form-data; boundary=' . $boundary->getBoundary();
+                    $skip_content_type = true;
                 }
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
             } else if (count($post_fields)) {
                 // fallback for empty HTTP_CONTENT_TYPE variable
                 $post_fields = http_build_query($post_fields);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-            } else if (!count($post_fields) && isset($_SERVER['HTTP_CONTENT_TYPE']) && strpos($_SERVER['HTTP_CONTENT_TYPE'], 'application/json') === 0) {
+            } else if (!count($post_fields) && strpos($content_type, 'application/json') === 0) {
                 // handling for JSON content type, check if the $post_fields is empty and if the content type is application/json(; charset=UTF-8)
                 $json_data = $this->readJSONInput();
                 if (!empty($json_data)) {
@@ -123,6 +153,10 @@ class CurlRequest
 
         foreach ($_SERVER as $header_name => $header_value) {
             if (substr($header_name, 0, 5) !== 'HTTP_') {
+                continue;
+            }
+
+            if ($skip_content_type && $header_name === 'HTTP_CONTENT_TYPE') {
                 continue;
             }
 
@@ -228,6 +262,9 @@ class CurlRequest
                 // The url given is not a multilingual url, we need to translate it first
                 $redirected_url = Url::translateUrl($redirected_url);
             }
+
+            Hook::trigger('onBeforeRedirect');
+
             $response->setRedirect($redirected_url);
             $response->end();
         }

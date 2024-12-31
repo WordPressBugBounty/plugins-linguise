@@ -128,6 +128,11 @@ if (!empty($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE']) && $_SERVER['HTTP_LINGUI
         }
         return str_replace('%%endpoint%%', '%%endpoint%%&linguise_language=' . $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'], $endpoint);
     }, 10, 2);
+
+    add_action('woocommerce_customer_reset_password', function () {
+        $reset_pass_cookie = 'wp-resetpass-' . COOKIEHASH;
+        setcookie($reset_pass_cookie, ' ', time() - YEAR_IN_SECONDS, '/', COOKIE_DOMAIN, is_ssl(), true);
+    });
 }
 
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action

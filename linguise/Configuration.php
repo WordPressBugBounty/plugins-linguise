@@ -3,6 +3,7 @@
 namespace Linguise\Script;
 
 use Linguise\Vendor\Linguise\Script\Core\Response;
+use Linguise\Vendor\Linguise\Script\Core\Request;
 
 defined('LINGUISE_SCRIPT_TRANSLATION') || die('');
 
@@ -680,6 +681,31 @@ class Configuration
                         'value' => $value,
                     ]
                 ]);
+            }
+        }
+    }
+
+    /**
+     * Remove token after user set new password
+     *
+     * @return void
+     */
+    public static function onBeforeRedirect()
+    {
+        $response = Response::getInstance();
+        $cookies = $response->getCookies();
+        foreach ($cookies as $index => $cookie) {
+            if (strpos($cookie, 'wp-resetpass') !== false) {
+                $request = Request::getInstance();
+                $original_url = $request->getNonTranslatedUrl();
+
+                // Urs translation is on
+                if (strpos($original_url, $request->getPathname()) === false) {
+                    /**
+                     * If set cookie into translated page sometimes not working for Cyrillic alphabet, i.e: Russian
+                     */
+                    $cookies[$index]->setPath('/');
+                }
             }
         }
     }

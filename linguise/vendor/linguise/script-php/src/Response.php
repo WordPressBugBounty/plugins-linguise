@@ -171,6 +171,16 @@ class Response {
     }
 
     /**
+     * Get Cookies
+     * 
+     * @return array Cookies
+     */
+    public function getCookies()
+    {
+        return $this->cookies;
+    }
+
+    /**
      * Actually redirect
      */
     protected function redirect()

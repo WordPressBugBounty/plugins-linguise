@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.7
-Stable tag:2.0.38
+Stable tag:2.0.39
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +101,9 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.0.39 =
+- Fix: Forgot password not working in translation page
+
 = 2.0.38 =
 - Fix: WooCommerce issue: template system is broken when live editor is enabled
 

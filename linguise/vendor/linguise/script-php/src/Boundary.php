@@ -20,6 +20,12 @@ class Boundary
     protected $fields = [];
 
     /**
+     * Array of files to store
+     * @var array
+     */
+    protected $files = [];
+
+    /**
      * Post field content
      *
      * @var string
@@ -51,7 +57,31 @@ class Boundary
      */
     public function addPostFields($name, $value)
     {
-        $this->fields[$name] = $value;
+        // Check if value is array
+        if (is_array($value)) {
+            foreach ($value as $key => $val) {
+                $this->addPostFields($name.'['.$key.']', $val);
+            }
+        } else {
+            $this->fields[$name] = $value;
+        }
+    }
+
+    /**
+     * Add a field to the fields array
+     *
+     * @param $file_path
+     * @param $file_name
+     * @param $file_type
+     * @return void
+     */
+    public function addPostFile($name, $file_path, $file_name = null, $file_type = null)
+    {
+        $this->files[$name] = [
+            'path' => $file_path,
+            'name' => $file_name,
+            'type' => $file_type,
+        ];
     }
 
     /**
@@ -73,7 +103,20 @@ class Boundary
         $content = '';
         foreach ($this->fields as $name => $value) {
             $content .= '--'.$this->boundary."\r\n";
-            $content .= "Content-Disposition: form-data; name=\"".$name."\"\r\n\r\n".$value."\r\n";
+            $content .= "Content-Disposition: form-data; name=\"" . $name . "\"\r\n\r\n" . $value . "\r\n";
+        }
+        foreach ($this->files as $name => $file) {
+            $real_path = realpath($file['path']);
+            $post_filename = $file['name'] ?? basename($real_path);
+            $post_content_type = $file['type'] ?? mime_content_type($real_path);
+
+            $content .= '--'.$this->boundary."\r\n";
+            $content .= "Content-Disposition: form-data; name=\"" . $name . "\"; filename=\"" . $post_filename . "\"\r\n";
+            if (!empty($post_content_type)) {
+                $content .= "Content-Type: ".$post_content_type."\r\n";
+            }
+            $content .= "\r\n";
+            $content .= file_get_contents($real_path)."\r\n";
         }
         $content .= $this->endPostFields();
         return $content;
