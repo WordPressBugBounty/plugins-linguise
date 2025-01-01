@@ -98,7 +98,7 @@ class Mysql
     public function getInstallQuery($table_name)
     {
         return 'CREATE TABLE IF NOT EXISTS '. $table_name .' (
-                  `id` int(11) NOT NULL AUTO_INCREMENT,
+                  `id` BIGINT NOT NULL AUTO_INCREMENT,
                   `language` varchar(5) NOT NULL,
                   `source` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
                   `translation` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
