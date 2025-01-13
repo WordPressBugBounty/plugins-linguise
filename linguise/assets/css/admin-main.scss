@@ -825,7 +825,7 @@ div.wp-picker-holder {
 }
 
 .rounded {
-  background-image: url('../images/flags-rounded/en-us.svg');
+  background-image: url('../images/en-us.svg');
 }
 
 #translate_into_chosen {
@@ -1236,6 +1236,10 @@ div.wp-picker-holder {
   span {
     color: #4caf50;
     margin-right: 5px;
+
+    &.fail {
+      color: #f44336;
+    }
   }
 }
 
@@ -1492,6 +1496,22 @@ div.wp-picker-holder {
   font-weight: 700;
   padding: 1rem 1.5rem;
   border-radius: 5px;
+}
+
+.linguise-copy-button-area {
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+  user-select: none;
+  
+  &:hover {
+    opacity: 0.6;
+  }
+
+  > .linguise-copy-button {
+    font-size: 14px !important;
+    user-select: none;
+    margin-left: 2px;
+  }
 }
 
 /* WebKit and Opera browsers */

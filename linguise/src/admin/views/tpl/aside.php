@@ -30,8 +30,14 @@ foreach ($languages_enabled_param as $language) {
 $config = array_merge(array(
     'all_languages' => $languages_names,
     'languages' => $language_list,
+    'demo_mode' => true,
 ), $options);
+
+$configArray = array('vars' => array('configs' => $config));
 ?>
+<script id="config-script">
+    var linguise_configs = <?php echo json_encode($configArray); ?>;
+</script>
 <div class="content aside">
     <!--Start of Tawk.to Script-->
     <script type="text/javascript">
@@ -67,8 +73,7 @@ $config = array_merge(array(
         <li class="linguise-settings-option">
             <label class="linguise-setting-label label-bolder aside-label"
                    style="padding-left: 0"><?php esc_html_e('Language List Preview', 'linguise'); ?></label>
-            <div class="items-blocks linguise_preview"
-                 data-config="<?php echo esc_attr(htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8')) ?>">
+            <div class="items-blocks linguise_preview" id="dashboard-live-preview">
 
             </div>
         </li>

@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.0.40
+ * Version:2.0.48
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -329,6 +329,7 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'elem
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woo-stripe-payment.php');
 
 register_deactivation_hook(__FILE__, 'linguiseUnInstall');
 /**

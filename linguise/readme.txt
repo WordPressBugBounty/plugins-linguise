@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.7
-Stable tag:2.0.40
+Stable tag:2.0.48
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +101,31 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.0.48 =
+- Feature: Klarna issue: translate klarna for payment
+- Feature: Copy url to clipboard
+
+= 2.0.47 =
+- Feature: Replace all instance of shortcode and menu
+
+= 2.0.46 =
+- Feature: Replace all instance of shortcode and menu
+
+= 2.0.45 =
+- Feature: Replace all instance of shortcode and menu
+
+= 2.0.44 =
+- Improvement: Use Script-JS for switcher
+
+= 2.0.43 =
+- Improvement: Use Script-JS for switcher
+
+= 2.0.42 =
+- Improvement: Use Script-JS for switcher
+
+= 2.0.41 =
+- Improvement: Use Script-JS for switcher
+
 = 2.0.40 =
 - Fix: MYSQL issue: out of range value for column id
 

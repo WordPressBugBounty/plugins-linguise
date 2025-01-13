@@ -97,13 +97,16 @@ foreach ($languages_names as $language_code => $language) {
             <?php
                 echo sprintf(
                     esc_html__(
-                        '%1$s and copy your domain API key to activate the translation, use the domain %2$s .',
+                        '%1$s and copy your domain API key to activate the translation, use the domain %2$s',
                         'linguise'
                     ),
                     '<a href="https://dashboard.linguise.com/account/register" target="_blank">' . esc_html__('Register an account', 'linguise') . '</a>',
                     '<strong>' . esc_html(linguiseGetSite()) . '</strong>'
                 );
                 ?>
+            <span class="linguise-copy-button-area linguise-tippy" data-clipboard-text="<?php echo esc_attr(linguiseGetSite()) ?>" data-tippy="<?php esc_html_e('Copy to clipboard', 'linguise'); ?>">
+                <span class="material-icons linguise-copy-button">content_copy</span>
+            </span>
         </p>
         <div style="padding: 10px">
             <input type="text" class="linguise-input custom-input" name="linguise_options[token]"
