@@ -193,21 +193,16 @@ add_action('init', function () use ($languages_names) {
      * Create a shortcode to display linguise switcher
      */
     add_shortcode('linguise', function () use ($language_list, $config) {
-        do_action('linguise_load_scripts', $config);
-
-        $custom_css = linguiseRenderCustomCss($config);
-        wp_add_inline_style('linguise_switcher', $custom_css);
-
-        return '<div class="linguise_switcher_root"></div>';
+        return renderLinguiseShortcode($language_list, $config, true);
     });
 
-    add_action('wp_footer', function () use ($linguise_options) {
+    add_action('wp_footer', function () use ($language_list, $linguise_options, $config) {
         // Footer is an automatic flag switcher that will call the shortcode of linguise
         if (!$linguise_options['token'] || $linguise_options['add_flag_automatically'] !== 1) {
             return;
         }
 
-        echo do_shortcode('[linguise]');
+        echo renderLinguiseShortcode($language_list, $config);
     });
 });
 
@@ -253,6 +248,26 @@ function linguiseRenderCustomCss($options, $custom_css = '')
     }
 
     return $custom_css;
+}
+
+/**
+ * Render the actual linguise switcher
+ * 
+ * @param array $language_list The list of languages
+ * @param array $config        The configuration
+ * @param bool  $pin           Should we pin this in-place or follow the position of the flag that is defined.
+ */
+function renderLinguiseShortcode($language_list, $config, $pin = false) {
+    do_action('linguise_load_scripts', $config);
+
+    $custom_css = linguiseRenderCustomCss($config);
+    wp_add_inline_style('linguise_switcher', $custom_css);
+
+    if ($pin) {
+        return '<div class="linguise_switcher_root linguise_menu_root"></div>';
+    }
+
+    return '<div class="linguise_switcher_root"></div>';
 }
 
 /**
