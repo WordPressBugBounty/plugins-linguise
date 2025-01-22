@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.0
+ * Version:2.1.1
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -14,6 +14,7 @@
 
 use Linguise\Vendor\Linguise\Script\Core\Configuration;
 use Linguise\Vendor\Linguise\Script\Core\Database;
+use Linguise\WordPress\Helper as WPHelper;
 
 defined('ABSPATH') || die('');
 
@@ -324,6 +325,7 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'inst
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'switcher.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/browser_language.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'FragmentHandler.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'elementor.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
@@ -491,6 +493,7 @@ function linguiseFirstHook()
     if ($run) {
         return;
     }
+
     $run = true;
 
     $linguise_original_language = \Linguise\WordPress\Helper::getLanguage();
@@ -548,8 +551,33 @@ function linguiseFirstHook()
 
     include_once('script.php');
 }
+
+/**
+ * Hook to change locale based on Referer or HTTP header
+ */
+function linguiseHookLanguage()
+{
+    if (isset($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'])) {
+        $new_locale = WPHelper::mapLanguageToWordPressLocale($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE']);
+        if (!empty($new_locale)) {
+            switch_to_locale($new_locale);
+        }
+        return;
+    }
+
+    $lang_referer = WPHelper::getLanguageFromReferer();
+    if (!empty($lang_referer)) {
+        $new_locale = WPHelper::mapLanguageToWordPressLocale($lang_referer);
+        if (!empty($new_locale)) {
+            switch_to_locale($lang_referer);
+        }
+        return;
+    }
+}
+
 add_action('muplugins_loaded', 'linguiseFirstHook', 1);
 add_action('plugins_loaded', 'linguiseFirstHook', 1);
+add_action('plugins_loaded', 'linguiseHookLanguage', 2);
 add_action('init', function () {
     load_plugin_textdomain('linguise', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });

@@ -39,25 +39,29 @@
     "name": "Belarusian",
     "original_name": "Беларуская",
     "code": "be",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "bel"
   },
   "bn": {
     "name": "Bengali",
     "original_name": "বাংলা",
     "code": "bn",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "bn_BD"
   },
   "bs": {
     "name": "Bosnian",
     "original_name": "Bosanski",
     "code": "bs",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "bs_BA"
   },
   "bg": {
     "name": "Bulgarian",
     "original_name": "Български",
     "code": "bg",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "bg_BG"
   },
   "ca": {
     "name": "Catalan",
@@ -75,25 +79,29 @@
     "name": "Czech",
     "original_name": "Čeština",
     "code": "cs",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "cs_CZ"
   },
   "da": {
     "name": "Danish",
     "original_name": "Dansk",
     "code": "da",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "da_DK"
   },
   "nl": {
     "name": "Dutch",
     "original_name": "Nederlands",
     "code": "nl",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "nl_NL"
   },
   "en": {
     "name": "English",
     "original_name": "English",
     "code": "en",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "en_US"
   },
   "eo": {
     "name": "Esperanto",
@@ -111,7 +119,8 @@
     "name": "Filipino",
     "original_name": "Pilipino",
     "code": "tl",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "fi": {
     "name": "Finnish",
@@ -123,19 +132,22 @@
     "name": "French",
     "original_name": "Français",
     "code": "fr",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "fr_FR"
   },
   "ka": {
     "name": "Georgian",
     "original_name": "ქართული",
     "code": "ka",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ka_GE"
   },
   "de": {
     "name": "German",
     "original_name": "Deutsch",
     "code": "de",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "de_DE"
   },
   "el": {
     "name": "Greek",
@@ -154,37 +166,43 @@
     "name": "Haitian",
     "original_name": "Kreyòl Ayisyen",
     "code": "ht",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "ha": {
     "name": "Hausa",
     "original_name": "هَوُسَ",
     "code": "ha",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "he": {
     "name": "Hebrew",
     "original_name": "עברית",
     "code": "he",
-    "rtl": true
+    "rtl": true,
+    "wp_code": "he_IL"
   },
   "hi": {
     "name": "Hindi",
     "original_name": "हिन्दी",
     "code": "hi",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "hi_IN"
   },
   "hu": {
     "name": "Hungarian",
     "original_name": "Magyar",
     "code": "hu",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "hu_HU"
   },
   "id": {
     "name": "Indonesian",
     "original_name": "Bahasa Indonesia",
     "code": "id",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "id_ID"
   },
   "ga": {
     "name": "Irish",
@@ -196,19 +214,22 @@
     "name": "Igbo",
     "original_name": "Igbo",
     "code": "ig",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "is": {
     "name": "Icelandic",
     "original_name": "Íslenska",
     "code": "is",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "is_IS"
   },
   "it": {
     "name": "Italian",
     "original_name": "Italiano",
     "code": "it",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "it_IT"
   },
   "ja": {
     "name": "Japanese",
@@ -238,19 +259,22 @@
     "name": "Korean",
     "original_name": "한국어",
     "code": "ko",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ko_KR"
   },
   "ku": {
     "name": "Kurdish",
     "original_name": "Kurdî",
     "code": "ku",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "lb": {
     "name": "Luxembourgish",
     "original_name": "Lëtzebuergesch",
     "code": "lb",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "lb_LU"
   },
   "lo": {
     "name": "Lao",
@@ -262,7 +286,8 @@
     "name": "Lithuanian",
     "original_name": "Lietuvių",
     "code": "lt",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "lt_LT"
   },
   "lv": {
     "name": "Latvian",
@@ -274,31 +299,36 @@
     "name": "Macedonian",
     "original_name": "Македонски",
     "code": "mk",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "mk_MK"
   },
   "mg": {
     "name": "Malagasy",
     "original_name": "Malagasy",
     "code": "mg",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "mg_MG"
   },
   "ms": {
     "name": "Malay",
     "original_name": "Bahasa Melayu",
     "code": "ms",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ms_MY"
   },
   "ml": {
     "name": "Malayalam",
     "original_name": "മലയാളം",
     "code": "ml",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ml_IN"
   },
   "mt": {
     "name": "Maltese",
     "original_name": "Malti",
     "code": "mt",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "mr": {
     "name": "Marathi",
@@ -316,31 +346,36 @@
     "name": "Nepali",
     "original_name": "नेपाली",
     "code": "ne",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ne_NP"
   },
   "no": {
     "name": "Norwegian",
     "original_name": "Norsk",
     "code": "no",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "nb_NO"
   },
   "pa": {
     "name": "Panjabi",
     "original_name": "ਪੰਜਾਬੀ",
     "code": "pa",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "pa_IN"
   },
   "fa": {
     "name": "Persian",
     "original_name": "فارسی",
     "code": "fa",
-    "rtl": true
+    "rtl": true,
+    "wp_code": "fa_IR"
   },
   "pl": {
     "name": "Polish",
     "original_name": "Polski",
     "code": "pl",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "pl_PL"
   },
   "ps": {
     "name": "Pashto",
@@ -352,55 +387,64 @@
     "name": "Portuguese",
     "original_name": "Português",
     "code": "pt",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "pt_BR"
   },
   "ro": {
     "name": "Romanian",
     "original_name": "Română",
     "code": "ro",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ro_RO"
   },
   "ru": {
     "name": "Russian",
     "original_name": "Русский",
     "code": "ru",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ru_RU"
   },
   "sm": {
     "name": "Samoan",
     "original_name": "Gagana Sāmoa",
     "code": "sm",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "sr": {
     "name": "Serbian",
     "original_name": "Српски",
     "code": "sr",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "sr_RS"
   },
   "sk": {
     "name": "Slovak",
     "original_name": "Slovenčina",
     "code": "sk",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "sk_SK"
   },
   "sl": {
     "name": "Slovene",
     "original_name": "Slovenščina",
     "code": "sl",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "sl_SL"
   },
   "es": {
     "name": "Spanish",
     "original_name": "Español",
     "code": "es",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "es_ES"
   },
   "su": {
     "name": "Sundanese",
     "original_name": "Basa Sunda",
     "code": "su",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "su_ID"
   },
   "sw": {
     "name": "Swahili",
@@ -412,13 +456,15 @@
     "name": "Swedish",
     "original_name": "Svenska",
     "code": "sv",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "sv_SE"
   },
   "ta": {
     "name": "Tamil",
     "original_name": "தமிழ்",
     "code": "ta",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "ta_IN"
   },
   "te": {
     "name": "Telugu",
@@ -442,7 +488,8 @@
     "name": "Turkish",
     "original_name": "Türkçe",
     "code": "tr",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "tr_TR"
   },
   "uk": {
     "name": "Ukrainian",
@@ -472,30 +519,35 @@
     "name": "Hmong",
     "original_name": "Hmong",
     "code": "hmn",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   },
   "mi": {
     "name": "Maori",
     "original_name": "Māori",
     "code": "mi",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "mri"
   },
   "zh-cn": {
     "name": "Chinese",
     "original_name": "中文",
     "code": "zh-cn",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "zh_CN"
   },
   "zh-tw": {
     "name": "Taiwanese",
     "original_name": "台語",
     "code": "zh-tw",
-    "rtl": false
+    "rtl": false,
+    "wp_code": "zh_TW"
   },
   "zu": {
     "name": "Zulu",
     "original_name": "isiZulu",
     "code": "zu",
-    "rtl": false
+    "rtl": false,
+    "wp_code": null
   }
 }

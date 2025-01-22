@@ -3,13 +3,22 @@
         'name' => 'linguise/wordpress-plugin',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '946bbf5924a277862fda3967f0e7347ba41e99ed',
+        'reference' => 'bb0378889ba9c26efca234880cd149ae0f26b0c4',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => false,
     ),
     'versions' => array(
+        'galbar/jsonpath' => array(
+            'pretty_version' => '2.1',
+            'version' => '2.1.0.0',
+            'reference' => '346de727387b46148562209a0df2b9ae6cb551cd',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../galbar/jsonpath',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'linguise/script-php' => array(
             'pretty_version' => 'v1.3.12',
             'version' => '1.3.12.0',
@@ -22,7 +31,7 @@
         'linguise/wordpress-plugin' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '946bbf5924a277862fda3967f0e7347ba41e99ed',
+            'reference' => 'bb0378889ba9c26efca234880cd149ae0f26b0c4',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

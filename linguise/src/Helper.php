@@ -61,6 +61,54 @@ class Helper
     }
 
     /**
+     * Retrieve the language from referer
+     *
+     * Will parse the referer as an URL and check if it matches a translatable language
+     * If not, return null
+     *
+     * @return string|null
+     */
+    public static function getLanguageFromReferer()
+    {
+        if (!empty(wp_get_referer())) {
+            // Parse as URL
+            $language = self::getLanguageFromUrl(wp_get_referer());
+            if ($language !== null) {
+                return $language;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the language from an URL
+     *
+     * @param string $url
+     * @return string|null
+     */
+    public static function getLanguageFromUrl($url)
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        if (empty($path)) {
+            // Fail to parse!
+            return null;
+        }
+        $parts = explode('/', trim($path, '/'));
+
+        if (!count($parts) || $parts[0] === '') {
+            return null;
+        }
+
+        $language = $parts[0];
+        if (self::isTranslatableLanguage($language)) {
+            return $language;
+        }
+
+        return null;
+    }
+
+    /**
      * Return all languages information
      *
      * @return object
@@ -78,6 +126,31 @@ class Helper
     }
 
     /**
+     * Map Linguise language to WordPress locale
+     *
+     * @param string $language Linguise language
+     * @return string|null
+     */
+    public static function mapLanguageToWordPressLocale($language) {
+        $languages = self::getLanguagesInfos();
+
+        if (isset($languages->$language)) {
+            // Check if wp_code exist
+            // If not set, we use the same as $language
+            // If set and NULL we should return null
+            if (isset($languages->$language->wp_code) && !empty($languages->$language->wp_code)) {
+                return $languages->$language->wp_code;
+            } else if (!isset($languages->$language->wp_code)) {
+                return $language;
+            }
+
+            return null;
+        }
+
+        return null;
+    }
+
+    /**
      * Check if the passed language is translatable
      *
      * @param string $language Language code to check
@@ -89,6 +162,10 @@ class Helper
         linguiseSwitchMainSite();
         $linguise_options = get_option('linguise_options');
         linguiseRestoreMultisite();
+
+        if (!$linguise_options) {
+            return false;
+        }
 
         return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);
     }

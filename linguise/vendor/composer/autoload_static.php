@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1ede27179776e8208d40ed944912722b
+class ComposerStaticInit860a190720002dba4f694072e7b80c8d
 {
     public static $files = array (
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
@@ -13,6 +13,10 @@ class ComposerStaticInit1ede27179776e8208d40ed944912722b
     );
 
     public static $prefixLengthsPsr4 = array (
+        'U' => 
+        array (
+            'Utilities\\' => 10,
+        ),
         'T' => 
         array (
             'TypistTech\\Imposter\\Plugin\\' => 27,
@@ -28,9 +32,17 @@ class ComposerStaticInit1ede27179776e8208d40ed944912722b
         array (
             'Linguise\\Script\\Core\\' => 21,
         ),
+        'J' => 
+        array (
+            'JsonPath\\' => 9,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Utilities\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/Utilities',
+        ),
         'TypistTech\\Imposter\\Plugin\\' => 
         array (
             0 => __DIR__ . '/..' . '/typisttech/imposter-plugin/src',
@@ -55,10 +67,30 @@ class ComposerStaticInit1ede27179776e8208d40ed944912722b
         array (
             0 => __DIR__ . '/..' . '/linguise/script-php/src',
         ),
+        'JsonPath\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath',
+        ),
     );
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'Linguise\\Vendor\\JsonPath\\Expression\\ArrayInterval' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Expression/ArrayInterval.php',
+        'Linguise\\Vendor\\JsonPath\\Expression\\BooleanExpression' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Expression/BooleanExpression.php',
+        'Linguise\\Vendor\\JsonPath\\Expression\\ChildNameList' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Expression/ChildNameList.php',
+        'Linguise\\Vendor\\JsonPath\\Expression\\Comparison' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Expression/Comparison.php',
+        'Linguise\\Vendor\\JsonPath\\Expression\\IndexList' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Expression/IndexList.php',
+        'Linguise\\Vendor\\JsonPath\\Expression\\Value' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Expression/Value.php',
+        'Linguise\\Vendor\\JsonPath\\InvalidJsonException' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/InvalidJsonException.php',
+        'Linguise\\Vendor\\JsonPath\\InvalidJsonPathException' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/InvalidJsonPathException.php',
+        'Linguise\\Vendor\\JsonPath\\JsonObject' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/JsonObject.php',
+        'Linguise\\Vendor\\JsonPath\\JsonPath' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/JsonPath.php',
+        'Linguise\\Vendor\\JsonPath\\Language\\ChildSelector' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Language/ChildSelector.php',
+        'Linguise\\Vendor\\JsonPath\\Language\\Regex' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Language/Regex.php',
+        'Linguise\\Vendor\\JsonPath\\Language\\Token' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Language/Token.php',
+        'Linguise\\Vendor\\JsonPath\\Operation\\GetChild' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Operation/GetChild.php',
+        'Linguise\\Vendor\\JsonPath\\Operation\\GetRecursive' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Operation/GetRecursive.php',
+        'Linguise\\Vendor\\JsonPath\\Operation\\SelectChildren' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/JsonPath/Operation/SelectChildren.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\AfterUpdate' => __DIR__ . '/..' . '/linguise/script-php/src/AfterUpdate.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Boundary' => __DIR__ . '/..' . '/linguise/script-php/src/Boundary.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Cache' => __DIR__ . '/..' . '/linguise/script-php/src/Cache.php',
@@ -86,6 +118,7 @@ class ComposerStaticInit1ede27179776e8208d40ed944912722b
         'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Idn\\Resources\\unidata\\Regex' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/Resources/unidata/Regex.php',
         'Linguise\\Vendor\\Symfony\\Polyfill\\Intl\\Normalizer\\Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Normalizer.php',
         'Linguise\\Vendor\\Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
+        'Linguise\\Vendor\\Utilities\\ArraySlice' => __DIR__ . '/..' . '/galbar/jsonpath/src/Galbar/Utilities/ArraySlice.php',
         'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'TypistTech\\Imposter\\ArrayUtil' => __DIR__ . '/..' . '/typisttech/imposter/src/ArrayUtil.php',
         'TypistTech\\Imposter\\Config' => __DIR__ . '/..' . '/typisttech/imposter/src/Config.php',
@@ -112,9 +145,9 @@ class ComposerStaticInit1ede27179776e8208d40ed944912722b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1ede27179776e8208d40ed944912722b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1ede27179776e8208d40ed944912722b::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit1ede27179776e8208d40ed944912722b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit860a190720002dba4f694072e7b80c8d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit860a190720002dba4f694072e7b80c8d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit860a190720002dba4f694072e7b80c8d::$classMap;
 
         }, null, ClassLoader::class);
     }
