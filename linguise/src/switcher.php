@@ -153,6 +153,8 @@ add_action('init', function () use ($languages_names) {
         }
 
         if ($found) {
+            $custom_css = linguiseRenderCustomCss($config);
+            wp_add_inline_style('linguise_switcher', $custom_css);
             do_action('linguise_load_scripts', $config);
         }
 
