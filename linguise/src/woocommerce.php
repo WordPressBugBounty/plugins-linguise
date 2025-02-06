@@ -139,7 +139,7 @@ if (!empty($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE']) && $_SERVER['HTTP_LINGUI
 
 /**
  * Get WooCommerce language
- * 
+ *
  * @return string|null
  */
 function linguiseWooGetLanguage()
@@ -538,14 +538,15 @@ add_filter('kco_additional_checkboxes', function ($additional_checkboxes) {
 
 /**
  * Intercept WP-AJAX for WooCommerce cart
- * 
+ *
  * e.g. https://domain.com/wp-json/wc/store/v1/cart
- * 
+ *
  * @param WP_REST_Response|WP_HTTP_Response|WP_Error|mixed $response
- * @param array $handler
- * @param WP_REST_Request $request
+ * @param array                                            $handler
+ * @param WP_REST_Request                                  $request
  */
-function linguise_intercept_woo_cart($response, $handler, $request) {
+function linguise_intercept_woo_cart($response, $handler, $request)
+{
     $route = $request->get_route();
     $supported_prefix = [
         'wc/store/v1/cart',
@@ -707,3 +708,42 @@ function linguise_intercept_woo_cart($response, $handler, $request) {
 }
 
 add_filter('rest_request_after_callbacks', 'linguise_intercept_woo_cart', 10, 3);
+
+/**
+ * Fix: When removing an item on Classic Cart (Non block Cart) it gets 404 page.
+ * There's some weird redirect occurs when removing items and add double language code.
+ *
+ * Do not translate the redirect URL if the conditions below are met  :
+ * Request is for removing cart item or undoing removed item from cart
+ * Request is from translated page
+ */
+add_action('wp_redirect', function ($location) {
+    // Get Linguise language from HTTP request referer
+    $language = WPHelper::getLanguageFromReferer();
+
+    if ($language === null) {
+        // original page, skip
+        return $location;
+    }
+
+    // Check: is request for remove cart item or undo removed item from cart
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
+    if (!isset($_REQUEST['remove_item']) && !isset($_REQUEST['undo_item'])) {
+        /**
+         * Request is not remove cart item or is not undo removing cart item
+        */
+        return $location;
+    }
+
+    /**
+     * Set header to prevent Script-PHP translate the translated url.
+     * If the header is not exist, Script-PHP would re-translated the URL that has been translated before.
+     * So we need to add this header to make sure the below code is not re-translate the translated URL.
+     *
+     * @see Linguise\Vendor\Linguise\Script\Core\CurlRequest
+     * the above class has code to check if the header has Linguise-Translated-Redirect or not
+     */
+    header('Linguise-Translated-Redirect: true');
+
+    return $location;
+});

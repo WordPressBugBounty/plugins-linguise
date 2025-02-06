@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.7
-Stable tag:2.1.5
+Stable tag:2.1.6
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +101,9 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.1.6 =
+- Fix: Translation issue: the page redirect to 404 after removing item and undo item in cart page
+
 = 2.1.5 =
 - Fix: Switcher style issue: Race condition when adding custom CSS
 
