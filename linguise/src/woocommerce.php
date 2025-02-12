@@ -25,26 +25,36 @@ if ($linguise_options['woocommerce_emails_translation']) {
     /**
      * Save the current language at order creation
      */
-    add_action('woocommerce_new_order', function ($order_id) {
+    add_action('woocommerce_new_order', function ($order_id, $order) {
         if (WPHelper::isAdminRequest()) {
             return;
         }
 
         $language = WPHelper::getLanguage();
+        if (!$language) {
+            $language = WPHelper::getLanguageFromReferer();
+        }
 
         if ($language === null) {
             return;
         }
 
         add_post_meta($order_id, 'linguise_language', $language);
-    }, 10, 1);
+
+        $order->update_meta_data('linguise_language', $language);
+        $order->save_meta_data();
+        $order->apply_changes();
+    }, 100, 2);
 
     add_filter('woocommerce_mail_callback_params', function ($args, $wc_email) {
         if (!$wc_email->is_customer_email()) {
             return $args;
         }
 
-        $language_meta = get_post_meta($wc_email->object->get_id(), 'linguise_language', true);
+        $language_meta = $wc_email->object->get_meta('linguise_language', true);
+        if (empty($language_meta)) {
+            $language_meta = get_post_meta($wc_email->object->get_id(), 'linguise_language', true);
+        }
         $language_fallback = WPHelper::getLanguage();
 
         $language = $language_meta ? $language_meta : $language_fallback;
@@ -52,8 +62,6 @@ if ($linguise_options['woocommerce_emails_translation']) {
         if (!$language || !WPHelper::isTranslatableLanguage($language)) {
             return $args;
         }
-
-        $linguise_options = get_option('linguise_options');
 
         if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
             define('LINGUISE_SCRIPT_TRANSLATION', 1);

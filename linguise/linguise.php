@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.7
+ * Version:2.1.8
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -14,6 +14,12 @@
 
 use Linguise\Vendor\Linguise\Script\Core\Configuration;
 use Linguise\Vendor\Linguise\Script\Core\Database;
+use Linguise\Vendor\Linguise\Script\Core\Boundary;
+use Linguise\Vendor\Linguise\Script\Core\Helper;
+use Linguise\Vendor\Linguise\Script\Core\Processor;
+use Linguise\Vendor\Linguise\Script\Core\Request;
+use Linguise\Vendor\Linguise\Script\Core\Translation;
+use Linguise\WordPress\FragmentHandler;
 use Linguise\WordPress\Helper as WPHelper;
 
 defined('ABSPATH') || die('');
@@ -306,8 +312,18 @@ function linguiseGetConfiguration()
 
 if (wp_doing_ajax()) {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
+    if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'wpamelia_api') {
+        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'ameliabooking.php');
+    }
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
     if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'bookingpress_front_save_appointment_booking') {
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
+    }
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
+    if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'woocommerce_mark_order_status') {
+        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce-admin-email.php');
     }
 
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
@@ -329,6 +345,7 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Frag
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'elementor.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'facetwp.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woo-stripe-payment.php');

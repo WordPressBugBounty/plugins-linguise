@@ -56,7 +56,7 @@ class FragmentHandler
      *
      * @var string
      */
-    protected static $frag_html_match = '/<(div|a) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|text)" data-fragment-mode="(auto|override)"(?: href="([^"]*)")?>(.*?)<\/\1>/si';
+    protected static $frag_html_match = '/<(div|a|linguise-main) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text)" data-fragment-mode="(auto|override)"(?: href="([^"]*)")?>(.*?)<\/\1>/si';
 
     /**
      * Default filters for the fragments
@@ -344,28 +344,30 @@ class FragmentHandler
 
         foreach ($wp_frag_list as $frag_item) {
             $allow = $frag_item['kind'] === 'allow';
+            $cast_data = isset($frag_item['cast']) ? $frag_item['cast'] : null;
             if ($frag_item['mode'] === 'path') {
                 // check if full key is the same
                 if ($frag_item['key'] === $full_key) {
-                    return $allow;
+                    // Return cast or bool
+                    return $cast_data ? $cast_data : $allow;
                 }
             } elseif ($frag_item['mode'] === 'exact') {
                 // check if key is the same
                 if ($frag_item['key'] === $key) {
-                    return $allow;
+                    return $cast_data ? $cast_data : $allow;
                 }
             } elseif ($frag_item['mode'] === 'regex' || $frag_item['mode'] === 'regex_full') {
                 // check if regex matches
                 $key_match = $frag_item['mode'] === 'regex_full' ? $full_key : $key;
                 $match_re = '/' . $frag_item['key'] . '/';
                 if (preg_match($match_re, $key_match)) {
-                    return $allow;
+                    return $cast_data ? $cast_data : $allow;
                 }
             } elseif ($frag_item['mode'] === 'wildcard') {
                 // check if wildcard matches
                 $match_re = '/^.*?' . $frag_item['key'] . '.*?$/';
                 if (preg_match($match_re, $key)) {
-                    return $allow;
+                    return $cast_data ? $cast_data : $allow;
                 }
             }
         }
@@ -432,7 +434,7 @@ class FragmentHandler
      *
      * @param string $value The string to be checked
      *
-     * @return boolean - True if it's a HTML element, false if it's not
+     * @return string|false - True if it's a HTML element, false if it's not
      */
     private static function isHTMLElement($value)
     {
@@ -442,7 +444,16 @@ class FragmentHandler
 
         // use simplexml, suppress the warning
         $doc = @simplexml_load_string($value); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
-        return $doc !== false;
+        if ($doc !== false) {
+            return 'html';
+        }
+
+        // Use strip_tags method
+        if (strip_tags($value) !== $value) {
+            return 'html-main';
+        }
+
+        return false;
     }
 
     /**
@@ -499,10 +510,10 @@ class FragmentHandler
         } elseif (is_string($value)) {
             // By default, we assume "text" for now.
             $allowed_filters = self::isKeyAllowed($key, $use_key);
-            if ($strict && $allowed_filters !== true) {
+            if ($strict && ($allowed_filters !== true && !is_string($allowed_filters))) {
                 return $collected_fragments;
             }
-            if (!is_null($allowed_filters) && !$allowed_filters) {
+            if (!is_null($allowed_filters) && $allowed_filters === false) {
                 // If it's not null and it's false, then we don't need to check further
                 return $collected_fragments;
             }
@@ -513,10 +524,13 @@ class FragmentHandler
             $format = 'text';
             if ($tl_link) {
                 $format = 'link';
-            } elseif ($tl_dom) {
-                $format = 'html';
+            } elseif (is_string($tl_dom)) {
+                $format = $tl_dom;
             }
-            if ($tl_string || $tl_link || $tl_dom || $allowed_filters) {
+            if (is_string($allowed_filters)) {
+                $format = $allowed_filters;
+            }
+            if ($tl_string || $tl_link || is_string($tl_dom) || $allowed_filters) {
                 $collected_fragments[] = [
                     'key' => $use_key,
                     'value' => $value,
@@ -717,9 +731,12 @@ class FragmentHandler
                 $tag = 'a';
             }
             $frag_value = $fragment['value'];
-            // check if html has div, if yes change it to divlinguise
             if ($fragment['format'] === 'html') {
+                // check if html has div, if yes change it to divlinguise
                 $frag_value = preg_replace('/<div(.*?)>(.*?)<\/div>$/si', '<linguise-div$1>$2</linguise-div>', $frag_value, 1);
+            }
+            if ($fragment['format'] === 'html-main') {
+                $tag = 'linguise-main';
             }
             $html .= '<' . $tag . ' class="linguise-fragment" data-fragment-name="' . $fragment_name . '" data-fragment-param="' . $fragment_param . '" data-fragment-key="';
             $html .= $fragment['key'] . '" data-fragment-format="' . $fragment['format'] . '" data-fragment-mode="' . $json_fragments['mode'] . '"';
@@ -762,6 +779,9 @@ class FragmentHandler
             if ($fragment_format === 'html') {
                 // parse back the linguise-dev
                 $fragment_value = preg_replace('/<linguise-div(.*?)>(.*?)<\/linguise-div>$/si', '<div$1>$2</div>', $fragment_value, 1);
+            } else if ($fragment_format === 'html-main') {
+                // parse back the linguise-main
+                $fragment_value = preg_replace('/<linguise-main>(.*?)<\/linguise-main>$/si', '$1', $fragment_value, 1);
             }
 
             if (!isset($fragments[$fragment_name])) {
@@ -777,7 +797,7 @@ class FragmentHandler
             // The returned data is encoded HTML entities for non-ASCII characters
             // Decode it back to UTF-8 for link and text, for HTML since it would be rendered
             // the browser will decode it back to UTF-8 automatically
-            if ($fragment_format !== 'html') {
+            if ($fragment_format !== 'html' && $fragment_format !== 'html-main') {
                 $fragment_value = html_entity_decode($fragment_value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             }
 
