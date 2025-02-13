@@ -204,7 +204,7 @@ add_action('init', function () use ($languages_names) {
             return;
         }
 
-        echo renderLinguiseShortcode($language_list, $config);
+        echo renderLinguiseShortcode($language_list, $config); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this should be secure enough
     });
 });
 
@@ -254,12 +254,15 @@ function linguiseRenderCustomCss($options, $custom_css = '')
 
 /**
  * Render the actual linguise switcher
- * 
- * @param array $language_list The list of languages
- * @param array $config        The configuration
- * @param bool  $pin           Should we pin this in-place or follow the position of the flag that is defined.
+ *
+ * @param array   $language_list The list of languages
+ * @param array   $config        The configuration
+ * @param boolean $pin           Should we pin this in-place or follow the position of the flag that is defined.
+ *
+ * @return string
  */
-function renderLinguiseShortcode($language_list, $config, $pin = false) {
+function renderLinguiseShortcode($language_list, $config, $pin = false)
+{
     do_action('linguise_load_scripts', $config);
 
     $custom_css = linguiseRenderCustomCss($config);

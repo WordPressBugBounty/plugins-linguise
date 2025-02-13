@@ -84,7 +84,8 @@ class Helper
     /**
      * Get the language from an URL
      *
-     * @param string $url
+     * @param string $url The URL to parse
+     *
      * @return string|null
      */
     public static function getLanguageFromUrl($url)
@@ -129,9 +130,11 @@ class Helper
      * Map Linguise language to WordPress locale
      *
      * @param string $language Linguise language
+     *
      * @return string|null
      */
-    public static function mapLanguageToWordPressLocale($language) {
+    public static function mapLanguageToWordPressLocale($language)
+    {
         $languages = self::getLanguagesInfos();
 
         if (isset($languages->$language)) {
@@ -140,7 +143,7 @@ class Helper
             // If set and NULL we should return null
             if (isset($languages->$language->wp_code) && !empty($languages->$language->wp_code)) {
                 return $languages->$language->wp_code;
-            } else if (!isset($languages->$language->wp_code)) {
+            } elseif (!isset($languages->$language->wp_code)) {
                 return $language;
             }
 

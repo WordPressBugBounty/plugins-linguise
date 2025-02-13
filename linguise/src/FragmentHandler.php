@@ -229,11 +229,15 @@ class FragmentHandler
                 '^payment_sections\..*',
                 '^stripeParams\..*',
                 '^(shipping|billing)\_.*\.(autocapitalize|autocomplete|class.*|value)',
+                '^merchant_(id|name)$',
+                '^button_(\w+)$',
             ];
             $payment_keys_exact = [
+                'api_key',
+                'button',
+                'button_size_mode',
                 'country_code',
                 'currency',
-                'gateway_id',
                 'local_payment_type',
                 'banner_enabled',
                 'rest_nonce',
@@ -244,6 +248,8 @@ class FragmentHandler
                 'account',
                 'mode',
                 'version',
+                'environment',
+                'processing_country',
             ];
             foreach ($payment_keys_regex_full as $payment_key) {
                 $merged_defaults[] = [
@@ -399,6 +405,16 @@ class FragmentHandler
         // Has space? Most likely a translateable string
         if (has_space($value)) {
             return true;
+        }
+
+        // Check if email
+        if (!empty(filter_var($value, FILTER_VALIDATE_EMAIL))) {
+            return false;
+        }
+
+        // Check if string is UUID
+        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $value)) {
+            return false;
         }
 
         // Check if first word is lowercase (bad idea?)
@@ -570,9 +586,10 @@ class FragmentHandler
     /**
      * Checks if the given theme name is the current theme or the parent of the current theme.
      *
-     * @param string $theme_name The name of the theme to check.
+     * @param string         $theme_name   The name of the theme to check.
+     * @param \WP_Theme|null $parent_theme Optional. The parent theme to check. Default is null.
      *
-     * @return bool True if the given theme name is the current theme or its parent, false otherwise.
+     * @return boolean True if the given theme name is the current theme or its parent, false otherwise.
      */
     private static function isCurrentTheme($theme_name, $parent_theme = \null)
     {
@@ -603,6 +620,7 @@ class FragmentHandler
      * - position: The position of the JSON data, default to 1 (optional)
      * - encode: If the JSON data is URL encoded or not, default to false (optional)
      * - id: The id of the script, if it's not the same, then it will be skipped (optional)
+     * - mode: The mode of the script, default to 'script' (available are: `script` and `app_json`)
      *
      * @return array The array of JSON to match with fragment
      */
@@ -704,6 +722,14 @@ class FragmentHandler
             ];
         }
 
+        if (is_plugin_active('ameliabooking/ameliabooking.php')) {
+            $current_list[] = [
+                'name' => 'amelia-labels',
+                'match' => 'var wpAmeliaLabels = (.*?);',
+                'replacement' => 'var wpAmeliaLabels = $$JSON_DATA$$;',
+            ];
+        }
+
         // Merge with apply_filters
         if (function_exists('apply_filters')) {
             $current_list = apply_filters('linguise_fragment_override', $current_list);
@@ -779,7 +805,7 @@ class FragmentHandler
             if ($fragment_format === 'html') {
                 // parse back the linguise-dev
                 $fragment_value = preg_replace('/<linguise-div(.*?)>(.*?)<\/linguise-div>$/si', '<div$1>$2</div>', $fragment_value, 1);
-            } else if ($fragment_format === 'html-main') {
+            } elseif ($fragment_format === 'html-main') {
                 // parse back the linguise-main
                 $fragment_value = preg_replace('/<linguise-main>(.*?)<\/linguise-main>$/si', '$1', $fragment_value, 1);
             }
@@ -834,6 +860,22 @@ class FragmentHandler
         $override_list = self::getJSONOverrideMatcher();
 
         foreach ($override_list as $override_item) {
+            if (isset($override_item['mode']) && $override_item['mode'] === 'app_json') {
+                // If mode is app_json and key is the same
+                if (isset($override_item['key']) &&  $override_item['key'] === $script_id) {
+                    $json_data = json_decode($script_content, true);
+                    $collected_temp = self::collectFragmentFromJson($json_data);
+                    if (!empty($collected_temp)) {
+                        return [
+                            'name' => $override_item['name'],
+                            'fragments' => $collected_temp,
+                        ];
+                    }
+                }
+
+                continue;
+            }
+
             if (isset($override_item['key']) && $override_item['key'] !== $script_id) {
                 // If the key is set and it's not the same, then we skip
                 continue;
@@ -860,7 +902,11 @@ class FragmentHandler
             $json_data = json_decode($matched, true);
 
             // collect the fragment
-            $collected_temp = self::collectFragmentFromJson($json_data);
+            $is_strict = false;
+            if (isset($override_item['strict']) && $override_item['strict']) {
+                $is_strict = true;
+            }
+            $collected_temp = self::collectFragmentFromJson($json_data, $is_strict);
             if (!empty($collected_temp)) {
                 return [
                     'name' => $override_item['name'],
@@ -993,43 +1039,67 @@ class FragmentHandler
             return $html_data;
         }
 
-        $match_res = preg_match('/' . $matched_fragment['match'] . '/s', $html_data, $html_matches);
-        if ($match_res === false || $match_res === 0) {
-            return $html_data;
-        }
-
-        $index_match = 1;
-        if (isset($matched_fragment['position'])) {
-            $index_match = $matched_fragment['position'];
-        }
-
-        $before_match = $html_matches[$index_match];
-        $should_encode = isset($matched_fragment['encode']) && $matched_fragment['encode'];
-        if ($should_encode) {
-            $before_match = urldecode($before_match);
-        }
-
-        $json_data = new JsonObject(json_decode($before_match, true));
-        foreach ($fragment_info['fragments'] as $fragment) {
-            // remove the html fragment from the translated page
-            $html_data = str_replace($fragment['match'], '', $html_data);
-            try {
-                $json_data->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
-            } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                Debug::log('Failed to set key in override: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+        if (isset($matched_fragment['mode']) && $matched_fragment['mode'] === 'app_json') {
+            if (!isset($matched_fragment['key'])) {
+                return $html_data;
             }
-        }
 
-        $replaced_json = $json_data->getJson();
-        if ($should_encode) {
-            $replaced_json = rawurlencode($replaced_json);
-        }
-        $subst_ptrn = $matched_fragment['replacement'];
-        $subst_ptrn = str_replace('$$JSON_DATA$$', $replaced_json, $subst_ptrn);
+            $match_res = preg_match('/<script.*? id=["\']' . $matched_fragment['key'] . '["\'].+?>{(.*)}<\/script>/s', $html_data, $html_matches);
 
-        $replacement = preg_replace('/' . $matched_fragment['match'] . '/', $subst_ptrn, $html_data, 1, $count);
-        if ($count) {
-            $html_data = $replacement;
+            if ($match_res === false || $match_res === 0) {
+                return $html_data;
+            }
+
+            $match_data = $html_matches[1];
+            $json_data = new JsonObject(json_decode('{' . $match_data . '}', true));
+            foreach ($fragment_info['fragments'] as $fragment) {
+                try {
+                    $json_data->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
+                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
+                    Debug::log('Failed to set key in override: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+                }
+            }
+
+            $replaced_json = $json_data->getJson();
+
+            $html_data = str_replace('{' . $match_data . '}', $replaced_json, $html_data);
+        } else {
+            $match_res = preg_match('/' . $matched_fragment['match'] . '/s', $html_data, $html_matches);
+            if ($match_res === false || $match_res === 0) {
+                return $html_data;
+            }
+
+            $index_match = 1;
+            if (isset($matched_fragment['position'])) {
+                $index_match = $matched_fragment['position'];
+            }
+
+            $before_match = $html_matches[$index_match];
+            $should_encode = isset($matched_fragment['encode']) && $matched_fragment['encode'];
+            if ($should_encode) {
+                $before_match = urldecode($before_match);
+            }
+
+            $json_data = new JsonObject(json_decode($before_match, true));
+            foreach ($fragment_info['fragments'] as $fragment) {
+                try {
+                    $json_data->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
+                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
+                    Debug::log('Failed to set key in override: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+                }
+            }
+
+            $replaced_json = $json_data->getJson();
+            if ($should_encode) {
+                $replaced_json = rawurlencode($replaced_json);
+            }
+            $subst_ptrn = $matched_fragment['replacement'];
+            $subst_ptrn = str_replace('$$JSON_DATA$$', $replaced_json, $subst_ptrn);
+
+            $replacement = preg_replace('/' . $matched_fragment['match'] . '/', $subst_ptrn, $html_data, 1, $count);
+            if ($count) {
+                $html_data = $replacement;
+            }
         }
 
         return $html_data;
@@ -1038,8 +1108,8 @@ class FragmentHandler
     /**
      * Apply the translated fragments for the auto mode.
      *
-     * @param array $json_data  The JSON data to be injected
-     * @param array $fragments  The array of fragments to be injected, from intoJSONFragments
+     * @param array $json_data The JSON data to be injected
+     * @param array $fragments The array of fragments to be injected, from intoJSONFragments
      *
      * @return array
      */
@@ -1100,6 +1170,7 @@ class FragmentHandler
 
                 if ($mode === 'override') {
                     $html_data = self::applyTranslatedFragmentsForOverride($html_data, $fragment_param, $fragment_list);
+                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
 

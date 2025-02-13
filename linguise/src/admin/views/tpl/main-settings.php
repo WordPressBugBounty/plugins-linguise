@@ -453,7 +453,7 @@ foreach ($languages_names as $language_code => $language) {
     </div>
 </div>
 
-<p class="submit" style="margin-top: 10px;margin-right: 10px;display: inline-block;float: right; width: 100%;'"><input
+<p class="submit" style="margin-top: 10px;margin-right: 10px;display: inline-block; float: right; width: 100%;"><input
             type="submit"
             name="linguise_submit"
             id="submit"
