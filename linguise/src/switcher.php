@@ -2,6 +2,7 @@
 
 use Linguise\Vendor\Linguise\Script\Core\Configuration;
 use Linguise\Vendor\Linguise\Script\Core\Request;
+use Linguise\WordPress\Helper;
 
 defined('ABSPATH') || die('');
 
@@ -171,8 +172,8 @@ add_action('init', function () use ($languages_names) {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action
         $isWpBrickEditPage = array_key_exists('bricks', $_GET) ? $_GET['bricks'] : false;
         if (!$linguise_scripts && !$isWpBrickEditPage) {
-            wp_enqueue_script('linguise_switcher', plugin_dir_url(dirname(__FILE__)) . '/assets/js/front.bundle.js', array(), LINGUISE_VERSION);
-            wp_enqueue_style('linguise_switcher', plugin_dir_url(dirname(__FILE__)) . '/assets/css/front.bundle.css', array(), LINGUISE_VERSION);
+            wp_enqueue_script('linguise_switcher', Helper::getScriptUrl('/assets/js/front.bundle.js'), array(), LINGUISE_VERSION);
+            wp_enqueue_style('linguise_switcher', Helper::getScriptUrl('/assets/css/front.bundle.css'), array(), LINGUISE_VERSION);
 
             $tl_host = Configuration::getInstance()->get('host');
             $tl_port = (int)Configuration::getInstance()->get('port');

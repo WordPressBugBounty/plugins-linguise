@@ -86,7 +86,7 @@ class Helper
      *
      * @param string $url The URL to parse
      *
-     * @return string|null
+     * @return string|null The parsed language (or null if not found)
      */
     public static function getLanguageFromUrl($url)
     {
@@ -171,5 +171,28 @@ class Helper
         }
 
         return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);
+    }
+
+    /**
+     * Create a URL path to our script
+     *
+     * @param string $path Path to our script
+     *
+     * @return boolean
+     */
+    public static function getScriptUrl($path)
+    {
+        // Check if path starts with /
+        if (substr($path, 0, 1) === '/') {
+            // Strip / since we want some consistency
+            $path = substr($path, 1);
+        }
+
+        // Check if LINGUISE_PLUGIN_URL has / at the end
+        if (substr(LINGUISE_PLUGIN_URL, -1) === '/') {
+            return LINGUISE_PLUGIN_URL . $path;
+        }
+
+        return LINGUISE_PLUGIN_URL . '/' . $path;
     }
 }

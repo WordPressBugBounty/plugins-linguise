@@ -322,7 +322,7 @@ add_filter('woocommerce_get_return_url', function ($url, $order) {
 }, 10, 2);
 
 add_filter('woocommerce_get_endpoint_url', function ($url, $endpoint, $value, $permalink) {
-    $allowed_endpoints = ['order-pay', 'lost-password'];
+    $allowed_endpoints = ['order-pay'];
 
     $language = linguiseWooGetLanguage();
     if (!$language) {

@@ -1,4 +1,7 @@
 <?php
+
+use Linguise\WordPress\Helper;
+
 defined('ABSPATH') || die('');
 
 /**
@@ -391,14 +394,14 @@ class LinguiseConfiguration
             wp_enqueue_script('wp-color-picker');
             wp_enqueue_script(
                 'linguise_chosen_sortable_script',
-                LINGUISE_PLUGIN_URL . 'assets/js/jquery-chosen-sortable.min.js',
+                Helper::getScriptUrl('/assets/js/jquery-chosen-sortable.min.js'),
                 array('jquery'),
                 LINGUISE_VERSION,
                 true
             );
             wp_enqueue_script(
                 'linguise_admin_script',
-                LINGUISE_PLUGIN_URL . 'assets/js/admin.bundle.js',
+                Helper::getScriptUrl('/assets/js/admin.bundle.js'),
                 array('jquery'),
                 LINGUISE_VERSION,
                 true
@@ -409,11 +412,11 @@ class LinguiseConfiguration
             ));
             wp_enqueue_style(
                 'linguise_admin_script',
-                LINGUISE_PLUGIN_URL . 'assets/css/admin.bundle.css',
+                Helper::getScriptUrl('/assets/css/admin.bundle.css'),
                 array(),
                 LINGUISE_VERSION
             );
-            wp_enqueue_style('linguise_switcher', LINGUISE_PLUGIN_URL . '/assets/css/front.bundle.css', array(), LINGUISE_VERSION);
+            wp_enqueue_style('linguise_switcher', Helper::getScriptUrl('/assets/css/front.bundle.css'), array(), LINGUISE_VERSION);
         }
     }
 }
