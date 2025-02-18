@@ -25,11 +25,20 @@ function locale_compare($locale, $test_locale)
         return true;
     }
 
-    $test_substr = substr($test_locale, 0, 2);
+    // trim until _ or -
+    $test_substr = substr($test_locale, 0, strpos($test_locale, '_'));
+    $test_substr = substr($test_substr, 0, strpos($test_substr, '-'));
 
-    return strcasecmp($locale, $test_substr) === 0;
+    if (strcasecmp($locale, $test_substr) === 0) {
+        return true;
+    }
+
+    // trim $locale until _ or -
+    $locale = substr($locale, 0, strpos($locale, '_'));
+    $locale = substr($locale, 0, strpos($locale, '-'));
+
+    return strcasecmp($locale, $test_locale) === 0;
 }
-
 
 /**
  * Get the native name of a language code
@@ -50,19 +59,15 @@ function get_wp_lang_native_name($lang_code)
 }
 
 $website_locale = get_locale();
-// strip the country code since Linguise does not use it.
-// but, do not strip CC if locale is zh_CN or zh_TW
-if (strpos($website_locale, '_') !== false && substr($website_locale, 0, 2) !== 'zh') {
-    $website_locale = substr($website_locale, 0, strpos($website_locale, '_'));
-}
-$website_locale = strtolower(str_replace('_', '-', $website_locale));
 $website_lang_name = '';
 $linguise_lang_code = isset($options['default_language']) ? $options['default_language'] : 'en';
+$mapped_lang_code = \Linguise\WordPress\Helper::mapLanguageToWordPressLocale($linguise_lang_code);
 $linguise_lang_name = 'Unknown';
 $linguise_supported = false;
 foreach ($languages_names as $language_code => $language) {
     $current = $linguise_lang_code === 'en' ? $language['name'] : $language['original_name'];
-    if (locale_compare($language_code, $website_locale)) {
+    $lang_code_as_wp = \Linguise\WordPress\Helper::mapLanguageToWordPressLocale($language_code);
+    if (locale_compare($lang_code_as_wp, $website_locale)) {
         $website_lang_name = $current;
         $linguise_supported = true;
     }
@@ -132,7 +137,7 @@ foreach ($languages_names as $language_code => $language) {
                 <?php endforeach; ?>
             </select>
         </div>
-        <?php if (!locale_compare($linguise_lang_code, $website_locale)) : ?>
+        <?php if (!locale_compare($mapped_lang_code, $website_locale)) : ?>
             <div class="items-blocks">
                 <p class="block linguise-message linguise-warning" style="margin: 10px 30px;">
                     <?php if ($linguise_supported) : ?>
