@@ -23,22 +23,7 @@ class Database
 
     private function __construct()
     {
-        $cms = 'none';
-        if (empty(Configuration::getInstance()->get('cms')) || Configuration::getInstance()->get('cms') === 'auto') {
-            $base_dir = Configuration::getInstance()->get('base_dir');
-            if (file_exists($base_dir . 'wp-config.php')) {
-                $cms = 'wordpress';
-            } elseif (file_exists($base_dir . 'configuration.php')) {
-                $config_content = file_get_contents($base_dir . 'configuration.php');
-                if ($config_content && strpos($config_content, 'JConfig') !== false) {
-                    $cms = 'joomla';
-                }
-            }
-        } elseif (strtolower(Configuration::getInstance()->get('cms')) === 'joomla') {
-            $cms = 'joomla';
-        } elseif (strtolower(Configuration::getInstance()->get('cms')) === 'wordpress') {
-            $cms = 'wordpress';
-        }
+        $cms = CmsDetect::detect();
 
         if ($cms === 'joomla') {
             $this->_configuration = $this->retrieveJoomlaConfiguration();

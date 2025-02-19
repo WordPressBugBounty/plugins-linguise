@@ -27,6 +27,7 @@ return array(
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Boundary' => $vendorDir . '/linguise/script-php/src/Boundary.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Cache' => $vendorDir . '/linguise/script-php/src/Cache.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Certificates' => $vendorDir . '/linguise/script-php/src/Certificates.php',
+    'Linguise\\Vendor\\Linguise\\Script\\Core\\CmsDetect' => $vendorDir . '/linguise/script-php/src/CmsDetect.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Configuration' => $vendorDir . '/linguise/script-php/src/Configuration.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\CurlMulti' => $vendorDir . '/linguise/script-php/src/CurlMulti.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\CurlRequest' => $vendorDir . '/linguise/script-php/src/CurlRequest.php',

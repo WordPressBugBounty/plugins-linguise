@@ -41,6 +41,7 @@ class Request
     }
 
     protected function parseBaseDirectory() {
+        $current_cms = CmsDetect::detect();
         if (defined('JPATH_ROOT') && method_exists('JURI', 'getPath')) {
             // We are in a Joomla installation
             $this->base_directory = \JUri::getInstance()->root(true);
@@ -52,7 +53,7 @@ class Request
             } else {
                 $this->base_directory = site_url( '', 'relative' );
             }
-        } elseif (in_array(Configuration::getInstance()->get('cms'), ['laravel', 'magento'])) {
+        } elseif (in_array($current_cms, ['laravel', 'magento'])) {
             // We are in a Laravel or Magento installation
             $this->base_directory = '';
         } else {
