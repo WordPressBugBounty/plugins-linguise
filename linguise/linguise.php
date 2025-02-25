@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.13
+ * Version:2.1.14
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -351,6 +351,7 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'face
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woo-stripe-payment.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'wp-rocket.php');
 
 register_deactivation_hook(__FILE__, 'linguiseUnInstall');
 /**
@@ -602,3 +603,51 @@ add_action('plugins_loaded', 'linguiseHookLanguage', 2);
 add_action('init', function () {
     load_plugin_textdomain('linguise', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
+
+/**
+ * If the website behind cloudflare
+ * Exclude front.bundle.js from rocket loader
+ */
+add_filter('script_loader_tag', function ($tag, $handle) {
+    if (is_admin()) {
+        return $tag;
+    }
+
+    if (!WPHelper::isBehindCloudflare()) {
+        return $tag;
+    }
+
+    if ('linguise_switcher' !== $handle) {
+        return $tag;
+    }
+
+    /**
+     * Add data-cfasync="false" to exluded from Rocket loader
+     *
+     * @see https://developers.cloudflare.com/speed/optimization/content/rocket-loader/ignore-javascripts/
+     */
+    return str_replace(' src', ' data-cfasync="false" src', $tag);
+}, 50, 2);
+
+/**
+ * The front.bundle.js is depend on <script id="linguise_switcher-js-extra">
+ * Also exclude <script id="linguise_switcher-js-extra"> from Rocket loader
+ */
+add_filter('wp_inline_script_attributes', function ($attributes) {
+    if (is_admin()) {
+        return $attributes;
+    }
+
+    if (!WPHelper::isBehindCloudflare()) {
+        return $attributes;
+    }
+
+    /**
+     * Append data-cfasync=true into <script id="linguise_switcher-js-extra">
+     */
+    if (isset($attributes['id']) && $attributes['id'] === 'linguise_switcher-js-extra') {
+        $attributes = array_merge(array( 'data-cfasync' => 'false' ), $attributes);
+    }
+
+    return $attributes;
+}, 50);

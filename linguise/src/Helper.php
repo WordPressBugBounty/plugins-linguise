@@ -195,4 +195,18 @@ class Helper
 
         return LINGUISE_PLUGIN_URL . '/' . $path;
     }
+
+    /**
+     * Check if the request is behind Cloudflare
+     *
+     * @return boolean true if the request is behind Cloudflare
+     */
+    public static function isBehindCloudflare()
+    {
+        if (array_key_exists('HTTP_CF_CONNECTING_IP', $_SERVER)) {
+            return true;
+        }
+
+        return false;
+    }
 }
