@@ -73,6 +73,7 @@ class FragmentHandler
             'key' => 'i18n_.+',
             'mode' => 'regex',
             'kind' => 'allow',
+            'cast' => 'html-main',
         ],
         [
             'key' => 'currency\..*',
@@ -438,8 +439,31 @@ class FragmentHandler
         // Has http:// or https://
         // Has %%endpoint%%
         // Starts with / and has no space
-        if (preg_match('/https?:\/\//', $value) || preg_match('/%%.*%%/', $value) || (substr($value, 0, 1) === '/' && !has_space($value))) {
-            return true;
+        if (preg_match('/https?:\/\//', $value)) {
+            // Validate the link
+            if (filter_var($value, FILTER_VALIDATE_URL)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        if (substr($value, 0, 1) === '/' && !has_space($value)) {
+            $as_url = parse_url($value);
+            if (empty($as_url)) {
+                return false;
+            }
+
+            // Check if it only have "path" and not other keys
+            $array_keys = array_keys($as_url);
+            if (count($array_keys) === 1 && $array_keys[0] === 'path') {
+                return true;
+            }
+
+            if (preg_match('/%%.*%%/', $value)) {
+                // Assume WC-AJAX
+                return true;
+            }
         }
 
         return false;
