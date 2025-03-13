@@ -25,14 +25,15 @@ add_filter('rocket_exclude_defer_js', 'linguise_rocket_exclude_js', 10, 1);
 /**
  * Excludes Linguise CSS from WP Rocket CSS minification
  *
- * @param array $excluded_js An array of CSS handles enqueued in WordPress.
+ * @param array $excluded_css An array of CSS handles enqueued in WordPress.
  *
  * @return array the updated array of handles
  */
-function linguise_rocket_exclude_css($excluded_js)
+function linguise_rocket_exclude_css($excluded_css)
 {
-    $excluded_js[] = str_replace(home_url(), '', Helper::getScriptUrl('/assets/css/front.bundle.css'));
+    $excluded_css[] = str_replace(home_url(), '', Helper::getScriptUrl('/assets/css/front.bundle.css'));
 
-    return $excluded_js;
+    return $excluded_css;
 }
 add_filter('rocket_exclude_css', 'linguise_rocket_exclude_css', 10, 1);
+add_filter('rocket_rucss_external_exclusions', 'linguise_rocket_exclude_css', 10, 1);
