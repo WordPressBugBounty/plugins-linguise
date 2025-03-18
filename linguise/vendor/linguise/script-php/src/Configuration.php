@@ -22,6 +22,8 @@ class Configuration {
     private $cache_max_size = 200; // In megabyte
     /** TTL of the cache (in seconds) */
     private $cache_time_check = 600; // In seconds
+    /** Enable search translations */
+    private $search_translations = true;
 
     /** Advanced configuration **/
     /** The CMS used by the website */

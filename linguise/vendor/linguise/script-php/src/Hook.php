@@ -16,8 +16,8 @@ class Hook
 
     public static function trigger($name, &...$parameters)
     {
-        if (!empty(self::$hooks[$name]) && is_callable(self::$hooks[$name].'::'.$name)) {
-            call_user_func(self::$hooks[$name].'::'.$name, $parameters);
+        if (!empty(self::$hooks[$name]) && is_callable([self::$hooks[$name], $name])) {
+            call_user_func_array([self::$hooks[$name], $name], $parameters);
         }
     }
 }

@@ -109,6 +109,12 @@ class LinguiseBrowserLanguage
     {
         // Get from module parameters for the enabled languages
         $languages_enabled = isset($options['enabled_languages']) ? $options['enabled_languages'] : array();
+        $current_language = isset($options['default_language']) ? $options['default_language'] : null;
+
+        if (!empty($current_language) && !in_array($current_language, $languages_enabled)) {
+            // If the default language is not in the enabled languages, add it
+            $languages_enabled[] = $current_language;
+        }
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $accept_language = sanitize_text_field($_SERVER['HTTP_ACCEPT_LANGUAGE']);

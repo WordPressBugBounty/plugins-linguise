@@ -91,8 +91,12 @@ class CurlRequest
 
             if (count($post_fields) && !empty($content_type)) {
                 if (strpos($content_type, 'application/json') === 0) {
+                    Hook::trigger('onBeforePostFields', $post_fields);
+
                     $post_fields = json_encode($post_fields);
                 } elseif (strpos($content_type, 'application/x-www-form-urlencoded') === 0) {
+                    Hook::trigger('onBeforePostFields', $post_fields);
+
                     $post_fields = http_build_query($post_fields);
                 } elseif (strpos($content_type, 'multipart/form-data') === 0) {
                     $boundary = new Boundary();
@@ -125,6 +129,8 @@ class CurlRequest
                             }
                         }
                     }
+
+                    Hook::trigger('onBeforePostFields', $boundary);
 
                     $post_fields = $boundary->getContent();
                     $input_headers[] = 'Content-Type: multipart/form-data; boundary=' . $boundary->getBoundary();
@@ -263,9 +269,8 @@ class CurlRequest
                 $redirected_url = Url::translateUrl($redirected_url);
             }
 
-            Hook::trigger('onBeforeRedirect');
-
             $response->setRedirect($redirected_url);
+            Hook::trigger('onBeforeRedirect');
             $response->end();
         }
 

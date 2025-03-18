@@ -19,7 +19,7 @@ class Request
     protected $query;
     protected $language;
     protected $trailing_slashes;
-
+    protected $metadata;
 
     private function __construct()
     {
@@ -35,7 +35,9 @@ class Request
         $this->query = parse_url($href, PHP_URL_QUERY);
         $this->query = $this->query === null ? '' : $this->query;
         preg_match('/.*?(\/*)$/', $this->pathname, $matches);
-        $this->trailing_slashes =  $matches[1];
+        $this->trailing_slashes = $matches[1];
+        // Create an empty metadata
+        $this->metadata = [];
 
         Debug::log('Requested url: ' . $this->getRequestedUrl());
     }
@@ -129,6 +131,16 @@ class Request
         return $this->language;
     }
 
+    public function setMetadata($key, $value)
+    {
+        $this->metadata[$key] = $value;
+    }
+
+    public function getMetadata($key, $default = null)
+    {
+        return $this->metadata[$key] ?? $default;
+    }
+
     public function getBaseUrl()
     {
         return $this->getProtocol() . '://' . $this->getHostname() . $this->getBaseDir();
@@ -137,6 +149,10 @@ class Request
     public function getRequestedUrl()
     {
         return $this->getProtocol() . '://' . $this->getHostname() . $this->getBaseDir() . '/' . $this->getLanguage() . $this->getPathname(false) . $this->getTrailingSlashes() . $this->getQuery(true);
+    }
+
+    public function setQuery($query) {
+        $this->query = $query;
     }
 
     /**

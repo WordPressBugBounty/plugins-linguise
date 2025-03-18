@@ -103,6 +103,16 @@ class Response {
     }
 
     /**
+     * Get current redirect url
+     * 
+     * @return string|null
+     */
+    public function getRedirect()
+    {
+        return $this->redirect;
+    }
+
+    /**
      * Set redirection
      *
      * @param $url string Url to redirect the user to

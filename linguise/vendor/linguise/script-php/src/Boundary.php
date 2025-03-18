@@ -85,6 +85,14 @@ class Boundary
     }
 
     /**
+     * Get a field from the fields array
+     */
+    public function getPostField($name)
+    {
+        return $this->fields[$name];
+    }
+
+    /**
      * Return the end of a boundary
      * @return string
      */
