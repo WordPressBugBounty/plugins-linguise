@@ -56,6 +56,13 @@
     "rtl": false,
     "wp_code": "bs_BA"
   },
+  "pt-br": {
+    "name": "Brazilian",
+    "original_name": "Brasileiro",
+    "code": "pt-br",
+    "rtl": false,
+    "wp_code": null
+  },
   "bg": {
     "name": "Bulgarian",
     "original_name": "Български",

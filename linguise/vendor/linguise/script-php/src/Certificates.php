@@ -57,6 +57,9 @@ class Certificates
      * @return bool
      */
     public function shouldBeExecuted() {
+        if (!Configuration::getInstance()->get('dl_certificates')) {
+            return false;
+        }
         $time_info_file = $this->getCertificatesPath() . 'time.txt';
         if (file_exists($time_info_file) && (int)file_get_contents($time_info_file) + (Configuration::getInstance()->get('dl_certificates') ? 86400 : 604800) > time()) {
             return false;

@@ -520,4 +520,116 @@ class PrestaShop
 
         return $content;
     }
+
+    public static function translateSortOrder($json_content, $language)
+    {
+        return self::translateJson($json_content, $language, self::$autocomplete_matchers);
+    }
+
+    public static function isAjaxSearchRequest()
+    {
+        if (!self::isSearch()) {
+            return false;
+        }
+
+        if (!array_key_exists('from-xhr', $_GET)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function isSearch()
+    {
+        if (!array_key_exists('controller', $_GET)) {
+            return false;
+        }
+
+        $action = $_GET['controller'];
+
+        if (!isset($action) || $action !== 'search') {
+            return false;
+        }
+
+        if (!array_key_exists('s', $_GET)) {
+            return false;
+        }
+
+        $search_query = $_GET['s'];
+
+        if (!isset($search_query)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function preprocessIgnoreInlineSortOptions($content)
+    {
+        // append <div-ignore-inline> to prevent inline translation
+        $content = preg_replace_callback('/<a\s+[^>]*class="[^"]*select-list[^"]*"[^>]*>(.*?)<\/a>/is', function ($matches) {
+            return '<div-ignore-inline>' . $matches[0] . '</div-ignore-inline>';
+        }, $content);
+
+        return $content;
+    }
+
+    public static function postprocessIgnoreInlineSortOptions($content)
+    {
+        // remove <div-ignore-inline>
+        $content = preg_replace_callback('/<div-ignore-inline>(.*?)<\/div-ignore-inline>/is', function ($matches) {
+            return $matches[1];
+        }, $content);
+
+        return $content;
+    }
+
+    public static function preprocessIgnoreInlineSortOptionsJson($json_content)
+    {
+        if (array_key_exists('rendered_products_top', $json_content)) {
+            $json_content['rendered_products_top'] = self::preprocessIgnoreInlineSortOptions($json_content['rendered_products_top']);
+        }
+
+        return $json_content;
+    }
+
+    public static function postprocessIgnoreInlineSortOptionsJson($json_content)
+    {
+        if (array_key_exists('rendered_products_top', $json_content)) {
+            $json_content['rendered_products_top'] = self::postprocessIgnoreInlineSortOptions($json_content['rendered_products_top']);
+        }
+
+        return $json_content;
+    }
+
+    public static function preprocessIgnoreInlineMaterialIcons($content)
+    {
+        $content = preg_replace_callback('/<i\s+[^>]*class="[^"]*material-icons[^"]*"[^>]*>(.*?)<\/i>/is', function ($matches) {
+            return '<div-ignore-inline-i-tag>' . $matches[0] . '</div-ignore-inline-i-tag>';
+        }, $content);
+
+        return $content;
+    }
+
+    public static function postprocessIgnoreInlineMaterialIcons($content)
+    {
+        $content = preg_replace_callback('/<div-ignore-inline-i-tag>(.*?)<\/div-ignore-inline-i-tag>/is', function ($matches) {
+            return $matches[1];
+        }, $content);
+
+        return $content;
+    }
+
+    public static function isNonAjaxSearchRequest()
+    {
+        if (!self::isSearch()) {
+            return false;
+        }
+
+        if (array_key_exists('from-xhr', $_GET)) {
+          return false;
+        }
+
+        return true;
+    }
 }

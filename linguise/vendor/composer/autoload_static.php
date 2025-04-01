@@ -109,6 +109,7 @@ class ComposerStaticInite2e2cea28308e0dbd75711df06341c35
         'Linguise\\Vendor\\Linguise\\Script\\Core\\JsonWalker' => __DIR__ . '/..' . '/linguise/script-php/src/JsonWalker.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\OpenCart' => __DIR__ . '/..' . '/linguise/script-php/src/Platforms/OpenCart.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\PrestaShop' => __DIR__ . '/..' . '/linguise/script-php/src/Platforms/PrestaShop.php',
+        'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\Zencart' => __DIR__ . '/..' . '/linguise/script-php/src/Platforms/Zencart.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Processor' => __DIR__ . '/..' . '/linguise/script-php/src/Processor.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Request' => __DIR__ . '/..' . '/linguise/script-php/src/Request.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Response' => __DIR__ . '/..' . '/linguise/script-php/src/Response.php',

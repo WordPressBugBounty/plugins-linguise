@@ -144,16 +144,11 @@ class Configuration
         $cookies = $response->getCookies();
         foreach ($cookies as $index => $cookie) {
             if (strpos($cookie, 'wp-resetpass') !== false) {
-                $request = Request::getInstance();
-                $original_url = $request->getNonTranslatedUrl();
-
-                // Urs translation is on
-                if (strpos($original_url, $request->getPathname()) === false) {
-                    /**
-                     * If set cookie into translated page sometimes not working for Cyrillic alphabet, i.e: Russian
-                     */
-                    $cookies[$index]->setPath('/');
-                }
+                /**
+                 * If set cookie into translated page sometimes not working for Cyrillic alphabet, i.e: Russian
+                 * Set path into  / to work in translated and non translated URL.
+                 */
+                $cookies[$index]->setPath('/');
             }
         }
     }

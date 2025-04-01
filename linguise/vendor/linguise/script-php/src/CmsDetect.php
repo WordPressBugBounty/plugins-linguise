@@ -59,6 +59,17 @@ class CmsDetect {
             return 'magento';
         }
 
+        if (file_exists($base_dir . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'version.php')) {
+            // Read file
+            $php_file = file_get_contents($base_dir . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'version.php');
+            if ($php_file && strpos($php_file, 'Zen Cart') !== false) {
+                return 'zencart';
+            }
+            if ($php_file && strpos($php_file, 'zen-cart.com') !== false) {
+                return 'zencart';
+            }
+        }
+
         // TODO: Find a reliable way to detect Laravel installation setup
 
         return $current_cms;

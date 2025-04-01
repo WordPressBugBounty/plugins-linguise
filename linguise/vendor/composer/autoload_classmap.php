@@ -41,6 +41,7 @@ return array(
     'Linguise\\Vendor\\Linguise\\Script\\Core\\JsonWalker' => $vendorDir . '/linguise/script-php/src/JsonWalker.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\OpenCart' => $vendorDir . '/linguise/script-php/src/Platforms/OpenCart.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\PrestaShop' => $vendorDir . '/linguise/script-php/src/Platforms/PrestaShop.php',
+    'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\Zencart' => $vendorDir . '/linguise/script-php/src/Platforms/Zencart.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Processor' => $vendorDir . '/linguise/script-php/src/Processor.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Request' => $vendorDir . '/linguise/script-php/src/Request.php',
     'Linguise\\Vendor\\Linguise\\Script\\Core\\Response' => $vendorDir . '/linguise/script-php/src/Response.php',

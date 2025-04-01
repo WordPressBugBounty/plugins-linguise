@@ -50,7 +50,7 @@ if ($linguise_options['woocommerce_emails_translation']) {
             return $args;
         }
 
-        $language_meta = $wc_email->object->get_meta('linguise_language', true);
+        $language_meta = method_exists($wc_email->object, 'get_meta') ? $wc_email->object->get_meta('linguise_language', true) : '';
         if (empty($language_meta)) {
             $language_meta = get_post_meta($wc_email->object->get_id(), 'linguise_language', true);
         }

@@ -60,6 +60,9 @@ class CurlMulti
         $at_least_one_request = false;
         $this->_curl_multi = curl_multi_init();
         foreach ($this->_request_instances as $instance) {
+            if (!$instance->shouldBeExecuted()) {
+                continue;
+            }
             $ch = $this->prepareRequest($instance);
             if (!$ch) {
                 continue;
@@ -69,6 +72,7 @@ class CurlMulti
         }
 
         if (!$at_least_one_request) {
+            $this->_curl_multi = null;
             return;
         }
 
@@ -101,9 +105,6 @@ class CurlMulti
      * @return false|resource
      */
     public function prepareRequest($instance) {
-        if (!$instance->shouldBeExecuted()) {
-            return false;
-        }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_NOBODY, true); // SET HEAD type
