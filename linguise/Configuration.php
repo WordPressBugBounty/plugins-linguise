@@ -58,6 +58,12 @@ class Configuration
      */
     public static function onBeforeTranslation()
     {
+        $request = Request::getInstance();
+
+        if (strpos($request->getPathname(), 'wp-json/oembed/1.0/embed') !== false) {
+            return;
+        }
+
         self::excludeAdminBar();
 
         // Extract WordPress translation from Scripts
@@ -71,6 +77,11 @@ class Configuration
      */
     public static function onAfterTranslation()
     {
+        $request = Request::getInstance();
+
+        if (strpos($request->getPathname(), 'wp-json/oembed/1.0/embed') !== false) {
+            return;
+        }
 
         // Insert back WordPress translation into Scripts
         self::wpFragmentsScriptInsertion();
@@ -96,7 +107,6 @@ class Configuration
      */
     protected static function wpFragmentsScriptExtraction()
     {
-
         $response = Response::getInstance();
         $content  = $response->getContent();
 
@@ -151,5 +161,20 @@ class Configuration
                 $cookies[$index]->setPath('/');
             }
         }
+    }
+
+    /**
+     * We should translate JSON request to oembed
+     * @return bool
+     */
+    public static function onJsonShouldTranslate()
+    {
+        $request = Request::getInstance();
+
+        if (strpos($request->getPathname(), 'wp-json/oembed/1.0/embed') !== false) {
+            return true;
+        }
+
+        return false;
     }
 }

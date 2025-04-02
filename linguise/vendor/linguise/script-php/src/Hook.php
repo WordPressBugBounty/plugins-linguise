@@ -20,4 +20,13 @@ class Hook
             call_user_func_array([self::$hooks[$name], $name], $parameters);
         }
     }
+
+    public static function wait($name, &...$parameters)
+    {
+        if (!empty(self::$hooks[$name]) && is_callable(self::$hooks[$name].'::'.$name)) {
+            return call_user_func(self::$hooks[$name].'::'.$name, $parameters);
+        }
+
+        return null;
+    }
 }

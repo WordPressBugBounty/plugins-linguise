@@ -239,7 +239,8 @@ class CurlRequest
         $content_type = explode(';', $content_type)[0];
 
         // Check if JSON response (include utf-8 charset)
-        if ($response_code === 200 && strpos($content_type, 'application/json') === 0) {
+        $json_translate = Hook::wait('onJsonShouldTranslate');
+        if ($response_code === 200 && strpos($content_type, 'application/json') === 0 && $json_translate !== true) {
             $response->setResponseCode($response_code);
             $response->setContent($body);
             // So in Configuration[Local] we can modify JSON response if we want.
@@ -247,7 +248,7 @@ class CurlRequest
             $response->end();
         }
 
-        if ($response_code !== 304 && !in_array($content_type, ['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml', 'application/rss+xml'])) {
+        if ($response_code !== 304 && (!in_array($content_type, ['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml', 'application/rss+xml']) && $json_translate !== true)) {
             $response->setRedirect($url);
             Debug::log('Content type not translatable ' . $content_type);
             Debug::saveError('Content type not translatable ' . $content_type);
