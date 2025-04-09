@@ -165,7 +165,8 @@ class Configuration
 
     /**
      * We should translate JSON request to oembed
-     * @return bool
+     *
+     * @return boolean
      */
     public static function onJsonShouldTranslate()
     {

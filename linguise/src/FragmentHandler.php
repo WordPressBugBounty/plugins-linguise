@@ -155,6 +155,11 @@ class FragmentHandler
             'mode' => 'regex',
             'kind' => 'deny',
         ],
+        [
+            'key' => 'wc_ajax_url',
+            'mode' => 'exact',
+            'kind' => 'deny',
+        ],
     ];
 
     /**
