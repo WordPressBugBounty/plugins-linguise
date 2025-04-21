@@ -160,6 +160,34 @@ class FragmentHandler
             'mode' => 'exact',
             'kind' => 'deny',
         ],
+        /**
+         * Plugin : woocommerce-gateway-stripe
+         */
+        [
+            'key' => 'paymentMethodsConfig.*?(card|us_bank_account|alipay|klarna|afterpay_clearpay|link|wechat_pay|cashapp)\.countries',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'accountCountry',
+            'mode' => 'exact',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'appearance\..*',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'blocksAppearance\..*',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'paymentMethodData.*?stripe\.plugin_url',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
     ];
 
     /**

@@ -352,7 +352,7 @@
             "version_normalized": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/typisttech/imposter.git",
+                "url": "https://github.com/typisttech/imposter",
                 "reference": "0282df368b1862594f7ad09e50dbb264dbb146ec"
             },
             "dist": {
@@ -420,16 +420,6 @@
                 "issues": "https://github.com/TypistTech/imposter/issues",
                 "source": "https://github.com/TypistTech/imposter"
             },
-            "funding": [
-                {
-                    "url": "https://typist.tech/donation/",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/tangrufus",
-                    "type": "github"
-                }
-            ],
             "install-path": "../typisttech/imposter"
         },
         {
