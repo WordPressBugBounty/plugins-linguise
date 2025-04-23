@@ -10,8 +10,6 @@ use Linguise\Vendor\Linguise\Script\Core\Translation;
 use Linguise\WordPress\FragmentHandler;
 use Linguise\WordPress\Helper as WPHelper;
 
-defined('ABSPATH') || die('No direct access allowed!');
-
 include_once ABSPATH . 'wp-admin/includes/plugin.php';
 if (!is_plugin_active('surecart/surecart.php')) {
     return;

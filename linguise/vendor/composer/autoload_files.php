@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'e69f7f6ee287b969198c3c9d6777bd38' => $vendorDir . '/symfony/polyfill-intl-normalizer/bootstrap.php',
-    '16eed290c5592c18dc3f16802ad3d0e4' => $vendorDir . '/ivopetkov/html5-dom-document-php/autoload.php',
     'f598d06aa772fa33d905e87be6398fb1' => $vendorDir . '/symfony/polyfill-intl-idn/bootstrap.php',
     '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => $vendorDir . '/symfony/polyfill-mbstring/bootstrap.php',
 );

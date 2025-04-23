@@ -56,7 +56,7 @@ class FragmentHandler
      *
      * @var string
      */
-    protected static $frag_html_match = '/<(div|a|linguise-main) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text)" data-fragment-mode="(auto|override|attribute)"(?: href="([^"]*)")?>(.*?)<\/\1>/si';
+    protected static $frag_html_match = '/<(div|a|linguise-main) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text)" data-fragment-mode="(auto|override)"(?: href="([^"]*)")?>(.*?)<\/\1>/si';
 
     /**
      * Default filters for the fragments
@@ -562,9 +562,6 @@ class FragmentHandler
     private static function collectFragment($key, $value, $collected_fragments, $current_key, $strict = false, $array_index = null)
     {
         $use_key = self::wrapKey($key);
-        if ($array_index !== null) {
-            $use_key .= '[' . $array_index . ']';
-        }
         if (!empty($current_key)) {
             if ($key === $use_key) {
                 $use_key = '.' . $use_key;
@@ -572,13 +569,16 @@ class FragmentHandler
 
             $use_key = $current_key . $use_key;
         }
+        if ($array_index !== null) {
+            $use_key = $use_key . '.' . $array_index;
+        }
 
         if (is_actual_object($value)) {
             $collected_fragments = self::collectFragmentFromJson($value, $strict, $collected_fragments, $use_key);
         } elseif (is_array($value)) {
-            for ($arr_i = 0; $arr_i < count($value); $arr_i++) { // phpcs:ignore Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed
-                $inner_value = $value[$arr_i];
-                $collected_fragments = self::collectFragment('', $inner_value, $collected_fragments, $use_key, $strict, $arr_i);
+            for ($i = 0; $i < count($value); $i++) { // phpcs:ignore Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed
+                $inner_value = $value[$i];
+                $collected_fragments = self::collectFragment($key, $inner_value, $collected_fragments, $current_key, $strict, $i);
             }
         } elseif (is_string($value)) {
             // By default, we assume "text" for now.
@@ -650,10 +650,6 @@ class FragmentHandler
      */
     private static function isCurrentTheme($theme_name, $parent_theme = \null)
     {
-        if (!function_exists('wp_get_theme')) {
-            return false;
-        }
-
         $theme = $parent_theme ?: wp_get_theme();
         if (empty($theme)) {
             return false;
@@ -672,27 +668,6 @@ class FragmentHandler
     }
 
     /**
-     * Load the HTML data into a DOMDocument object.
-     *
-     * @param string $html_data The HTML data to be loaded
-     *
-     * @return \IvoPetkov\HTML5DOMDocument|\Dom\HTMLDocument The loaded HTML DOM object
-     */
-    protected static function loadHTML($html_data)
-    {
-        // Check if 8.4 since they've added \Dom
-        if (class_exists('\Dom\HTMLDocument') && method_exists('\Dom\HTMLDocument', 'createFromString')) {
-            $html_dom = \Dom\HTMLDocument::createFromString($html_data);
-            return $html_dom;
-        } else {
-            // Fallback to HTML5DOMDocument
-            $html_dom = new \Linguise\Vendor\IvoPetkov\HTML5DOMDocument();
-            @$html_dom->loadHTML($html_data); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
-            return $html_dom;
-        }
-    }
-
-    /**
      * Get override JSON fragment matching
      *
      * The way the override works is by matching the script content with the regex, the schema of each item is:
@@ -704,11 +679,9 @@ class FragmentHandler
      * - id: The id of the script, if it's not the same, then it will be skipped (optional)
      * - mode: The mode of the script, default to 'script' (available are: `script` and `app_json`)
      *
-     * @param string $html_data The HTML data input
-     *
      * @return array The array of JSON to match with fragment
      */
-    private static function getJSONOverrideMatcher($html_data)
+    private static function getJSONOverrideMatcher()
     {
         $current_list = [];
 
@@ -816,7 +789,7 @@ class FragmentHandler
 
         // Merge with apply_filters
         if (function_exists('apply_filters')) {
-            $current_list = apply_filters('linguise_fragment_override', $current_list, $html_data);
+            $current_list = apply_filters('linguise_fragment_override', $current_list);
         }
 
         return $current_list;
@@ -932,17 +905,16 @@ class FragmentHandler
     /**
      * Try to match the script with the override list.
      *
-     * @param \DOMNode|\DOMElement $script    The script to be matched
-     * @param string               $html_data The raw HTML data to be checked
+     * @param \DOMNode|\DOMElement $script The script to be matched
      *
      * @return array|null
      */
-    private static function tryMatchWithOverride($script, $html_data)
+    private static function tryMatchWithOverride($script)
     {
         $script_content = $script->textContent;
         $script_id = $script->getAttribute('id');
 
-        $override_list = self::getJSONOverrideMatcher($html_data);
+        $override_list = self::getJSONOverrideMatcher();
 
         foreach ($override_list as $override_item) {
             if (isset($override_item['mode']) && $override_item['mode'] === 'app_json') {
@@ -1011,9 +983,10 @@ class FragmentHandler
      *
      * @return array
      */
-    public static function findWPFragments(&$html_data)
+    public static function findWPFragments($html_data)
     {
-        $html_dom = self::loadHTML($html_data);
+        $html_dom = new \DOMDocument();
+        @$html_dom->loadHTML($html_data); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
         $scripts = $html_dom->getElementsByTagName('script');
 
@@ -1022,7 +995,7 @@ class FragmentHandler
             $attr_id = $script->getAttribute('id');
             $match_res = preg_match('/^(.*)-js-extra$/', $attr_id, $attr_match);
             if ($match_res === false || $match_res === 0) {
-                $overridden_temp = self::tryMatchWithOverride($script, $html_data);
+                $overridden_temp = self::tryMatchWithOverride($script);
                 if (is_array($overridden_temp)) {
                     $all_fragments[$overridden_temp['name']][$overridden_temp['name']] = [
                         'mode' => 'override',
@@ -1038,7 +1011,7 @@ class FragmentHandler
             if ($match_res === false || $match_res === 0) {
                 $unmatched_res = preg_match_all('/var (.+)_params = (.*);/', $script->textContent, $json_multi_matches, PREG_SET_ORDER, 0);
                 if ($unmatched_res === false || $unmatched_res === 0) {
-                    $overridden_temp = self::tryMatchWithOverride($script, $html_data);
+                    $overridden_temp = self::tryMatchWithOverride($script);
                     if (is_array($overridden_temp)) {
                         $all_fragments[$frag_id][$overridden_temp['name']] = [
                             'mode' => 'override',
@@ -1088,7 +1061,7 @@ class FragmentHandler
      *
      * @return string
      */
-    protected static function decodeKeyName($key)
+    private static function decodeKeyName($key)
     {
         $key = html_entity_decode($key, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         // Would sometimes fails??
@@ -1100,16 +1073,15 @@ class FragmentHandler
     /**
      * Apply the translated fragments for the override.
      *
-     * @param string $html_data      The HTML data to be injected
-     * @param string $fragment_name  The name of the fragment, e.g. 'woocommerce'
-     * @param string $fragment_param The param of the fragment, e.g. 'woocommerce$$attr-1'
-     * @param array  $fragment_info  The array of fragments to be injected, from intoJSONFragments
+     * @param string $html_data     The HTML data to be injected
+     * @param string $fragment_name The name of the fragment, e.g. 'woocommerce'
+     * @param array  $fragment_info The array of fragments to be injected, from intoJSONFragments
      *
      * @return string
      */
-    public static function applyTranslatedFragmentsForOverride($html_data, $fragment_name, $fragment_param, $fragment_info)
+    public static function applyTranslatedFragmentsForOverride($html_data, $fragment_name, $fragment_info)
     {
-        $fragment_matcher = self::getJSONOverrideMatcher($html_data);
+        $fragment_matcher = self::getJSONOverrideMatcher();
 
         // Find the one that match $fragment_name
         $matched_fragment = null;
@@ -1227,7 +1199,7 @@ class FragmentHandler
      *
      * @return string
      */
-    protected static function cleanupFragments($html_data, $fragments)
+    private static function cleanupFragments($html_data, $fragments)
     {
         foreach ($fragments as $fragment) {
             // remove the html fragment from the translated page
@@ -1253,12 +1225,8 @@ class FragmentHandler
             foreach ($fragment_jsons as $fragment_param => $fragment_list) {
                 $mode = $fragment_list['mode'];
 
-                if (!in_array($mode, ['auto', 'override'])) {
-                    continue;
-                }
-
                 if ($mode === 'override') {
-                    $html_data = self::applyTranslatedFragmentsForOverride($html_data, $fragment_param, $fragment_name, $fragment_list);
+                    $html_data = self::applyTranslatedFragmentsForOverride($html_data, $fragment_param, $fragment_list);
                     $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }

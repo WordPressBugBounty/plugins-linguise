@@ -4,7 +4,6 @@ namespace Linguise\Script;
 
 use Linguise\Vendor\Linguise\Script\Core\Response;
 use Linguise\Vendor\Linguise\Script\Core\Request;
-use Linguise\WordPress\AttributeHandler;
 use Linguise\WordPress\FragmentHandler;
 
 defined('LINGUISE_SCRIPT_TRANSLATION') || die('');
@@ -112,11 +111,9 @@ class Configuration
         $content  = $response->getContent();
 
         $all_fragments = FragmentHandler::findWPFragments($content);
-        $attrs_fragments = AttributeHandler::findWPFragments($content);
-        $merged_fragments = array_merge($all_fragments, $attrs_fragments);
 
         $newContent = $content;
-        foreach ($merged_fragments as $frag_key => $frag_json) {
+        foreach ($all_fragments as $frag_key => $frag_json) {
             foreach ($frag_json as $frag_param => $frag_values) {
                 $frag_as_html = FragmentHandler::intoHTMLFragments($frag_key, $frag_param, $frag_values);
                 $newContent = str_replace('</body>', $frag_as_html . '</body>', $newContent);
@@ -139,12 +136,6 @@ class Configuration
         $all_fragments = FragmentHandler::intoJSONFragments($content);
         try {
             $translatedHtml = FragmentHandler::injectTranslatedWPFragments($content, $all_fragments);
-        } catch (\LogicException $e) {
-            $translatedHtml = $content;
-        }
-        $attrs_fragments = AttributeHandler::intoJSONFragments($translatedHtml);
-        try {
-            $translatedHtml = AttributeHandler::injectTranslatedWPFragments($translatedHtml, $attrs_fragments);
         } catch (\LogicException $e) {
             $translatedHtml = $content;
         }

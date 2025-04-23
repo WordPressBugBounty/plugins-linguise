@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.25
+ * Version:2.1.26
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -14,6 +14,12 @@
 
 use Linguise\Vendor\Linguise\Script\Core\Configuration;
 use Linguise\Vendor\Linguise\Script\Core\Database;
+use Linguise\Vendor\Linguise\Script\Core\Boundary;
+use Linguise\Vendor\Linguise\Script\Core\Helper;
+use Linguise\Vendor\Linguise\Script\Core\Processor;
+use Linguise\Vendor\Linguise\Script\Core\Request;
+use Linguise\Vendor\Linguise\Script\Core\Translation;
+use Linguise\WordPress\FragmentHandler;
 use Linguise\WordPress\Helper as WPHelper;
 
 defined('ABSPATH') || die('');
@@ -336,7 +342,6 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'swit
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/browser_language.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'FragmentHandler.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'AttributeHandler.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'rest-ajax.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'surecart.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce.php');
@@ -346,7 +351,6 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'face
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woo-stripe-payment.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'wc-product-addons.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'wp-rocket.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce-gateway-stripe.php');
 
