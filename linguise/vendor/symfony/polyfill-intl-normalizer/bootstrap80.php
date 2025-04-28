@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use Linguise\Vendor\Symfony\Polyfill\Intl\Normalizer as p;
+use Symfony\Polyfill\Intl\Normalizer as p;
 
 if (!function_exists('normalizer_is_normalized')) {
     function normalizer_is_normalized(?string $string, ?int $form = p\Normalizer::FORM_C): bool { return p\Normalizer::isNormalized((string) $string, (int) $form); }
