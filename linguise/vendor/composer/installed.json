@@ -56,12 +56,12 @@
         },
         {
             "name": "linguise/script-php",
-            "version": "v1.3.17",
-            "version_normalized": "1.3.17.0",
+            "version": "v1.3.18",
+            "version_normalized": "1.3.18.0",
             "source": {
                 "type": "git",
                 "url": "git@bitbucket.org:linguise/script-php.git",
-                "reference": "5f55f4ef19bd4e99657ba2c5ecca37f9361d4c06"
+                "reference": "0ed13ee13a7c11bb415ed92da6c01b8be0591c67"
             },
             "require": {
                 "ext-curl": "*",
@@ -72,7 +72,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^9"
             },
-            "time": "2025-04-02T06:15:25+00:00",
+            "time": "2025-04-30T05:29:30+00:00",
             "type": "library",
             "installation-source": "source",
             "autoload": {

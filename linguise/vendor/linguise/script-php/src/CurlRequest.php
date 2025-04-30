@@ -178,6 +178,10 @@ class CurlRequest
         // Add real user IP
         $input_headers[] = 'X-Forwarded-For: ' . Helper::getIpAddress();
 
+        $reparsed_url = parse_url($url);
+        if (!empty($reparsed_url)) {
+            $url = Helper::buildUrl($reparsed_url, true);
+        }
         curl_setopt($ch, CURLOPT_URL, $url);
         if (Configuration::getInstance()->get('server_ip') !== null) {
             curl_setopt($ch, CURLOPT_CONNECT_TO, [Request::getInstance()->getHostname() . ':' . Configuration::getInstance()->get('server_port') . ':' . Configuration::getInstance()->get('server_ip') . ':' . Configuration::getInstance()->get('server_port')]); // fixme: only available from php 7.0

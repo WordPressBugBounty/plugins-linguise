@@ -92,12 +92,13 @@ class Helper {
 
     /**
      * Create a new URL based on the parsed_url output
-     * @param array $parsed_url
+     * @param array   $parsed_url The parsed URL
+     * @param boolean $encoded    Should we encode the URL or not.
+     *
      * @return string
      */
-    public static function buildUrl($parsed_url)
+    public static function buildUrl($parsed_url, $encoded = \false)
     {
-
         $final_url = '';
         if (empty($parsed_url['scheme'])) {
             $final_url .= '//';
@@ -120,7 +121,12 @@ class Helper {
         }
 
         if (!empty($parsed_url['path'])) {
-            $final_url .= $parsed_url['path'];
+            if ($encoded) {
+                $explode_path = array_map('rawurlencode', explode('/', $parsed_url['path']));
+                $final_url .= implode('/', $explode_path);
+            } else {
+                $final_url .= $parsed_url['path'];
+            }
         }
 
         if (!empty($parsed_url['query'])) {
