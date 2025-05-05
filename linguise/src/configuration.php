@@ -307,6 +307,21 @@ class LinguiseConfiguration
         // get URL query
         $view_mode = isset($_GET['ling_mode']) ? $_GET['ling_mode'] : 'standard';
 
+        if (!extension_loaded('xml')) {
+            $errors[] = [
+                'type' => 'warning',
+                'message' => __('`xml` extension is not loaded, some Linguise features might not works properly!', 'linguise'),
+            ];
+        }
+
+        // Check if not running php7 or higher
+        if (version_compare(PHP_VERSION, '7.0.0', '<')) {
+            $errors[] = [
+                'type' => 'error',
+                'message' => __('PHP version is lower than 7.0.0, some Linguise features might not works properly!', 'linguise'),
+            ];
+        }
+
         // Show expert mode
         if ($view_mode === 'expert') {
             require_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src/admin/views' . DIRECTORY_SEPARATOR . 'expert-view.php');

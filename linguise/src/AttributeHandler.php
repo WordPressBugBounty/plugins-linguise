@@ -44,6 +44,13 @@ class AttributeHandler extends FragmentHandler
             $current_list = apply_filters('linguise_fragment_attributes', $current_list, $html_data);
         }
 
+        // loop through the list and add extra field, use reference
+        foreach ($current_list as &$matcher) {
+            $name_sanitized = str_replace(' ', '-', $matcher['name']);
+            $name_sanitized = sanitize_key($name_sanitized);
+            $matcher['attr_ids'] = 'data-linguise-attribute-' . $name_sanitized;
+        }
+
         return $current_list;
     }
 
@@ -76,15 +83,23 @@ class AttributeHandler extends FragmentHandler
     public static function findWPFragments(&$html_data)
     {
         $html_dom = self::loadHTML($html_data);
+        if (empty($html_dom)) {
+            return [];
+        }
 
         $matchers = self::getMatcher($html_data);
         $internal_counter = 0;
 
         $all_fragments = [];
-        foreach ($matchers as $matcher) {
-            $attr_html = $html_dom->querySelector('[' . $matcher['key'] . ']');
-            if (!empty($attr_html)) {
-                $key_data = $attr_html->getAttribute($matcher['key']);
+        // Loop through all valid DOM elements
+        $elements = $html_dom->getElementsByTagName('*');
+        foreach ($elements as $element) {
+            if ($element->nodeType !== XML_ELEMENT_NODE) {
+                continue;
+            }
+
+            foreach ($matchers as $matcher) {
+                $key_data = $element->getAttribute($matcher['key']);
                 if (empty($key_data)) {
                     continue;
                 }
@@ -95,7 +110,7 @@ class AttributeHandler extends FragmentHandler
                     $key_data = urldecode($key_data);
                 }
 
-                $json_data = json_decode($attr_html->getAttribute($matcher['key']), true);
+                $json_data = json_decode($key_data, true);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     continue;
                 }
@@ -104,10 +119,11 @@ class AttributeHandler extends FragmentHandler
 
                 $collected_temp = self::collectFragmentFromJson($json_data, $is_strict);
                 if (!empty($collected_temp)) {
-                    $int_marker = $matcher['name'] . '-' . $internal_counter;
-                    $attr_html->setAttribute('data-linguise-attribute-matched', $int_marker);
+                    $int_marker = $matcher['attr_ids'] . '-' . $internal_counter;
+                    $element->setAttribute($matcher['attr_ids'], $int_marker);
                     $all_fragments[$matcher['name']][$int_marker] = [
                         'mode' => 'attribute',
+                        'attribute' => $element->tagName,
                         'fragments' => $collected_temp,
                     ];
                     $internal_counter++;
@@ -115,13 +131,38 @@ class AttributeHandler extends FragmentHandler
             }
         }
 
-        if ($internal_counter > 0) {
+        if (!empty($all_fragments)) {
             $html_data = $html_dom->saveHTML();
         }
 
         Debug::log('AttributeHandler -> Collected: ' . json_encode($all_fragments, JSON_PRETTY_PRINT));
 
         return $all_fragments;
+    }
+
+    /**
+     * Find the element by attribute and matcher.
+     *
+     * @param \DOMDocument $html_dom   The HTML DOM object
+     * @param string       $tag_name   The tag name to search for
+     * @param string       $attr_name  The attribute name to search for
+     * @param string       $attr_value The attribute value to search for
+     *
+     * @return \DOMElement|null The found element or null if not found
+     */
+    private static function findElementByAttributeAndMatcher($html_dom, $tag_name, $attr_name, $attr_value)
+    {
+        $elements = $html_dom->getElementsByTagName($tag_name);
+        foreach ($elements as $element) {
+            if ($element->nodeType !== XML_ELEMENT_NODE) {
+                continue;
+            }
+
+            if ($element->hasAttribute($attr_name) && $element->getAttribute($attr_name) === $attr_value) {
+                return $element;
+            }
+        }
+        return null;
     }
 
     /**
@@ -134,21 +175,35 @@ class AttributeHandler extends FragmentHandler
      */
     public static function injectTranslatedWPFragments($html_data, $fragments)
     {
-        Debug::log('AttributeHandler -> Injecting: ' . json_encode($fragments, JSON_PRETTY_PRINT));
-
         $html_dom = self::loadHTML($html_data);
+        if (empty($html_dom)) {
+            return $html_data;
+        }
+        
+        Debug::log('AttributeHandler -> Injecting: ' . json_encode($fragments, JSON_PRETTY_PRINT));
 
         $queued_deletions = [];
         $fragment_matchers = self::getMatcher($html_data);
         foreach ($fragments as $fragment_name => $fragment_jsons) {
             $matched = self::findMatcher($fragment_name, $fragment_matchers);
             foreach ($fragment_jsons as $fragment_param => $fragment_list) {
-                $attr_html = $html_dom->querySelector('[data-linguise-attribute-matched="' . $fragment_param . '"]');
                 $queued_deletions[] = $fragment_list['fragments'];
-                if (empty($attr_html)) {
+
+                if (!isset($fragment_list['attribute'])) {
                     continue;
                 }
                 if (empty($matched)) {
+                    continue;
+                }
+
+                $attr_html = self::findElementByAttributeAndMatcher(
+                    $html_dom,
+                    $fragment_list['attribute'],
+                    $matched['attr_ids'],
+                    $fragment_param
+                );
+
+                if (empty($attr_html)) {
                     continue;
                 }
 
@@ -182,7 +237,7 @@ class AttributeHandler extends FragmentHandler
                 }
 
                 $attr_html->setAttribute($matched['key'], $replaced_json);
-                $attr_html->removeAttribute('data-linguise-attribute-matched');
+                $attr_html->removeAttribute($matched['attr_ids']);
             }
         }
 

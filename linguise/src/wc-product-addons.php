@@ -70,15 +70,15 @@ add_filter('linguise_fragment_filters', function ($filters) {
     }
     $regex_fields = [
         'name',
-        'value',
         'type',
         'elementId',
         'cl_rule',
+        'values\.\d+\.(?:value|tempId)$',
     ];
     foreach ($regex_fields as $key) {
         $filters[] = [
-            'key' => '^fields\.([\w\d_-]+)\.fields\.(\d+)\.(\d+)\.' . $key,
-            'mode' => 'regex',
+            'key' => '^fields\.(?:[\w\d_-]+)\.fields\.\d+\.\d+\.' . $key,
+            'mode' => 'regex_full',
             'kind' => 'deny',
         ];
     }
