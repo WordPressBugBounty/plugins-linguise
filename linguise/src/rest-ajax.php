@@ -48,6 +48,7 @@ function linguise_intercept_ajax_request($response, $handler, $request)
     // Default AJAX to intercept
     $supported_prefix = [];
     $supported_prefix = apply_filters('linguise_ajax_intercept_prefixes', $supported_prefix);
+    $supported_prefix = array_unique($supported_prefix);
     Debug::log('Intercepting AJAX request: ' . $route);
     Debug::log('Supported prefixes: ' . print_r($supported_prefix, true)); // phpcs:ignore WordPress.PHP.DevelopmentFunctions
 

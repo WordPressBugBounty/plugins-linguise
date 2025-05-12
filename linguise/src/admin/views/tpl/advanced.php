@@ -1,5 +1,10 @@
 <?php
 defined('ABSPATH') || die('');
+
+$integrations = \Linguise\WordPress\ThirdPartyLoader::getInstance();
+$loaded_integrations = $integrations->getLoadedIntegrationsNames();
+$active_integrations = $integrations->getActiveIntegrations();
+
 ?>
 <div class="content">
     <ul>
@@ -41,8 +46,7 @@ defined('ABSPATH') || die('');
         </li>
 
         <li class="linguise-settings-option full-width">
-            <label for="woocommerce_mail_translation" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy"
-                   data-tippy="<?php esc_html_e('Enable WooCommerce email translation. Emails sent to customers will be translated to the language they made their order from. (This options can increase a lot your translation quota )', 'linguise'); ?>"><?php esc_html_e('Translate WooCommerce emails', 'linguise'); ?><span class="material-icons">help_outline</span></label>
+            <label for="woocommerce_mail_translation" class="linguise-setting-label label-bolder linguise-label-inline" style="min-width: unset;"><?php esc_html_e('Translate emails', 'linguise'); ?></label>
             <div class="linguise-switch-button">
                 <label class="switch">
                     <input type="hidden" name="linguise_options[woocommerce_emails_translation]" value="0">
@@ -51,6 +55,11 @@ defined('ABSPATH') || die('');
                     <div class="slider"></div>
                 </label>
             </div>
+            <p class="description" style="width: 100%; display: inline-block; padding-left: 15px; margin: 2px 0 10px 0">
+                <?php esc_html_e('The following feature allows Linguies to translate your WooCommerce emails and FluentCRM campaigns to the language user ordered their item or registered in.', 'linguise'); ?>
+                <br />
+                <strong><?php esc_html_e('This feature will increase your translation quota', 'linguise'); ?></strong>
+            </p>
         </li>
 
         <li class="linguise-settings-option full-width">
@@ -195,10 +204,44 @@ defined('ABSPATH') || die('');
                 </div>
             </div>
         </li>
+
+        <li class="linguise-settings-option full-width">
+            <label class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy">
+                <?php esc_html_e('Third-party integrations', 'linguise'); ?>
+            </label>
+            <div class="items-blocks" style="padding: 0px 15px 15px;">
+                <?php if (!empty($loaded_integrations)) { ?>
+                <ul>
+                    <?php foreach ($loaded_integrations as $integration_name) { ?>
+                        <li class="linguise-tp">
+                            <?php echo esc_html($integration_name); ?>
+                            <?php if (in_array($integration_name, $active_integrations)) { ?>
+                                <strong><?php esc_html_e('(Active)', 'linguise'); ?></strong>
+                            <?php } ?>
+                        </li>
+                    <?php } ?>
+                </ul>
+                <?php } else { ?>
+                    <div>
+                        <strong><?php esc_html_e('No third-party integrations loaded', 'linguise'); ?></strong>
+                    </div>
+                <?php } ?>
+            </div>
+        </li>
     </ul>
 </div>
 
-<p class="submit" style="margin-top: 10px;display: inline-block;float: right; width: 100%"><input
+<style>
+    li.linguise-tp::before {
+        content: "\2022";
+        color: #000;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+    }
+</style>
+
+<p class="submit" style="margin-top: 10px;display: inline-block; float: right; width: 100%"><input
             type="submit"
             name="linguise_submit"
             id="submit"

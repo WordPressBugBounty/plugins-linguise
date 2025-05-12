@@ -210,127 +210,6 @@ class FragmentHandler
         // ]
 
         $merged_defaults = self::$default_filters;
-        if (is_plugin_active('woocommerce/woocommerce.php')) {
-            // Payment methods data
-            $payment_keys_regex_full = [
-                '^(paymentMethods|paymentMethodData)\..*\.style\..*',
-                '^(paymentMethods|paymentMethodData)\..*\.cardOptions.*',
-                '^(paymentMethods|paymentMethodData)\..*\.cards\..*',
-                '^(paymentMethods|paymentMethodData)\..*\.icons\..*',
-                '^(paymentMethods|paymentMethodData)\..*\.customFieldOptions.*',
-                '^(paymentMethods|paymentMethodData)\..*\.elementOptions.*',
-                '^(paymentMethods|paymentMethodData)\..*\.features.*',
-                '^(paymentMethods|paymentMethodData)\..*\.icons.*',
-                '^(paymentMethods|paymentMethodData)\..*\.(name|paymentType|countryCode)',
-                '^(paymentMethods|paymentMethodData)\..*\.(countries|currencies)\..*',
-                '^(paymentMethods|paymentMethodData)\..*\.(requiredParams|paymentSections|specificCountries).*',
-                '^paymentMethodSortOrder\..*',
-                '^collectableMethodIds\..*',
-            ];
-            foreach ($payment_keys_regex_full as $payment_key) {
-                $merged_defaults[] = [
-                    'key' => $payment_key,
-                    'mode' => 'regex_full',
-                    'kind' => 'deny',
-                ];
-            }
-
-            /* For AJAX requests */
-            $merged_defaults[] = [
-                'key' => '^items\.\d+\.(name|(short_)?description|permalink)', // -> cart request
-                'mode' => 'regex_full',
-                'kind' => 'allow',
-            ];
-            $merged_defaults[] = [
-                'key' => '^responses\.\d+\.body\.items\.\d+\.(name|(short_)?description|permalink)', // -> batch request
-                'mode' => 'regex_full',
-                'kind' => 'allow',
-            ];
-            $merged_defaults[] = [
-                'key' => '^payment_result\.(redirect_url|message)', // -> checkout request
-                'mode' => 'regex_full',
-                'kind' => 'allow',
-            ];
-        }
-
-        if (is_plugin_active('woo-stripe-payment/stripe-payments.php')) {
-            $payment_keys_regex_full = [
-                '^stripeGeneralData\..*',
-                '^elementOptions\..*',
-                '^paymentElementOptions\..*',
-                '^messageOptions\..*',
-                '^confirmParams\..*',
-                '^payment_sections\..*',
-                '^stripeParams\..*',
-                '^(shipping|billing)\_.*\.(autocapitalize|autocomplete|class.*|value)',
-                '^merchant_(id|name)$',
-                '^button_(\w+)$',
-            ];
-            $payment_keys_exact = [
-                'api_key',
-                'button',
-                'button_size_mode',
-                'country_code',
-                'currency',
-                'local_payment_type',
-                'banner_enabled',
-                'rest_nonce',
-                'page',
-                'saved_method_selector',
-                'token_selector',
-                'user_id',
-                'account',
-                'mode',
-                'version',
-                'environment',
-                'processing_country',
-            ];
-            foreach ($payment_keys_regex_full as $payment_key) {
-                $merged_defaults[] = [
-                    'key' => $payment_key,
-                    'mode' => 'regex_full',
-                    'kind' => 'deny',
-                ];
-            }
-            foreach ($payment_keys_exact as $payment_key) {
-                $merged_defaults[] = [
-                    'key' => $payment_key,
-                    'mode' => 'exact',
-                    'kind' => 'deny',
-                ];
-            }
-        }
-
-        if (is_plugin_active('pymntpl-paypal-woocommerce/pymntpl-paypal-woocommerce.php')) {
-            $merged_defaults[] = [
-                'key' => '^paypalQueryParams\..*',
-                'mode' => 'regex_full',
-                'kind' => 'deny',
-            ];
-
-            $path_key_disallowed = [
-                'ppcpGeneralData.ajaxRestPath',
-                'ppcpGeneralData.blocksVersion',
-                'ppcpGeneralData.clientId',
-                'ppcpGeneralData.context',
-                'ppcpGeneralData.environment',
-            ];
-
-            foreach ($path_key_disallowed as $path_key) {
-                $merged_defaults[] = [
-                    'key' => $path_key,
-                    'mode' => 'path',
-                    'kind' => 'deny',
-                ];
-            }
-
-            $merged_defaults[] = [
-                'key' => '^ppcpGeneralData\.restRoutes\..*',
-                'mode' => 'regex_full',
-                'kind' => 'deny',
-            ];
-        }
-
         if (self::isCurrentTheme('Woodmart')) {
             $regex_key_disallowed = [
                 'add_to_cart_action.*',
@@ -798,26 +677,6 @@ class FragmentHandler
             ];
         }
 
-        if (is_plugin_active('woo-stripe-payment/stripe-payments.php')) {
-            $current_list[] = [
-                'name' => 'wc-stripe-params-v3',
-                'match' => 'var wc_stripe_params_v3 = (.*?);',
-                'replacement' => 'var wc_stripe_params_v3 = $$JSON_DATA$$;',
-            ];
-
-            $current_list[] = [
-                'name' => 'wc-stripe-messages',
-                'match' => 'var wc_stripe_messages = (.*?);',
-                'replacement' => 'var wc_stripe_messages = $$JSON_DATA$$;',
-            ];
-
-            $current_list[] = [
-                'name' => 'wc-stripe-checkout-fields',
-                'match' => 'var wc_stripe_checkout_fields = (.*?);',
-                'replacement' => 'var wc_stripe_checkout_fields = $$JSON_DATA$$;',
-            ];
-        }
-
         if (self::isCurrentTheme('Woodmart')) {
             $current_list[] = [
                 'name' => 'woodmart-theme',
@@ -838,14 +697,6 @@ class FragmentHandler
                 'name' => 'calderaforms',
                 'match' => 'CF_VALIDATOR_STRINGS = (.*?);',
                 'replacement' => 'CF_VALIDATOR_STRINGS = $$JSON_DATA$$;',
-            ];
-        }
-
-        if (is_plugin_active('ameliabooking/ameliabooking.php')) {
-            $current_list[] = [
-                'name' => 'amelia-labels',
-                'match' => 'var wpAmeliaLabels = (.*?);',
-                'replacement' => 'var wpAmeliaLabels = $$JSON_DATA$$;',
             ];
         }
 

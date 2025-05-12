@@ -1,6 +1,7 @@
 <?php
 
 use Linguise\WordPress\Helper;
+use Linguise\WordPress\ThirdPartyLoader;
 
 defined('ABSPATH') || die('');
 
@@ -250,6 +251,9 @@ class LinguiseConfiguration
             );
 
             update_option('linguise_options', $linguise_options);
+
+            // After updating options, we want to reload integrations
+            ThirdPartyLoader::getInstance()->reload();
 
             echo '<div class="linguise_saved_wrap"><span class="material-icons"> done </span> '. esc_html__('Linguise settings saved!', 'linguise') .'</div>';
         }

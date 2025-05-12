@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.29
+ * Version:2.1.30
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -304,22 +304,44 @@ function linguiseGetConfiguration()
     return $attributes;
 }
 
+/**
+ * Hook to insert custom user meta
+ *
+ * @param array    $custom_meta Custom metadata that we want to insert
+ * @param \WP_User $user        User object itself
+ * @param bool     $update      Whether this is an update or not
+ *
+ * @return array
+ */
+add_filter('insert_custom_user_meta', function ($custom_meta, $user, $update) {
+    if ($update) {
+        // We don't want to update custom meta on update
+        return $custom_meta;
+    }
+
+    $language = WPHelper::getLanguage();
+    if (!$language && strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') {
+        $language = WPHelper::getLanguageFromReferer();
+    }
+
+    if (!$language) {
+        // No language metadata
+        return $custom_meta;
+    }
+
+    $custom_meta['linguise_register_language'] = $language;
+
+    return $custom_meta;
+}, 5, 3);
+
+// Load all the super-important stuff first
+require_once ABSPATH . 'wp-admin/includes/plugin.php';
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'FragmentHandler.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'AttributeHandler.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'rest-ajax.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'third-party-loader.php');
+
 if (wp_doing_ajax()) {
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
-    if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'wpamelia_api') {
-        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'ameliabooking.php');
-    }
-
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
-    if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'bookingpress_front_save_appointment_booking') {
-        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
-    }
-
-    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
-    if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'woocommerce_mark_order_status') {
-        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce-admin-email.php');
-    }
-
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
     if (empty($_REQUEST['action']) || strpos($_REQUEST['action'], 'wc_emailer') === false) {
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'debug.php');
@@ -331,25 +353,13 @@ if (wp_doing_ajax()) {
 // fixme: should not be a global script variable
 $languages_names = \Linguise\WordPress\Helper::getLanguagesInfos();
 
+// Load all the frontend stuff
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'install.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'switcher.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/browser_language.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'FragmentHandler.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'AttributeHandler.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'rest-ajax.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'surecart.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bookingpress-appointment-booking.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'elementor.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'facetwp.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woo-stripe-payment.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'wc-product-addons.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'wp-rocket.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'woocommerce-gateway-stripe.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'ajax-search-for-woocommerce.php');
 
 register_deactivation_hook(__FILE__, 'linguiseUnInstall');
 /**
