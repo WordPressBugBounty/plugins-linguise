@@ -26,9 +26,11 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
      * @var array
      */
     protected static $fragment_overrides = [
-        'name' => 'wcpa-context',
-        'match' => 'var wcpa_front = (.*?);',
-        'replacement' => 'var wcpa_front = $$JSON_DATA$$;',
+        [
+            'name' => 'wcpa-context',
+            'match' => 'var wcpa_front = (.*?);',
+            'replacement' => 'var wcpa_front = $$JSON_DATA$$;',
+        ],
     ];
 
     /**
@@ -86,25 +88,6 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
         }
 
         self::$fragment_keys = $fragment_filters;
-
-        add_filter('linguise_fragment_attributes', function ($fragments, $html_data) {
-            // Check if there is data-wcpa attribute in the HTML data
-            if (preg_match('/data-wcpa=(["\'])([^"]+)\1/', $html_data, $matches)) {
-                // Get the value of the data-wcpa attribute
-                $wcpa = $matches[1];
-
-                // Check if the value is not empty
-                if (!empty($wcpa)) {
-                    // Add the data-wcpa attribute to the fragments array
-                    $fragments[] = [
-                        'name' => 'wcpa-data-attrs',
-                        'key' => 'data-wcpa',
-                    ];
-                }
-            }
-
-            return $fragments;
-        }, 100, 2);
     }
 
     /**
@@ -114,7 +97,9 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
      */
     public function shouldLoad()
     {
-        return is_plugin_active('woo-custom-product-addons/start.php');
+        $free_ver = is_plugin_active('woo-custom-product-addons/start.php');
+        $pro_ver = is_plugin_active('woo-custom-product-addons-pro/start.php');
+        return $free_ver || $pro_ver;
     }
 
     /**
@@ -124,7 +109,7 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
      */
     public function init()
     {
-        // Stub
+        add_filter('linguise_fragment_attributes', [$this, 'filterAttribute'], 100, 2);
     }
 
     /**
@@ -134,6 +119,36 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
      */
     public function destroy()
     {
-        // Stub
+        remove_filter('linguise_fragment_attributes', [$this, 'filterAttribute'], 100, 2);
+    }
+
+    /**
+     * Filter the attributes to be translated by Linguise
+     *
+     * This is used since we want to also dynamically check if data-wcpa is present
+     *
+     * @param array  $fragments The fragments attributes that will be translated
+     * @param string $html_data The HTML data of the current page
+     *
+     * @return array The modified fragments attributes
+     */
+    public function filterAttribute($fragments, $html_data)
+    {
+        // Check if there is data-wcpa attribute in the HTML data
+        if (preg_match('/data-wcpa=(["\'])([^"]+)\1/', $html_data, $matches)) {
+            // Get the value of the data-wcpa attribute
+            $wcpa = $matches[1];
+
+            // Check if the value is not empty
+            if (!empty($wcpa)) {
+                // Add the data-wcpa attribute to the fragments array
+                $fragments[] = [
+                    'name' => 'wcpa-data-attrs',
+                    'key' => 'data-wcpa',
+                ];
+            }
+        }
+
+        return $fragments;
     }
 }

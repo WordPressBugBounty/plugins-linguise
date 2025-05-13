@@ -27,10 +27,12 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
      * @var array
      */
     protected static $fragment_overrides = [
-        'name' => 'ajax-search-for-woocommerce',
-        'key' => 'jquery-dgwt-wcas-js-extra',
-        'match' => 'var dgwt_wcas = (.*?);',
-        'replacement' => 'var dgwt_wcas = $$JSON_DATA$$;',
+        [
+            'name' => 'ajax-search-for-woocommerce',
+            'key' => 'jquery-dgwt-wcas-js-extra',
+            'match' => 'var dgwt_wcas = (.*?);',
+            'replacement' => 'var dgwt_wcas = $$JSON_DATA$$;',
+        ]
     ];
 
     /**
