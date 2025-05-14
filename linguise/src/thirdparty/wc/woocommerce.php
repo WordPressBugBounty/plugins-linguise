@@ -263,7 +263,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     {
         $language_meta = $this->getWooLanguage();
         if (empty($language_meta)) {
-            return $language_meta;
+            return $endpoint;
         }
 
         if ($request === 'checkout') {
