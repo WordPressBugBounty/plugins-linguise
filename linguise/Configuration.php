@@ -111,6 +111,10 @@ class Configuration
         $response = Response::getInstance();
         $content  = $response->getContent();
 
+        if (self::isXml($content)) {
+            return;
+        }
+
         $all_fragments = FragmentHandler::findWPFragments($content);
         $attrs_fragments = AttributeHandler::findWPFragments($content);
         $merged_fragments = array_merge($all_fragments, $attrs_fragments);
@@ -135,6 +139,10 @@ class Configuration
     {
         $response = Response::getInstance();
         $content = $response->getContent();
+
+        if (self::isXml($content)) {
+            return;
+        }
 
         $all_fragments = FragmentHandler::intoJSONFragments($content);
         try {
@@ -183,6 +191,31 @@ class Configuration
 
         if (strpos($request->getPathname(), 'wp-json/oembed/1.0/embed') !== false) {
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if content is XML
+     *
+     * @param string $content The request content
+     *
+     * @return boolean
+     */
+    public static function isXml($content)
+    {
+        $patterns = [
+            '/^[\s]*<\?xml[\s\S]*?>[\s]*<(urlset|sitemapindex)[\s\S]*?>[\s\S]*?<\/(urlset|sitemapindex)>/mi',
+            '/^<(urlset|sitemapindex)/',
+            '/^[\s]*(<\?xml[^>]*>)?<rss[^>]*xmlns:g="http:\/\/base\.google\.com\/ns(?:\/[^"]*)?"[^>]*>/mi',
+            '/<\?xml[^>]*>\s*<rss[^>]*>([\s\S]*?<\/item>\s*<\/channel>\s*<\/rss>)/mi',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $content)) {
+                return true;
+            }
         }
 
         return false;
