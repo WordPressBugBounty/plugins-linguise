@@ -40,7 +40,7 @@ class WPRocketIntegration extends LinguiseBaseIntegrations
         add_filter('rocket_exclude_js', [$this, 'excludeJS'], 10, 1);
         add_filter('rocket_exclude_defer_js', [$this, 'excludeJS'], 10, 1);
         add_filter('rocket_exclude_css', [$this, 'excludeCSS'], 10, 1);
-        add_filter('rocket_rucss_external_exclusions', 'excludeCSS', 10, 1);
+        add_filter('rocket_rucss_external_exclusions', [$this, 'excludeCSS'], 10, 1);
     }
 
     /**
@@ -53,6 +53,7 @@ class WPRocketIntegration extends LinguiseBaseIntegrations
         remove_filter('rocket_exclude_js', [$this, 'excludeJS'], 10, 1);
         remove_filter('rocket_exclude_defer_js', [$this, 'excludeJS'], 10, 1);
         remove_filter('rocket_exclude_css', [$this, 'excludeCSS'], 10, 1);
+        remove_filter('rocket_rucss_external_exclusions', [$this, 'excludeCSS'], 10, 1);
     }
 
     /**

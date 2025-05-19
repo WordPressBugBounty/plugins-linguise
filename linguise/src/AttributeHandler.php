@@ -104,6 +104,9 @@ class AttributeHandler extends FragmentHandler
                     continue;
                 }
 
+                // Unroll the entity
+                $key_data = html_entity_decode(self::unprotectEntity($key_data), ENT_QUOTES, 'UTF-8');
+
                 // Is the data URL encoded?
                 $should_encode = isset($matched['encode']) && $matched['encode'];
                 if ($should_encode) {
@@ -132,7 +135,7 @@ class AttributeHandler extends FragmentHandler
         }
 
         if (!empty($all_fragments)) {
-            $html_data = $html_dom->saveHTML();
+            $html_data = self::saveHTML($html_dom);
         }
 
         Debug::log('AttributeHandler -> Collected: ' . json_encode($all_fragments, JSON_PRETTY_PRINT));
@@ -175,6 +178,10 @@ class AttributeHandler extends FragmentHandler
      */
     public static function injectTranslatedWPFragments($html_data, $fragments)
     {
+        if (empty($fragments)) {
+            return $html_data;
+        }
+
         $html_dom = self::loadHTML($html_data);
         if (empty($html_dom)) {
             return $html_data;
@@ -212,6 +219,9 @@ class AttributeHandler extends FragmentHandler
                     continue;
                 }
 
+                // Since we have protection enabled around this!
+                $match_data = html_entity_decode(self::unprotectEntity($match_data), ENT_QUOTES, 'UTF-8');
+
                 $should_encode = isset($matched['encode']) && $matched['encode'];
                 if ($should_encode) {
                     $match_data = urldecode($match_data);
@@ -236,15 +246,26 @@ class AttributeHandler extends FragmentHandler
                     $replaced_json = rawurlencode($replaced_json);
                 }
 
-                $attr_html->setAttribute($matched['key'], $replaced_json);
+                // Protect the entity back
+                $protected_json = self::protectEntity(htmlspecialchars($replaced_json, ENT_QUOTES, 'UTF-8', false));
+
+                $attr_html->setAttribute($matched['key'], $protected_json);
                 $attr_html->removeAttribute($matched['attr_ids']);
             }
         }
 
-        $html_data = $html_dom->saveHTML();
+        $html_data = self::saveHTML($html_dom);
         foreach ($queued_deletions as $deletion) {
             foreach ($deletion as $fragment) {
+                $decoded_match = html_entity_decode($fragment['match'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 $html_data = str_replace($fragment['match'], '', $html_data);
+                $html_data = str_replace($decoded_match, '', $html_data);
+
+                // Replace single & to &amp;
+                $simple_sub = preg_replace('/&(?!(?:amp|lt|gt|quot|apos);)/', '&amp;', $decoded_match);
+                if (!empty($simple_sub)) {
+                    $html_data = str_replace($simple_sub, '', $html_data);
+                }
             }
         }
 

@@ -59,6 +59,17 @@ class FragmentHandler
     protected static $frag_html_match = '/<(div|a|linguise-main) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: href="([^"]*)")?>(.*?)<\/\1>/si';
 
     /**
+     * Marker used to protect the HTML entities
+     *
+     * @var array
+     */
+    protected static $marker_entity = [
+        'common' => 'linguise-internal-entity',
+        'named' => 'linguise-internal-entity1',
+        'numeric' => 'linguise-internal-entity2',
+    ];
+
+    /**
      * Default filters for the fragments
      *
      * @var array
@@ -553,6 +564,87 @@ class FragmentHandler
     }
 
     /**
+     * Protect the HTML entities in the source code.
+     *
+     * Adapted from: https://github.com/ivopetkov/html5-dom-document-php/blob/master/src/HTML5DOMDocument.php
+     *
+     * @param string $source The source code to be protected
+     *
+     * @return string The protected source code
+     */
+    protected static function protectEntity($source)
+    {
+        // Replace the entity with our own
+        $source = preg_replace('/&([a-zA-Z]*);/', self::$marker_entity['named'] . '-$1-end', $source);
+        $source = preg_replace('/&#([0-9]*);/', self::$marker_entity['numeric'] . '-$1-end', $source);
+
+        return $source;
+    }
+
+    /**
+     * Unprotect the HTML entities in the source code.
+     *
+     * @param string $html The HTML code to be unprotected
+     *
+     * @return string The unprotected HTML code
+     */
+    protected static function unprotectEntity($html)
+    {
+        if (strpos($html, self::$marker_entity['common']) !== false) {
+            $html = preg_replace('/' . self::$marker_entity['named'] . '-(.*?)-end/', '&$1;', $html);
+            $html = preg_replace('/' . self::$marker_entity['numeric'] . '-(.*?)-end/', '&#$1;', $html);
+        }
+
+        return $html;
+    }
+
+    /**
+     * Protect the HTML string before processing with DOMDocument.
+     *
+     * It does:
+     * - Add CDATA around script tags content
+     * - Preserve html entities
+     *
+     * Adapted from: https://github.com/ivopetkov/html5-dom-document-php/blob/master/src/HTML5DOMDocument.php
+     *
+     * @param string $source The HTML source code to be protected
+     *
+     * @return string The protected HTML source code
+     */
+    private static function protectHTML($source)
+    {
+        // Add CDATA around script tags content
+        $matches = null;
+        preg_match_all('/<script(.*?)>/', $source, $matches);
+        if (isset($matches[0])) {
+            $matches[0] = array_unique($matches[0]);
+            foreach ($matches[0] as $match) {
+                if (substr($match, -2, 1) !== '/') { // check if ends with />
+                    $source = str_replace($match, $match . '<![CDATA[-linguise-dom-internal-cdata', $source); // Add CDATA after the open tag
+                }
+            }
+        }
+
+        $source = str_replace('</script>', '-linguise-dom-internal-cdata]]></script>', $source); // Add CDATA before the end tag
+        $source = str_replace('<![CDATA[-linguise-dom-internal-cdata-linguise-dom-internal-cdata]]>', '', $source); // Clean empty script tags
+        $matches = null;
+        preg_match_all('/\<!\[CDATA\[-linguise-dom-internal-cdata.*?-linguise-dom-internal-cdata\]\]>/s', $source, $matches);
+        if (isset($matches[0])) {
+            $matches[0] = array_unique($matches[0]);
+            foreach ($matches[0] as $match) {
+                if (strpos($match, '</') !== false) { // check if contains </
+                    $source = str_replace($match, str_replace('</', '<-linguise-dom-internal-cdata-endtagfix/', $match), $source);
+                }
+            }
+        }
+
+        // Preserve html entities
+        $source = self::protectEntity($source);
+
+        return $source;
+    }
+
+    /**
      * Load the HTML data into a DOMDocument object.
      *
      * @param string $html_data The HTML data to be loaded
@@ -568,7 +660,7 @@ class FragmentHandler
 
         // Load HTML
         $html_dom = new \DOMDocument();
-        @$html_dom->loadHTML($html_data, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
+        @$html_dom->loadHTML(self::protectHTML($html_data), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
 
         /**
         * Avoid mangling the CSS and JS code with encoded HTML entities
@@ -604,6 +696,38 @@ class FragmentHandler
         }
 
         return $html_dom;
+    }
+
+    /**
+     * Save the HTML data into a string.
+     *
+     * @param \DOMDocument $dom The DOMDocument object to be saved
+     *
+     * @return string The saved HTML data
+     */
+    protected static function saveHTML($dom)
+    {
+        // Save HTML
+        $html_data = $dom->saveHTML();
+        if ($html_data === false) {
+            return '';
+        }
+
+        // Unprotect HTML entities
+        $html_data = self::unprotectEntity($html_data);
+
+        // Unprotect HTML
+        $code_to_be_removed = [
+            'linguise-dom-internal-content',
+            '<![CDATA[-linguise-dom-internal-cdata',
+            '-linguise-dom-internal-cdata]]>',
+            '-linguise-dom-internal-cdata-endtagfix'
+        ];
+        foreach ($code_to_be_removed as $code) {
+            $html_data = str_replace($code, '', $html_data);
+        }
+
+        return $html_data;
     }
 
     /**

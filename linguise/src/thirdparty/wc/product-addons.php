@@ -51,6 +51,10 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
             'className',
             'tempId',
             'elementId',
+            'repeater_section_field_label',
+            'repeater_section_label',
+            'repeater_bind',
+
         ];
         foreach ($key_exact_ignore as $key) {
             $fragment_filters[] = [
@@ -77,7 +81,13 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
             'type',
             'elementId',
             'cl_rule',
-            'values\.\d+\.(?:value|tempId)$',
+            'priceOptions',
+            'pricingType',
+            'price',
+            '\w+_position$',
+            'values\.\d+\.(?:value|tempId|price)$',
+            'relations\.\d+\.rules\.\d+\.operator',
+            'relations\.\d+\.rules\.\d+\.rules\.cl_(?:field|relation|val)',
         ];
         foreach ($regex_fields as $key) {
             $fragment_filters[] = [
@@ -86,6 +96,13 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
                 'kind' => 'deny',
             ];
         }
+
+        // Repeater fields
+        $fragment_filters[] = [
+            'key' => 'repeater_(section_*|bind|max)',
+            'mode' => 'regex',
+            'kind' => 'deny',
+        ];
 
         self::$fragment_keys = $fragment_filters;
     }
