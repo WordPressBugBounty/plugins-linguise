@@ -7,7 +7,7 @@ defined('LINGUISE_SCRIPT_TRANSLATION') or die();
 class Certificates
 {
     /**
-     * @var null|Request
+     * @var null|Certificates
      */
     private static $_instance = null;
 
@@ -19,7 +19,7 @@ class Certificates
     /**
      * Retrieve singleton instance
      *
-     * @return Request|null
+     * @return Certificates
      */
     public static function getInstance() {
 

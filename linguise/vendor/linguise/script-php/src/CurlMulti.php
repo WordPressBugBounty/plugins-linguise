@@ -7,7 +7,7 @@ defined('LINGUISE_SCRIPT_TRANSLATION') or die();
 class CurlMulti
 {
     /**
-     * @var null|Request
+     * @var null|CurlMulti
      */
     private static $_instance = null;
 
@@ -17,14 +17,14 @@ class CurlMulti
     protected $_request_instances = [];
 
     /**
-     * @var resource
+     * @var \CurlMultiHandle
      */
     protected $_curl_multi;
 
     /**
      * Retrieve singleton instance
      *
-     * @return Request|null
+     * @return CurlMulti
      */
     public static function getInstance() {
 
@@ -102,7 +102,7 @@ class CurlMulti
      * Prepare the request and return the curl resource
      *
      * @param $instance
-     * @return false|resource
+     * @return false|\CurlHandle
      */
     public function prepareRequest($instance) {
 

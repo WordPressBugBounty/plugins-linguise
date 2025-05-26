@@ -112,7 +112,7 @@ class CurlRequest
                                     if (!$file_value['tmp_name'][$index]) {
                                         continue;
                                     }
-        
+
                                     $boundary->addPostFile(
                                         $file_name . '[' . $index . ']',
                                         $file_value['tmp_name'][$index],
@@ -125,7 +125,8 @@ class CurlRequest
                                     continue;
                                 }
 
-                                $boundary->addPostFile($file_name, $file_value['tmp_name'], $file_name, $file_value['type']);
+                                $prefer_name = !empty($file_value['name']) ? $file_value['name'] : null;
+                                $boundary->addPostFile($file_name, $file_value['tmp_name'], $prefer_name, $file_value['type']);
                             }
                         }
                     }

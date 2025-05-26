@@ -7,7 +7,7 @@ defined('LINGUISE_SCRIPT_TRANSLATION') or die();
 class Cache
 {
     /**
-     * @var null|Request
+     * @var null|Cache
      */
     private static $_instance = null;
 
@@ -36,7 +36,7 @@ class Cache
     /**
      * Retrieve singleton instance
      *
-     * @return Request|null
+     * @return Cache
      */
     public static function getInstance() {
 
