@@ -241,6 +241,36 @@ class CurlRequest
         }
 
         $content_type = $response->getHeader('Content-Type');
+        if (empty($content_type)) {
+            // Determine if we need to translate the response
+            if (empty($body)) {
+                // Failed to retrieve content, we cannot determine the content type
+                $response->setResponseCode($response_code);
+                $response->setContent($body);
+                Debug::log('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
+                Debug::saveError('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
+                $response->end();
+            }
+
+            // Try to guess content type from body
+            if (strpos($body, '<!DOCTYPE html>') === 0 || strpos($body, '<html') === 0) {
+                $content_type = 'text/html; charset=UTF-8';
+            } elseif (strpos($body, '<?xml') === 0 || strpos($body, '<rss') === 0) {
+                $content_type = 'application/xml; charset=UTF-8';
+            } elseif (strpos($body, '{') === 0 && strpos($body, '}') !== false) {
+                $content_type = 'application/json; charset=UTF-8';
+            }
+
+            if (empty($content_type)) {
+                // Still no content type, we cannot determine the content type
+                $response->setResponseCode($response_code);
+                $response->setContent($body);
+                Debug::log('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
+                Debug::saveError('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
+                $response->end();
+            }
+        }
+
         $content_type = explode(';', $content_type)[0];
 
         // Check if JSON response (include utf-8 charset)

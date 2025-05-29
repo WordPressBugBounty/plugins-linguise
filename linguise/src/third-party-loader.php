@@ -66,6 +66,7 @@ class ThirdPartyLoader
         'surecart' => 'SurecartIntegration',
         'fluentcrm' => 'FluentCRMIntegration',
         'wp-rocket' => 'WPRocketIntegration',
+        'page-scroll-to-id' => 'PageScrollToIdIntegration'
     ];
 
     /**
