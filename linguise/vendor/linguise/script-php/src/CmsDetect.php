@@ -54,7 +54,11 @@ class CmsDetect {
             }
         }
 
-        if (file_exists($base_dir . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'magento')) {
+        $magento_root_dir = str_replace(DIRECTORY_SEPARATOR . 'pub', '', $base_dir);
+        if (
+            file_exists($base_dir . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'magento') ||
+            file_exists($magento_root_dir . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR . 'magento')
+        ) {
             // Magento 2.x
             return 'magento';
         }

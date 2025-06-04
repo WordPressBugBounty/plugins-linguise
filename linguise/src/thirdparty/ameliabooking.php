@@ -41,8 +41,7 @@ class AmeliaBookingIntegration extends LinguiseBaseIntegrations
     public function shouldLoad()
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
-        $is_ajax_active = wp_doing_ajax() && !empty($_REQUEST['action']) && $_REQUEST['action'] === 'wpamelia_api';
-        return is_plugin_active('ameliabooking/ameliabooking.php') && $is_ajax_active;
+        return is_plugin_active('ameliabooking/ameliabooking.php');
     }
 
     /**
