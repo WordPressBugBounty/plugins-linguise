@@ -56,7 +56,15 @@ class FragmentHandler
      *
      * @var string
      */
-    protected static $frag_html_match = '/<(div|a|linguise-main) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: href="([^"]*)")?>(.*?)<\/\1>/si';
+    protected static $frag_html_match = '/<(div|a|linguise-main|img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text|media-img|media-imgset)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?>(.*?)<\/\1>/si';
+    /**
+     * Regex/matcher for our custom HTML fragment
+     *
+     * This version support self-closing tag, e.g. <img>
+     *
+     * @var string
+     */
+    protected static $frag_html_match_self_close = '/<(img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text|media-img|media-imgset)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?\s*\/?>/si';
 
     /**
      * Marker used to protect the HTML entities
@@ -393,6 +401,25 @@ class FragmentHandler
     }
 
     /**
+     * Check if the string is a image link or not.
+     *
+     * @param string $value The string to be checked
+     *
+     * @return boolean - True if it's a image link, false if it's not
+     */
+    private static function isImageLink($value)
+    {
+        // There is so much more image extension
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff', 'tif', 'ico', 'avif', 'heic', 'heif'];
+        $regex_matcher = '/\.(?:' . implode('|', $extensions) . ')$/i';
+        if (preg_match($regex_matcher, $value)) {
+            // We don't need to validate the link since this is called inside isStringLink
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Check if the string is a HTML element or not.
      *
      * @param string $value The string to be checked
@@ -489,6 +516,9 @@ class FragmentHandler
             $format = 'text';
             if ($tl_link) {
                 $format = 'link';
+                if (self::isImageLink($value)) {
+                    $format = 'media-img';
+                }
             } elseif (is_string($tl_dom)) {
                 $format = $tl_dom;
             }
@@ -727,7 +757,48 @@ class FragmentHandler
             $html_data = str_replace($code, '', $html_data);
         }
 
+        // Unmangle stuff like &amp;#xE5;
+        $html_data = preg_replace('/&amp;#x([0-9A-Fa-f]+);/', '&#x$1;', $html_data);
+
         return $html_data;
+    }
+
+    /**
+     * Unclobber the CDATA internal
+     *
+     * NOTE: Only use this when processing a script content internal data not the whole HTML data.
+     *
+     * This is used to protect the CDATA internal data from being mangled by the DOMDocument.
+     *
+     * @param string $html_data The HTML data to be unclobbered
+     *
+     * @return string The unclobbered HTML data
+     */
+    protected static function unclobberCdataInternal($html_data)
+    {
+        // Unclobber the CDATA internal
+        $html_data = str_replace('<![CDATA[-linguise-dom-internal-cdata', '', $html_data);
+        $html_data = str_replace('-linguise-dom-internal-cdata]]>', '', $html_data);
+        $html_data = str_replace('<-linguise-dom-internal-cdata-endtagfix/', '</', $html_data);
+
+        return $html_data;
+    }
+
+    /**
+     * Clobber back the CDATA internal
+     *
+     * NOTE: Only use this when processing a script content internal data not the whole HTML data.
+     *
+     * This is used to protect the CDATA internal data from being mangled by the DOMDocument.
+     *
+     * @param string $html_data The HTML data to be clobbered
+     *
+     * @return string The clobbered HTML data
+     */
+    protected static function clobberCdataInternal($html_data)
+    {
+        // Append prefix and suffix
+        return '<![CDATA[-linguise-dom-internal-cdata' . $html_data . '-linguise-dom-internal-cdata]]>';
     }
 
     /**
@@ -824,6 +895,12 @@ class FragmentHandler
             ];
         }
 
+        $current_list[] = [
+            'name' => 'surecart-store-data',
+            'key' => 'sc-store-data',
+            'mode' => 'app_json',
+        ];
+
         // Merge with apply_filters
         if (function_exists('apply_filters')) {
             $current_list = apply_filters('linguise_fragment_override', $current_list, $html_data);
@@ -858,6 +935,9 @@ class FragmentHandler
             if ($fragment['format'] === 'html-main') {
                 $tag = 'linguise-main';
             }
+            if ($fragment['format'] === 'media-img' || $fragment['format'] === 'media-imgset') {
+                $tag = 'img';
+            }
             $html .= '<' . $tag . ' class="linguise-fragment" data-fragment-name="' . $fragment_name . '" data-fragment-param="' . $fragment_param . '" data-fragment-key="';
             $html .= $fragment['key'] . '" data-fragment-format="' . $fragment['format'] . '" data-fragment-mode="' . $json_fragments['mode'] . '"';
             if ($json_fragments['mode'] === 'attribute' && isset($json_fragments['attribute'])) {
@@ -865,6 +945,9 @@ class FragmentHandler
             }
             if ($fragment['format'] === 'link') {
                 $html .= ' href="' . $fragment['value'] . '">';
+            } elseif ($fragment['format'] === 'media-img' || $fragment['format'] === 'media-imgset') {
+                $tag_select = $fragment['format'] === 'media-imgset' ? 'srcset' : 'src';
+                $html .= ' ' . $tag_select . '="' . $fragment['value'] . '">';
             } else {
                 $html .= '>' . $frag_value;
             }
@@ -885,7 +968,9 @@ class FragmentHandler
     {
         $fragments = [];
         // Let's just use regex to get anything with "linguise-fragment" class
-        preg_match_all(self::$frag_html_match, $html_fragments, $matches, PREG_SET_ORDER, 0);
+        preg_match_all(self::$frag_html_match, $html_fragments, $std_matches, PREG_SET_ORDER, 0);
+        preg_match_all(self::$frag_html_match_self_close, $html_fragments, $self_close_matches, PREG_SET_ORDER, 0);
+        $matches = array_merge($std_matches, $self_close_matches);
         foreach ($matches as $match) {
             $fragment_name = $match[2];
             $fragment_param = $match[3];
@@ -893,9 +978,9 @@ class FragmentHandler
             $fragment_format = $match[5];
             $fragment_mode = $match[6];
 
-            $fragment_value = $match[9];
+            $fragment_value = isset($match[9]) ? $match[9] : '';
 
-            if ($fragment_format === 'link') {
+            if ($fragment_format === 'link' || $fragment_format === 'media-img' || $fragment_format === 'media-imgset') {
                 $fragment_value = $match[8];
             }
 
@@ -905,6 +990,12 @@ class FragmentHandler
             } elseif ($fragment_format === 'html-main') {
                 // parse back the linguise-main
                 $fragment_value = preg_replace('/<linguise-main>(.*?)<\/linguise-main>$/si', '$1', $fragment_value, 1);
+            }
+
+            // Strip any data-editor="linguise" wrap
+            $result_strip = preg_replace('/^\s*<span data-editor="linguise" data-linguise-hash="(?:.*?)">(.*?)<\/span>$/', '$1', $fragment_value, 1);
+            if (!empty($result_strip)) {
+                $fragment_value = $result_strip;
             }
 
             if (!isset($fragments[$fragment_name])) {
@@ -964,6 +1055,7 @@ class FragmentHandler
         $override_list = self::getJSONOverrideMatcher($html_data);
 
         foreach ($override_list as $override_item) {
+            $script_content = self::unclobberCdataInternal($script_content);
             if (isset($override_item['mode']) && $override_item['mode'] === 'app_json') {
                 // If mode is app_json and key is the same
                 if (isset($override_item['key']) &&  $override_item['key'] === $script_id) {
@@ -1056,9 +1148,11 @@ class FragmentHandler
 
             $frag_id = $attr_match[1];
 
-            $match_res = preg_match('/var ' . str_replace('-', '_', $frag_id) . '_params = (.*);/', $script->textContent, $json_matches);
+            $script_content = self::unclobberCdataInternal($script->textContent);
+
+            $match_res = preg_match('/var ' . str_replace('-', '_', $frag_id) . '_params = (.*);/', $script_content, $json_matches);
             if ($match_res === false || $match_res === 0) {
-                $unmatched_res = preg_match_all('/var (.+)_params = (.*);/', $script->textContent, $json_multi_matches, PREG_SET_ORDER, 0);
+                $unmatched_res = preg_match_all('/var (.+)_params = (.*);/', $script_content, $json_multi_matches, PREG_SET_ORDER, 0);
                 if ($unmatched_res === false || $unmatched_res === 0) {
                     $overridden_temp = self::tryMatchWithOverride($script, $html_data);
                     if (is_array($overridden_temp)) {

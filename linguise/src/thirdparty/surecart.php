@@ -40,6 +40,124 @@ class SurecartIntegration extends LinguiseBaseIntegrations
     ];
 
     /**
+     * A collection of HTML attributes that you want to translate
+     *
+     * @var array
+     */
+    protected static $fragment_attributes = [
+        [
+            'name' => 'surecart-customer-email-track',
+            'key' => 'tracking-confirmation-message',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-customer-email'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-customer-email-label',
+            'key' => 'label',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-customer-email'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-customer-name-label',
+            'key' => 'label',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-customer-name'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-customer-name-placeholder',
+            'key' => 'placeholder',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-customer-name'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-order-submit-secure-label',
+            'key' => 'secure-notice-text',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-order-submit'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-order-coupon-form-placeholder',
+            'key' => 'placeholder',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-order-coupon-form'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-order-summary-sum-text',
+            'key' => 'order-summary-text',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-order-summary'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-order-summary-inv-sum-text',
+            'key' => 'invoice-summary-text',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-order-summary'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-line-trial-label',
+            'key' => 'label',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'sc-line-item-trial'
+                ]
+            ]
+        ],
+        [
+            'name' => 'surecart-buy-button-context',
+            'key' => 'data-wp-context',
+            'matchers' => [
+                [
+                    'key' => 'data-sc-block-id',
+                    'value' => 'product-buy-button',
+                    'type' => 'attribute',
+                ]
+            ]
+        ]
+    ];
+
+    /**
      * A list of WP-REST ajax methods that we want to be intercepted.
      *
      * @var string[]
@@ -139,6 +257,33 @@ class SurecartIntegration extends LinguiseBaseIntegrations
             ];
         }
 
+        $img_path = [
+            '^image\.src$',
+            '^line_items\.data\.\d+\.image\.src$',
+            '^checkout\.line_items\.data\.\d+\.image\.src$',
+        ];
+        foreach ($img_path as $path) {
+            $fragment_keys[] = [
+                'key' => $path,
+                'mode' => 'regex_full',
+                'kind' => 'allow',
+                'cast' => 'media-img'
+            ];
+        }
+        $imgset_path = [
+            '^image\.srcset$',
+            '^line_items\.data\.\d+\.image\.srcset$',
+            '^checkout\.line_items\.data\.\d+\.image\.srcset$',
+        ];
+        foreach ($imgset_path as $path) {
+            $fragment_keys[] = [
+                'key' => $path,
+                'mode' => 'regex_full',
+                'kind' => 'allow',
+                'cast' => 'media-imgset'
+            ];
+        }
+
         self::$fragment_keys = $fragment_keys;
     }
 
@@ -159,7 +304,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
      */
     public function init()
     {
-        add_filter('render_block_surecart/product-buy-button', [$this, 'translateBlockContent'], 1000, 3);
+        // add_filter('render_block_surecart/product-buy-button', [$this, 'translateBlockContent'], 1000, 3);
         // add_filter('render_block_surecart/product-page', [$this, 'translateBlockContent'], 1000, 3);
     }
 
@@ -170,7 +315,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
      */
     public function destroy()
     {
-        remove_filter('render_block_surecart/product-buy-button', [$this, 'translateBlockContent'], 1000, 3);
+        // remove_filter('render_block_surecart/product-buy-button', [$this, 'translateBlockContent'], 1000, 3);
         // remove_filter('render_block_surecart/product-page', [$this, 'translateBlockContent'], 1000, 3);
     }
 
@@ -189,11 +334,11 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         if (!$language_meta) {
             $language_meta = WPHelper::getLanguageFromReferer();
         }
-    
+
         if (!$language_meta) {
             return $block_content;
         }
-    
+
         $block_name = 'wp-block_' . $instance->name;
 
         // Find all data-wp-context data
@@ -257,11 +402,11 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         if (empty($translated_fragments)) {
             return $block_content;
         }
-    
+
         if (!isset($translated_fragments[$block_name])) {
             return $block_content;
         }
-    
+
         $wp_block_fragments = $translated_fragments[$block_name];
         foreach ($wp_block_fragments as $key_prefix => $tl_json_frag) {
             // We replace data-wp-context according to the key-prefix
@@ -272,19 +417,19 @@ class SurecartIntegration extends LinguiseBaseIntegrations
             if (empty($context)) {
                 continue;
             }
-    
+
             $tl_json_frag_list = $tl_json_frag['fragments'];
             if (empty($tl_json_frag_list)) {
                 continue;
             }
-    
+
             $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($context['data'], $tl_json_frag_list);
             if ($replaced_content !== false) {
                 $whole_content = 'data-wp-context=\'' . json_encode($replaced_content) . '\'';
                 $block_content = str_replace($context['context'], $whole_content, $block_content);
             }
         }
-    
+
         return $block_content;
     }
 }

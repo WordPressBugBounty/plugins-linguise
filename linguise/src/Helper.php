@@ -97,6 +97,12 @@ class Helper
         }
         $parts = explode('/', trim($path, '/'));
 
+        $site_path = parse_url(linguiseGetSite(), PHP_URL_PATH);
+        if (strpos($path, $site_path) === 0) {
+            // Remove the site path from the URL
+            $path = substr($path, strlen($site_path));
+        }
+
         if (!count($parts) || $parts[0] === '') {
             return null;
         }
