@@ -53,6 +53,7 @@ class ThirdPartyLoader
         'ameliabooking' => 'AmeliaBookingIntegration',
         'bookingpress' => 'BookingPressIntegration',
         'elementor' => 'ElementorIntegration',
+        'elementor-pro' => 'ElementorProIntegration',
         'facetwp' => 'FacetWPIntegration',
         'wc/woocommerce' => 'WooCommerceIntegration',
         'wc/emails' => 'WooCommerceEmailsIntegration',

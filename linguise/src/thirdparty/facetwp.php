@@ -125,7 +125,7 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
         if ($language === null && strtoupper($_SERVER['REQUEST_METHOD']) === 'POST') {
             $language = WPHelper::getLanguageFromReferer();
         }
-    
+
         if ($language === null) {
             return $output;
         }
@@ -142,7 +142,6 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
 
             return $filters;
         }, 15, 1);
-
 
         // Loop through facets
         $fragments = FragmentHandler::collectFragmentFromJson($output, true);
@@ -188,12 +187,12 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
         if (empty($tl_json_frag)) {
             return $output;
         }
-    
+
         $tl_json_frag_list = $tl_json_frag['fragments'];
         if (empty($tl_json_frag_list)) {
             return $output;
         }
-    
+
         $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($output, $tl_json_frag_list);
         if ($replaced_content !== false) {
             return $replaced_content;

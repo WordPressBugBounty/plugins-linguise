@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'linguise/wordpress-plugin',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => 'dedefde0612b07e7bd9944020cb73252a3c28374',
+        'pretty_version' => 'dev-test/debug-permission-folder',
+        'version' => 'dev-test/debug-permission-folder',
+        'reference' => 'e5b3939934b0ccf867212a8d2516fee7ea5cbf4a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'linguise/wordpress-plugin' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => 'dedefde0612b07e7bd9944020cb73252a3c28374',
+            'pretty_version' => 'dev-test/debug-permission-folder',
+            'version' => 'dev-test/debug-permission-folder',
+            'reference' => 'e5b3939934b0ccf867212a8d2516fee7ea5cbf4a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

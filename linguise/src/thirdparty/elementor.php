@@ -28,7 +28,7 @@ class ElementorIntegration extends LinguiseBaseIntegrations
      */
     public function shouldLoad()
     {
-        return !empty(Helper::getLanguage());
+        return is_plugin_active('elementor/elementor.php');
     }
 
     /**
