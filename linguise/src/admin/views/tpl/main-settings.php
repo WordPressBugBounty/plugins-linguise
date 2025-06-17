@@ -1,467 +1,1020 @@
 <?php
+
 defined('ABSPATH') || die('');
 
-$latestLinguiseError = null;
-if (count($latestLinguiseErrors)) {
-    $lastErrorTimeCompare = new \DateTime($latestLinguiseErrors[0]['time']);
-    $lastErrorTimeCompare->add(new DateInterval('PT5M'));
-    if ($lastErrorTimeCompare > new \DateTime()) {
-        // It's been less than 5 minutes
-        $latestLinguiseError = $latestLinguiseErrors[0];
-    }
-}
+$options = linguiseGetOptions();
+$has_api_key = !empty($options['token']);
+
+// Collection of Translation strings, for easy translation and modification
+$translation_strings = [
+    'token' => [
+        'title' => __('Linguise API key', 'linguise'),
+        'help' => __('Register or login to your Linguise dashboard using the link here. Then copy the API key attached to the domain', 'linguise'),
+        'description' => __('To activate the translation, you need to log in to your account or register.', 'linguise'),
+    ],
+    'register' => __('Register', 'linguise'),
+    'login' => __('Login', 'linguise'),
+    'apply' => __('Apply', 'linguise'),
+    'clipboard' => __('Copy to clipboard', 'linguise'),
+
+    'translation' => __('Translation', 'linguise'),
+    'default_language' => [
+        'title' => __('Website original language', 'linguise'),
+        'help' => __('Select the default language of your website. Make sure it\'s similar to your Linguise dashboard configuration', 'linguise'),
+        'compat_support' => __('Your WordPress installation language is set to %1$s while Linguise is set to %2$s. This will prevent Linguise from working correctly.', 'linguise'),
+        'compat_unsupported' => __('Your WordPress installation language (%s) is unsupported by Linguise. This will prevent Linguise from working correctly.', 'linguise'),
+        'compat_suggest' => __('You can change your WordPress installation language in the %1$s. You can also check %2$s'),
+        'compat_suggest_wp' => __('main settings page', 'linguise'),
+        'compat_suggest_docs' => __('our documentation page', 'linguise'),
+    ],
+    'translate_into' => [
+        'title' => __('Translate your website into', 'linguise'),
+        'help' => __('Select the languages you want to translate your website into. Make sure it\'s similar to your Linguise dashboard configuration', 'linguise'),
+        'placeholder' => __('Choose your language into', 'linguise'),
+    ],
+    'auto_switcher' => [
+        'title' => __('Add language switcher automatically', 'linguise'),
+        'description' => __('The flag switcher will be added automatically to all front pages of your website.', 'linguise'),
+        'description_2' => __('If you want to display the flag in a menu item through shortcode or php code, please look into the %1$s', 'linguise'),
+        'target' => __('help section.', 'linguise'),
+    ],
+
+    'display' => __('Display options', 'linguise'),
+    'language_display' => [
+        'title' => __('Language list display', 'linguise'),
+        'help' => __('Display flag and/or language names. Language switcher default position could be anywhere in the content or in a fixed position that stays fixed or moves on scroll', 'linguise'),
+        'mode-sbs' => __('Side by side', 'linguise'),
+        'mode-dropdown' => __('Dropdown', 'linguise'),
+        'mode-popup' => __('Popup', 'linguise'),
+    ],
+    'position' => [
+        'title' => __('Position', 'linguise'),
+        'pos-topl' => __('Top left', 'linguise'),
+        'pos-topr' => __('Top right', 'linguise'),
+        'pos-botl' => __('Bottom left', 'linguise'),
+        'pos-botr' => __('Bottom right', 'linguise'),
+        'pos-topl-ns' => __('Top left (no-scroll)', 'linguise'),
+        'pos-topr-ns' => __('Top right (no-scroll)', 'linguise'),
+        'pos-botl-ns' => __('Bottom left (no-scroll)', 'linguise'),
+        'pos-botr-ns' => __('Bottom right (no-scroll)', 'linguise'),
+        'pos-inplace' => __('In place', 'linguise'),
+    ],
+    'show_flag' => __('Show flag', 'linguise'),
+    'language_names' => [
+        'label' => __('Show language names', 'linguise'),
+        'full' => __('Full names (English, Spanish...)', 'linguise'),
+        'short' => __('Short names (EN, ES...)', 'linguise'),
+    ],
+    'language_prefer' => [
+        'label' => __('Language names display', 'linguise'),
+        'help' => __('In the language switcher, display the language names in English or in the original language, i.e. French or Français', 'linguise'),
+        'en' => __('English', 'linguise'),
+        'native' => __('Native language', 'linguise'),
+    ],
+    'flag_style' => [
+        'label' => __('Flag style', 'linguise'),
+        'help' => __('Select the flag style you want to use for the language switcher', 'linguise'),
+        'round' => __('Round', 'linguise'),
+        'rectangle' => __('Rectangular', 'linguise'),
+    ],
+
+    'flag_type' => __('Flag type settings', 'linguise'),
+    'flag_type_en' => [
+        'title' => __('English flag type', 'linguise'),
+        'help' => __('Select the preferred flags for the English languages', 'linguise'),
+        'usa' => __('USA', 'linguise'),
+        'gb' => __('Great Britain', 'linguise'),
+    ],
+    'flag_type_de' => [
+        'title' => __('German flag type', 'linguise'),
+        'help' => __('Select the preferred flags for the German languages', 'linguise'),
+        'de' => __('Germany', 'linguise'),
+        'at' => __('Austria', 'linguise'),
+    ],
+    'flag_type_pt' => [
+        'title' => __('Portuguese flag type', 'linguise'),
+        'help' => __('Select the preferred flags for the Portuguese languages', 'linguise'),
+        'pt' => __('Portugal', 'linguise'),
+        'br' => __('Brazil', 'linguise'),
+    ],
+    'flag_type_tw' => [
+        'title' => __('Taiwanese flag type', 'linguise'),
+        'help' => __('Select the preferred flags for the Taiwanese languages', 'linguise'),
+        'cn' => __('China', 'linguise'),
+        'tw' => __('Taiwan', 'linguise'),
+    ],
+    'flag_type_es' => [
+        'title' => __('Spanish flag type', 'linguise'),
+        'help' => __('Select the preferred flags for the Spanish languages', 'linguise'),
+        'es' => __('Spain', 'linguise'),
+        'mx' => __('Mexico', 'linguise'),
+        'pu' => __('Peru', 'linguise'),
+    ],
+
+    'appearance' => __('Appearance', 'linguise'),
+    'flag_border' => [
+        'title' => __('Flag border radius', 'linguise'),
+        'help' => __('If you\'re using the rectangle flag shape you can apply a custom border radius in pixels', 'linguise'),
+    ],
+    'flag_size' => [
+        'title' => __('Flag size', 'linguise'),
+        'help' => __('Adjust flag size in pixels. That doesn\'t change the image weight as it\'s a .svg format', 'linguise'),
+    ],
+    'text_color' => [
+        'title' => __('Text color', 'linguise'),
+        'name_title' => __('Language name color', 'linguise'),
+        'name_help' => __('Select the default text color for your language names', 'linguise'),
+        'hover_title' => __('Language name hover color', 'linguise'),
+        'hover_help' => __('Select the mouse hover text color for your language names', 'linguise'),
+        // unused currently
+        'inherit' => __('Inherit from parent', 'linguise'),
+        'inherit_help' => __('Inherit the text color from the parent element rather than selecting here', 'linguise'),
+    ],
+    'popup' => __('Popup settings', 'linguise'),
+    'popup_text_color' => [
+        'title' => __('Popup text color', 'linguise'),
+        'name_title' => __('Popup language color', 'linguise'),
+        'name_help' => __('Select the default text color for your language names in popup box', 'linguise'),
+        'hover_title' => __('Popup language hover color', 'linguise'),
+        'hover_help' => __('Select the mouse hover text color for your language names in popup box', 'linguise'),
+        // unused currently
+        'inherit' => __('Inherit from parent', 'linguise'),
+        'inherit_help' => __('Inherit the text color from the parent element rather than selecting here', 'linguise'),
+    ],
+    'flag_shadow' => [
+        'title' => __('Flag box shadow', 'linguise'),
+        'help' => __('Adjust the color and shadow size of the language flags', 'linguise'),
+        'x' => __('X offset', 'linguise'),
+        'y' => __('Y offset', 'linguise'),
+        'blur' => __('Blur', 'linguise'),
+        'spread' => __('Spread', 'linguise'),
+        'color' => __('Shadow color', 'linguise'),
+    ],
+    'flag_hover_shadow' => [
+        'title' => __('Flag box shadow on hover', 'linguise'),
+        'help' => __('Adjust the color and shadow size when hovering the language flags', 'linguise'),
+        'x' => __('X offset', 'linguise'),
+        'y' => __('Y offset', 'linguise'),
+        'blur' => __('Blur', 'linguise'),
+        'spread' => __('Spread', 'linguise'),
+        'color' => __('Shadow color', 'linguise'),
+    ],
+];
+
+$language_display_mode = [
+    [
+        'value' => 'side_by_side',
+        'label' => $translation_strings['language_display']['mode-sbs'],
+    ],
+    [
+        'value' => 'dropdown',
+        'label' => $translation_strings['language_display']['mode-dropdown'],
+    ],
+    [
+        'value' => 'popup',
+        'label' => $translation_strings['language_display']['mode-popup'],
+    ],
+];
+
+$position_display_mode = [
+    [
+        'value' => 'no',
+        'label' => $translation_strings['position']['pos-inplace'],
+    ],
+    [
+        'value' => 'top_left',
+        'label' => $translation_strings['position']['pos-topl'],
+    ],
+    [
+        'value' => 'top_left_no_scroll',
+        'label' => $translation_strings['position']['pos-topl-ns'],
+    ],
+    [
+        'value' => 'top_right',
+        'label' => $translation_strings['position']['pos-topr'],
+    ],
+    [
+        'value' => 'top_right_no_scroll',
+        'label' => $translation_strings['position']['pos-topr-ns'],
+    ],
+    [
+        'value' => 'bottom_left',
+        'label' => $translation_strings['position']['pos-botl'],
+    ],
+    [
+        'value' => 'bottom_left_no_scroll',
+        'label' => $translation_strings['position']['pos-botl-ns'],
+    ],
+    [
+        'value' => 'bottom_right',
+        'label' => $translation_strings['position']['pos-botr'],
+    ],
+    [
+        'value' => 'bottom_right_no_scroll',
+        'label' => $translation_strings['position']['pos-botr-ns'],
+    ],
+];
+
+$language_names_display_mode = [
+    [
+        'value' => 'short',
+        'label' => $translation_strings['language_names']['short'],
+    ],
+    [
+        'value' => 'full',
+        'label' => $translation_strings['language_names']['full'],
+    ],
+];
+
+$language_lang_mode = [
+    [
+        'value' => 'en',
+        'label' => $translation_strings['language_prefer']['en'],
+    ],
+    [
+        'value' => 'native',
+        'label' => $translation_strings['language_prefer']['native'],
+    ],
+];
+
+$flag_style_mode = [
+    [
+        'value' => 'rounded',
+        'label' => $translation_strings['flag_style']['round'],
+    ],
+    [
+        'value' => 'rectangular',
+        'label' => $translation_strings['flag_style']['rectangle'],
+    ],
+];
+
+$flag_en_mode = [
+    [
+        'value' => 'en-us',
+        'label' => $translation_strings['flag_type_en']['usa'],
+    ],
+    [
+        'value' => 'en-gb',
+        'label' => $translation_strings['flag_type_en']['gb'],
+    ],
+];
+$flag_de_mode = [
+    [
+        'value' => 'de',
+        'label' => $translation_strings['flag_type_de']['de'],
+    ],
+    [
+        'value' => 'de-at',
+        'label' => $translation_strings['flag_type_de']['at'],
+    ],
+];
+$flag_pt_mode = [
+    [
+        'value' => 'pt',
+        'label' => $translation_strings['flag_type_pt']['pt'],
+    ],
+    [
+        'value' => 'pt-br',
+        'label' => $translation_strings['flag_type_pt']['br'],
+    ],
+];
+$flag_tw_mode = [
+    [
+        'value' => 'zh-tw',
+        'label' => $translation_strings['flag_type_tw']['tw'],
+    ],
+    [
+        'value' => 'zh-cn',
+        'label' => $translation_strings['flag_type_tw']['cn'],
+    ],
+];
+$flag_es_mode = [
+    [
+        'value' => 'es',
+        'label' => $translation_strings['flag_type_es']['es'],
+    ],
+    [
+        'value' => 'es-mx',
+        'label' => $translation_strings['flag_type_es']['mx'],
+    ],
+    [
+        'value' => 'es-pu',
+        'label' => $translation_strings['flag_type_es']['pu'],
+    ],
+];
 
 /**
- * Locale compare check with country code ignore check supported.
+ * Render or create HTML for a color toggles
  *
- * @param string $locale      The current locale being checked
- * @param string $test_locale The locale to test against
+ * @param string $attr     The attribute name
+ * @param string $current  The current color
+ * @param string $title    The color title or what it is for (label)
+ * @param string $help     The help tooltip messages
+ * @param string $fallback The default color format
  *
- * @return boolean
+ * @return string The rendered color toggle
  */
-function locale_compare($locale, $test_locale)
+function renderColorToggle($attr, $current, $title, $help, $fallback = '#ffffff')
 {
-    if (strcasecmp($locale, $test_locale) === 0) {
-        return true;
-    }
-
-    // trim until _ or -
-    $test_substr = substr($test_locale, 0, strpos($test_locale, '_'));
-    $test_substr = substr($test_substr, 0, strpos($test_substr, '-'));
-
-    if (strcasecmp($locale, $test_substr) === 0) {
-        return true;
-    }
-
-    // trim $locale until _ or -
-    $locale = substr($locale, 0, strpos($locale, '_'));
-    $locale = substr($locale, 0, strpos($locale, '-'));
-
-    return strcasecmp($locale, $test_locale) === 0;
-}
+    $color = $current ? $current : $fallback;
+    return (
+        '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
+            . esc_html($title) .
+            '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+        '</div>' .
+        '<div class="flex flex-row gap-2 items-center">'.
+            '<div class="flex flex-row gap-0 linguise-color-group">' .
+                '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
+                '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-validate-target="' . esc_attr($attr) . '" />' .
+            '</div>' .
+            '<div class="m-0 text-base text-neutral large-only">'
+                . esc_html($title) .
+                '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+            '</div>' .
+        '</div>' .
+        '<label ' .
+            'data-validate-warn="' . esc_attr($attr) . '"' .
+            'data-prefix="[' . esc_attr($title) . ']">' .
+        '</label>'
+    );
+};
 
 /**
- * Get the native name of a language code
+ * Render or create HTML for a color toggles with alpha input
  *
- * @param string $lang_code The language code to get the native name for
+ * @param string $attr     The attribute name
+ * @param string $current  The current color
+ * @param float  $alpha    The alpha number
+ * @param string $title    The color title or what it is for (label)
+ * @param string $help     The help tooltip messages
+ * @param string $fallback The default color format
  *
- * @return string
+ * @return string The rendered color toggle with alpha input
  */
-function get_wp_lang_native_name($lang_code)
+function renderColorTranslucentToggle($attr, $current, $alpha, $title, $help, $fallback = '#ffffff')
 {
-    require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-    $translations = wp_get_available_translations();
-    if (isset($translations[$lang_code])) {
-        return $translations[$lang_code]['native_name'];
-    }
-
-    return 'Unknown';
-}
+    $color = $current ? $current : $fallback;
+    $attr_alpha = $attr . '_alpha';
+    return (
+        '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
+            . esc_html($title) .
+            '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+        '</div>' .
+        '<div class="flex flex-row gap-2 items-center">'.
+            '<div class="flex flex-row gap-0 linguise-color-group with-transparency">' .
+                '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
+                '<span class="color-block alpha-block" data-alpharama-target="' . esc_attr($attr_alpha) . '"></span>' .
+                '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-validate-target="' . esc_attr($attr) . '" />' .
+                '<input type="number" min="0.0" max="1.0" step="0.1" value="' . esc_attr($alpha) . '" class="linguise-input rounder alpha-input" name="linguise_options[' . esc_attr($attr_alpha) . ']" data-alpharama="' . esc_attr($attr_alpha) . '" data-validate-target="' . esc_attr($attr_alpha) . '" />' .
+            '</div>' .
+            '<div class="m-0 text-base text-neutral large-only">'
+                . esc_html($title) .
+                '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+            '</div>' .
+        '</div>' .
+        '<div class="flex flex-col">' .
+            '<label ' .
+                'data-validate-warn="' . esc_attr($attr) . '"' .
+                'data-prefix="[' . esc_attr($title) . ']">' .
+            '</label>' .
+            '<label ' .
+                'data-validate-warn="' . esc_attr($attr_alpha) . '"' .
+                'data-prefix="[' . esc_attr($title) . ' alpha]">' .
+            '</label>' .
+        '</div>'
+    );
+};
 
 $website_locale = get_locale();
 $website_lang_name = '';
-$linguise_lang_code = isset($options['default_language']) ? $options['default_language'] : 'en';
-$mapped_lang_code = \Linguise\WordPress\Helper::mapLanguageToWordPressLocale($linguise_lang_code);
+$linguise_default = isset($options['default_language']) ? $options['default_language'] : 'en';
+$linguise_default_wp = \Linguise\WordPress\Helper::mapLanguageToWordPressLocale($linguise_default);
 $linguise_lang_name = 'Unknown';
 $linguise_supported = false;
-foreach ($languages_names as $language_code => $language) {
-    $current = $linguise_lang_code === 'en' ? $language['name'] : $language['original_name'];
+foreach ($language_contents as $language_code => $language) {
+    $current = $linguise_default === 'en' ? $language->name : $language->original_name;
     $lang_code_as_wp = \Linguise\WordPress\Helper::mapLanguageToWordPressLocale($language_code);
-    if (locale_compare($lang_code_as_wp, $website_locale)) {
+    if (\Linguise\WordPress\Helper::localeCompare($lang_code_as_wp, $website_locale)) {
         $website_lang_name = $current;
         $linguise_supported = true;
     }
-    if ($language_code === $linguise_lang_code) {
+    if ($language_code === $linguise_default) {
         $linguise_lang_name = $current;
     }
 }
 
+$compatibility_error_text = null;
+if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_locale)) {
+    if ($linguise_supported) {
+        $compatibility_error_text = sprintf(
+            esc_html($translation_strings['default_language']['compat_support']),
+            '<strong>' . esc_html($website_lang_name) . '</strong>',
+            '<strong>' . esc_html($linguise_lang_name) . '</strong>'
+        );
+    } else {
+        $compatibility_error_text = sprintf(
+            esc_html($translation_strings['default_language']['compat_unsupported']),
+            '<strong>' . esc_html(\Linguise\WordPress\Admin\Helper::getWPLangNativeName($website_locale)) . '</strong>'
+        );
+    }
+    $compatibility_error_text .= ' ' . sprintf(
+        esc_html($translation_strings['default_language']['compat_suggest']),
+        '<a href="' . esc_url(get_admin_url(null, '/options-general.php#WPLANG')) . '" class="linguise-link">' . esc_html($translation_strings['default_language']['compat_suggest_wp']) . '</a>',
+        '<a href="https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/" class="linguise-link" target="_blank" rel="noopener noreferrer">' . esc_html($translation_strings['default_language']['compat_suggest_docs']) . '</a>'
+    );
+}
 ?>
-<div class="content">
 
-    <?php if ($latestLinguiseError) : ?>
-    <div class="linguise-settings-option full-width">
-        <label style="color: red;" class="linguise-setting-label label-bolder linguise-tippy">
-            <?php esc_html_e('Linguise latest error', 'linguise'); ?><span class="material-icons">error_outline</span>
-        </label>
-        <div style="width: 100%;display: inline-block;margin: 10px 0;padding-left: 15px;">
-            <?php esc_html_e('Linguise returned an error in the last past 5 minutes, click on the link to get more information', 'linguise'); ?> :
-            <strong><a href="<?php echo esc_url('https://www.linguise.com/documentation/debug-support/wordpress-plugin-error-codes/#' . $latestLinguiseError['code']); ?>" target="_blank" title="<?php esc_attr('Get more information about this error on Linguise', 'linguise');?>">
-                <?php echo esc_html($latestLinguiseError['message']); ?>
-            </a>
-            </strong>
-        </div>
-    </div>
-    <?php endif; ?>
-
-    <div class="linguise-settings-option full-width">
-        <label for="token"
-               class="linguise-setting-label label-bolder linguise-tippy"
-               data-tippy="<?php esc_html_e('Register or login to your Linguise dashboard using the link here. Then copy the API key attached to the domain', 'linguise'); ?>"><?php esc_html_e('Linguise API key', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <p style="width: 100%;display: inline-block;margin: 10px 0;padding-left: 15px;">
-            <?php
-                echo sprintf(
-                    esc_html__(
-                        '%1$s and copy your domain API key to activate the translation, use the domain %2$s',
-                        'linguise'
-                    ),
-                    '<a href="https://dashboard.linguise.com/account/register" target="_blank">' . esc_html__('Register an account', 'linguise') . '</a>',
-                    '<strong>' . esc_html(linguiseGetSite()) . '</strong>'
-                );
-                ?>
-            <span class="linguise-copy-button-area linguise-tippy" data-clipboard-text="<?php echo esc_attr(linguiseGetSite()) ?>" data-tippy="<?php esc_html_e('Copy to clipboard', 'linguise'); ?>">
-                <span class="material-icons linguise-copy-button">content_copy</span>
+<div class="tab-linguise-options">
+    <!-- [BLOCK] API key -->
+    <div class="linguise-options full-width">
+        <h2 class="m-0 text-2xl font-bold text-black">
+            <?php echo esc_html($translation_strings['token']['title']); ?>
+            <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['token']['help']); ?>" data-tippy-direction="right">
+                help_outline
             </span>
-        </p>
-        <div style="padding: 10px">
-            <input type="text" class="linguise-input custom-input" name="linguise_options[token]"
-                   id="token"
-                   value="<?php echo isset($options['token']) ? esc_html($options['token']) : '' ?>"/>
-            <input type="submit"
-                   class="linguise-button blue-button waves-effect waves-light small-radius small-button"
-                   id="token_apply" value="<?php esc_html_e('Apply', 'linguise'); ?>"/>
+        </h2>
+        <div class="text-neutral mt-3">
+            <?php echo esc_html($translation_strings['token']['description']); ?>
         </div>
-    </div>
-    <div class="linguise-settings-option full-width">
-        <label for="original_language"
-               class="linguise-setting-label label-bolder linguise-tippy"
-               data-tippy="<?php esc_html_e('Select the default language of your website. Make sure it\'s similar to your Linguise dashboard configuration', 'linguise'); ?>"><?php esc_html_e('Website original language', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select id="original_language" name="linguise_options[default_language]"
-                    class="linguise-select original-color">
-                <?php foreach ($languages_names as $language_code => $language) : ?>
-                    <option value="<?php echo esc_attr($language_code); ?>" <?php echo isset($options['default_language']) ? (selected($options['default_language'], $language_code, false)) : (''); ?>>
-                        <?php // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- don't need to translate this
-                        esc_html_e($language['name']); ?> (<?php esc_html_e($language_code); ?>)
-                    </option>
-                <?php endforeach; ?>
-            </select>
+        <div id="login-register-btn-area" class="flex flex-row gap-2 mt-3<?php echo $has_api_key ? ' hidden' : ''; ?>">
+            <button type="button" class="linguise-btn rounder btn-sm" data-linguise-register-action="register" disabled>
+                <?php echo esc_html($translation_strings['register']); ?>
+            </button>
+            <button type="button" class="linguise-btn rounder outlined btn-sm" data-linguise-register-action="login" disabled>
+                <?php echo esc_html($translation_strings['login']); ?>
+            </button>
         </div>
-        <?php if (!locale_compare($mapped_lang_code, $website_locale)) : ?>
-            <div class="items-blocks">
-                <p class="block linguise-message linguise-warning" style="margin: 10px 30px;">
-                    <?php if ($linguise_supported) : ?>
-                        <?php echo sprintf(esc_html__('Your WordPress installation language is set to %1$s while Linguise is set to %2$s. This will prevent Linguise from working correctly.', 'linguise'), esc_attr($website_lang_name), esc_attr($linguise_lang_name)); ?>
-                    <?php else : ?>
-                        <?php echo sprintf(esc_html__('Your WordPress installation language (%s) is unsupported by Linguise. This will prevent Linguise from working correctly.', 'linguise'), esc_attr(get_wp_lang_native_name(get_locale()))); ?>
-                    <?php endif; ?>
-                    <?php echo sprintf(esc_html__('You can change your WordPress installation language in the %1$s. You can also check %2$s', 'linguise'), '<a target="_blank" href="' . esc_attr(get_admin_url(null, '/options-general.php#WPLANG')) . '">'. esc_html__('main settings page', 'linguise') . '</a>', '<a target="_blank" href="https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/">'. esc_html__('our documentation page', 'linguise') . '</a>'); ?>
-                </p>
-            </div>
-        <?php endif ?>
-    </div>
-    <div class="linguise-settings-option full-width">
-        <label for="translate_into"
-               class="linguise-setting-label label-bolder linguise-tippy"
-               data-tippy="<?php esc_html_e('Select the languages you want to translate your website into. Make sure it\'s similar to your Linguise dashboard configuration', 'linguise'); ?>"><?php esc_html_e('Translate your website into', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items-blocks">
-            <div class="block" style="margin: 10px;">
-                <select id="translate_into"
-                        data-placeholder="<?php esc_html_e('Choose your language into', 'linguise'); ?>" multiple
-                        class="chosen-select enabled_languages full-on-mobile chosen-sortable" name="linguise_options[enabled_languages][]">
-                    <?php foreach ($languages_names as $language_code => $language) : ?>
-                        <option value="<?php echo esc_attr($language_code); ?>" <?php echo isset($options['enabled_languages']) ? (selected(in_array($language_code, $options['enabled_languages']), true, false)) : (''); ?>>
-                            <?php // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- don't need to translate this
-                            esc_html_e($language['name']); ?> (<?php esc_html_e($language_code); ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <input type="hidden" name="enabled_languages_sortable" class="enabled_languages_sortable">
-            </div>
-        </div>
-        <p class="linguise_note note_lang_choose"><?php echo sprintf(esc_html__('Note that adding or removing languages won\'t apply as the language configuration is made from the %s only.', 'linguise'), '<a target="_blank" href="https://dashboard.linguise.com/">'. esc_html__('Linguise dashboard', 'linguise') .'</a>'); ?></p>
-        <p class="linguise_note note_lang_choose"><?php esc_html_e('Please update the domain configuration from the dashboard and save the plugin settings again, thanks! :)', 'linguise') ?></p>
-    </div>
-    <div class="linguise-settings-option full-width">
-        <label for="id-add_flag_automatically"
-               class="linguise-setting-label label-bolder linguise-label-inline"><?php esc_html_e('Add language switcher automatically', 'linguise'); ?></label>
-        <div class="linguise-switch-button" style="float: left">
-            <label class="switch">
-                <input type="hidden" name="linguise_options[add_flag_automatically]" value="0">
-                <input type="checkbox" id="id-add_flag_automatically" name="linguise_options[add_flag_automatically]"
-                       value="1" <?php echo isset($options['add_flag_automatically']) ? (checked($options['add_flag_automatically'], 1)) : (''); ?> />
-                <div class="slider"></div>
-            </label>
-        </div>
-
-        <p class="description" style="width: 100%; display: inline-block; padding-left: 15px; margin: 2px 0 10px 0">
-            <?php esc_html_e('The flag switcher will be added automatically to all front pages of your website ', 'linguise'); ?><br/>
-            <a href="#" onclick="document.getElementById('help').click();"><?php esc_html_e('If you want to display the flag in a menu item through shortcode or php code, please look into the help section ', 'linguise'); ?></a>
-        </p>
-    </div>
-    <div class="linguise-settings-option full-width">
-        <label class="linguise-setting-label label-bolder linguise-tippy"
-               data-tippy="<?php esc_html_e('Display flag and/or language names. Language switcher default position could be anywhere in the content or in a fixed position that stays fixed or moves on scroll', 'linguise'); ?>"><?php esc_html_e('Language list display', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items-blocks language-list-display">
-            <div class="display-type">
-                <ul>
-                    <?php foreach (array('side_by_side' => esc_html__('Side By Side', 'linguise'), 'dropdown' => esc_html__('Dropdown', 'linguise'), 'popup' => esc_html__('Popup', 'linguise')) as $key => $value) : ?>
-                        <li>
-                            <input type="radio" class="flag_display_type" id="id-<?php echo esc_attr($key) ?>"
-                                   name="linguise_options[flag_display_type]"
-                                   value="<?php echo esc_attr($key) ?>" <?php checked($options['flag_display_type'], $key) ?>>
-                            <label for="id-<?php echo esc_attr($key) ?>"><?php echo esc_html($value) ?></label>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-                <div class="linguise_mt_20">
-                    <?php esc_html_e('Position: '); ?>
-                    <select name="linguise_options[display_position]" class="linguise-select full-on-mobile original-color">
-                        <?php
-                        $positions = array(
-                            'no' => esc_html__('In place', 'linguise'),
-                            'top_left' => esc_html__('Top left', 'linguise'),
-                            'top_left_no_scroll' => esc_html__('Top left (no-scroll)', 'linguise'),
-                            'top_right' => esc_html__('Top right', 'linguise'),
-                            'top_right_no_scroll' => esc_html__('Top right (no-scroll)', 'linguise'),
-                            'bottom_left' => esc_html__('Bottom left', 'linguise'),
-                            'bottom_left_no_scroll' => esc_html__('Bottom left (no-scroll)', 'linguise'),
-                            'bottom_right' => esc_html__('Bottom right', 'linguise'),
-                            'bottom_right_no_scroll' => esc_html__('Bottom right (no-scroll)', 'linguise')
-                        );
-                        foreach ($positions as $key => $value) :
-                            ?>
-                            <option <?php selected($options['display_position'], $key) ?>
-                                    value="<?php echo esc_attr($key) ?>">
-                                <?php echo esc_html($value) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+        <div class="flex flex-col halfish-width with-fill-small gap-2 mt-4">
+            <div class="block-highlight flex flex-row justify-between">
+                <div class="domain-part font-bold" style="user-select: all;"><?php echo esc_html(linguiseGetSite()); ?></div>
+                <div class="copy-part" data-clipboard-text="<?php echo esc_attr(linguiseGetSite()); ?>" data-tippy="<?php echo esc_attr($translation_strings['clipboard']); ?>">
+                    <span class="material-icons copy-button align-bottom">content_copy</span>
                 </div>
             </div>
-            <div class="flag-name full-width">
-                <ul>
-                    <li>
-                        <div class="linguise-switch-button">
-                            <label class="switch" style="margin: 2px  10px">
-                                <input type="hidden" name="linguise_options[enable_flag]" value="0">
-                                <input type="checkbox" id="id-enable_flag" name="linguise_options[enable_flag]"
-                                       class="enable_flag"
-                                       value="1" <?php echo isset($options['enable_flag']) ? (checked($options['enable_flag'], 1)) : (''); ?> />
-                                <div class="slider"></div>
-                            </label>
-                            <label for="id-enable_flag"><?php esc_html_e('Flag', 'linguise'); ?></label>
-                        </div>
-                    </li>
-
-                    <li>
-                        <div class="linguise-switch-button">
-                            <label class="switch" style="margin: 2px  10px">
-                                <input type="hidden" name="linguise_options[enable_language_name]" value="0">
-                                <input type="checkbox" id="id-enable_language_name"
-                                       name="linguise_options[enable_language_name]" class="enable_language_name"
-                                       value="1" <?php echo isset($options['enable_language_name']) ? (checked($options['enable_language_name'], 1)) : (''); ?> />
-                                <div class="slider"></div>
-                            </label>
-                            <label for="id-enable_language_name"><?php esc_html_e('Language Name', 'linguise'); ?></label>
-                        </div>
-                    </li>
-
-                    <li>
-                        <div class="linguise-switch-button">
-                            <label class="switch" style="margin: 2px  10px">
-                                <input type="hidden" name="linguise_options[enable_language_short_name]" value="0">
-                                <input type="checkbox" id="id-enable_language_short_name"
-                                       name="linguise_options[enable_language_short_name]" class="enable_language_short_name"
-                                       value="1" <?php echo isset($options['enable_language_short_name']) ? (checked($options['enable_language_short_name'], 1)) : (''); ?> />
-                                <div class="slider"></div>
-                            </label>
-                            <label for="id-enable_language_short_name"><?php esc_html_e('Short names (EN, ES...)', 'linguise'); ?></label>
-                        </div>
-                    </li>
-                </ul>
+            <div class="flex flex-row gap-2 mt-2">
+                <input type="text" class="linguise-input rounder" name="linguise_options[token]" value="<?php echo esc_attr($options['token']); ?>">
+                <input type="submit" class="linguise-btn rounder btn-sm success" value="<?php echo esc_attr($translation_strings['apply']); ?>">
             </div>
         </div>
     </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="language_name_display" class="linguise-setting-label label-bolder linguise-tippy"
-               data-tippy="<?php esc_html_e('In the language switcher, display the language names in English or in the original language, i.e. French or Français', 'linguise'); ?>"><?php esc_html_e('Language names display', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[language_name_display]"
-                    class="linguise-select right-select original-color language_name_display">
-                <option value="en" <?php echo isset($options['language_name_display']) ? (selected($options['language_name_display'], 'en', false)) : (''); ?>><?php esc_html_e('English', 'linguise'); ?></option>
-                <option value="native" <?php echo isset($options['language_name_display']) ? (selected($options['language_name_display'], 'native', false)) : (''); ?>><?php esc_html_e('Native Language', 'linguise'); ?></option>
-            </select>
+    <!-- [BLOCK] Translation -->
+    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+        <div class="disabled-warning-inset"></div>
+        <div class="disabled-warning">
+            <h2 class="disabled-warning-text">
+                <?php echo esc_html($translation_strings_root['settings-hidden']['banner']); ?>
+            </h2>
+        </div>
+        <h2 class="m-0 text-2xl font-bold text-black">
+            <?php echo esc_html($translation_strings['translation']); ?>
+        </h2>
+        <div class="flex flex-col mt-4 linguise-inner-options">
+            <div>
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['default_language']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['default_language']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <select class="linguise-input rounder mt-2" name="linguise_options[default_language]">
+                <?php foreach ($language_contents as $language_code => $language) : ?>
+                    <option value="<?php echo esc_attr($language_code); ?>" <?php echo isset($options['default_language']) ? (selected($options['default_language'], $language_code, false)) : (''); ?>>
+                        <?php echo esc_html($language->name); ?> (<?php echo esc_html($language_code); ?>)
+                    </option>
+                <?php endforeach; ?>
+                </select>
+            </div>
+            <?php if (!empty($compatibility_error_text)) : ?>
+                <div class="mt-4">
+                    <?php echo \Linguise\WordPress\Admin\Helper::renderAdmonition($compatibility_error_text, 'error'); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+                </div>
+            <?php endif; ?>
+            <div class="mt-4">
+                <h3 class="m-0 text-base text-neutral-deep">
+                    <?php echo esc_html($translation_strings['translate_into']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['translate_into']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="mw-full w-full">
+                    <select id="ms-translate-into" class="chosen-select chosen-sortable mt-2 w-full mw-full" name="linguise_options[enabled_languages][]" multiple data-placeholder="<?php echo esc_attr($translation_strings['translate_into']['placeholder']); ?>">
+                    <?php foreach ($language_contents as $language_code => $language) : ?>
+                        <option value="<?php echo esc_attr($language_code); ?>" <?php echo isset($options['enabled_languages']) ? (selected(in_array($language_code, $options['enabled_languages']), true, false)) : (''); ?>>
+                            <?php echo esc_html($language->name); ?> (<?php echo esc_html($language_code); ?>)
+                        </option>
+                    <?php endforeach; ?>
+                    </select>
+                    <input type="hidden" name="enabled_languages_sortable">
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col linguise-inner-options mt-4">
+            <div class="m-0 text-base text-neutral-deep">
+                <input
+                    id="add_flag_automatically"
+                    type="checkbox"
+                    name="linguise_options[add_flag_automatically]"
+                    value="1"
+                    class="!m-0 align-middle"
+                    data-int-checkbox="add_flag_automatically"
+                    <?php echo isset($options['add_flag_automatically']) ? (checked($options['add_flag_automatically'], 1)) : (''); ?> />
+                <label for="add_flag_automatically" class="ml-1 font-semibold align-middle">
+                    <?php echo esc_html($translation_strings['auto_switcher']['title']); ?>
+                </label>
+            </div>
+            <div class="mt-1 text-neutral">
+                <div>
+                    <?php echo esc_html($translation_strings['auto_switcher']['description']); ?>
+                </div>
+                <div>
+                    <?php echo sprintf(
+                        esc_html($translation_strings['auto_switcher']['description_2']),
+                        '<a href="#help" class="linguise-link">' . esc_html($translation_strings['auto_switcher']['target']) . '</a>'
+                    ); ?>
+                </div>
+            </div>
         </div>
     </div>
+    <!-- [BLOCK] Display -->
+    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+        <div class="disabled-warning-inset"></div>
+        <div class="disabled-warning">
+            <h2 class="disabled-warning-text">
+                <?php echo esc_html($translation_strings_root['settings-hidden']['banner']); ?>
+            </h2>
+        </div>
+        <h2 class="m-0 text-2xl font-bold text-black">
+            <?php echo esc_html($translation_strings['display']); ?>
+        </h2>
+        <div class="flex flex-col mt-4 linguise-inner-options">
+            <div>
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['language_display']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['language_display']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="mt-4 flex flex-row gap-2 flex-wrap">
+                    <?php foreach ($language_display_mode as $disp_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[flag_display_type]"
+                                value="<?php echo esc_attr($disp_mode['value']); ?>"
+                                data-linguise-radio="flag_display_type"
+                                <?php checked($options['flag_display_type'], $disp_mode['value']) ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($disp_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="mt-2">
+                <h3 class="m-0 text-base text-neutral">
+                    <?php echo esc_html($translation_strings['position']['title']); ?>
+                </h3>
+                <select class="linguise-input rounder mt-2" name="linguise_options[display_position]">
+                <?php foreach ($position_display_mode as $positron) : ?>
+                    <option value="<?php echo esc_attr($positron['value']); ?>" <?php selected($options['display_position'], $positron['value']) ?> />
+                        <?php echo esc_html($positron['label']); ?>
+                    </option>
+                <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mt-4">
+                <div>
+                    <label class="linguise-slider-checkbox">
+                        <input type="checkbox" class="slider-input" data-int-checkbox="enable_flag" name="linguise_options[enable_flag]" value="1" <?php echo isset($options['enable_flag']) ? (checked($options['enable_flag'], 1)) : (''); ?> />
+                        <span class="slider"></span>
+                        <span class="slider-label font-semibold"><?php echo esc_html($translation_strings['show_flag']); ?></span>
+                    </label>
+                </div>
+                <div class="mt-2">
+                    <label class="linguise-slider-checkbox">
+                        <input type="checkbox" class="slider-input" data-int-checkbox="enable_language_name" name="linguise_options[enable_language_name]" value="1" <?php echo isset($options['enable_language_name']) ? (checked($options['enable_language_name'], 1)) : (''); ?> />
+                        <span class="slider"></span>
+                        <span class="slider-label font-semibold"><?php echo esc_html($translation_strings['language_names']['label']); ?></span>
+                    </label>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div class="flex flex-row gap-2 flex-wrap">
+                    <?php foreach ($language_names_display_mode as $name_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[enable_language_short_name]"
+                                value="<?php echo esc_attr($name_mode['value']); ?>"
+                                data-linguise-radio-int="enable_language_short_name"
+                                data-linguise-radio-int-correct="short"
+                                <?php echo isset($options['enable_language_short_name']) ? (checked($options['enable_language_short_name'], $name_mode['value'] === 'short' ? 1 : 0)) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($name_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-phone-dir mt-4 gap-2 w-full">
+            <div class="flex flex-col linguise-inner-options w-full">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['language_prefer']['label']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['language_prefer']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="flex flex-row gap-2 mt-2 flex-wrap">
+                    <?php foreach ($language_lang_mode as $lang_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[language_name_display]"
+                                value="<?php echo esc_attr($lang_mode['value']); ?>"
+                                data-linguise-radio="language_name_display"
+                                <?php echo isset($options['language_name_display']) ? (checked($options['language_name_display'], $lang_mode['value'])) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($lang_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
-    <div class="linguise-settings-option width-50-15">
-        <label for="flag_shape" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Use round svg or rectangular svg flag icons', 'linguise'); ?>"><?php esc_html_e('Flag style', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[flag_shape]"
-                    class="linguise-select right-select original-color flag_shape">
-                <option value="rounded" <?php echo isset($options['flag_shape']) ? (selected($options['flag_shape'], 'rounded', false)) : (''); ?>><?php esc_html_e('Round', 'linguise'); ?></option>
-                <option value="rectangular" <?php echo isset($options['flag_shape']) ? (selected($options['flag_shape'], 'rectangular', false)) : (''); ?>><?php esc_html_e('Rectangular', 'linguise'); ?></option>
-            </select>
+            <div class="flex flex-col linguise-inner-options w-full">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['flag_style']['label']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['flag_style']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="flex flex-row gap-2 mt-2 flex-wrap">
+                    <?php foreach ($flag_style_mode as $flag_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[flag_shape]"
+                                value="<?php echo esc_attr($flag_mode['value']); ?>"
+                                data-linguise-radio="flag_shape"
+                                <?php echo isset($options['flag_shape']) ? (checked($options['flag_shape'], $flag_mode['value'])) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($flag_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="flag_en_type" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Use the Great Britain or USA Flag for english', 'linguise'); ?>"><?php esc_html_e('English flag type', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[flag_en_type]"
-                    class="linguise-select right-select original-color flag_en_type">
-                <option value="en-us" <?php echo isset($options['flag_en_type']) ? (selected($options['flag_en_type'], 'en-us', false)) : (''); ?>><?php esc_html_e('USA flag', 'linguise'); ?></option>
-                <option value="en-gb" <?php echo isset($options['flag_en_type']) ? (selected($options['flag_en_type'], 'en-gb', false)) : (''); ?>><?php esc_html_e('Great Britain Flag', 'linguise'); ?></option>
-            </select>
+    <!-- [BLOCK] Flag display -->
+    <div class="linguise-options full-widt<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+        <div class="disabled-warning-inset"></div>
+        <div class="disabled-warning">
+            <h2 class="disabled-warning-text">
+                <?php echo esc_html($translation_strings_root['settings-hidden']['banner']); ?>
+            </h2>
+        </div>
+        <h2 class="m-0 text-2xl font-bold text-black">
+            <?php echo esc_html($translation_strings['flag_type']); ?>
+        </h2>
+        <div class="flex flex-row w-full gap-2 mt-4 flex-auto-wrap">
+            <div class="flex flex-col linguise-inner-options w-full">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['flag_type_en']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['flag_type_en']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="flex flex-row gap-2 mt-3 flex-wrap">
+                    <?php foreach ($flag_en_mode as $en_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[flag_en_type]"
+                                value="<?php echo esc_attr($en_mode['value']); ?>"
+                                data-linguise-radio="flag_en_type"
+                                <?php echo isset($options['flag_en_type']) ? (checked($options['flag_en_type'], $en_mode['value'])) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($en_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="flex flex-col linguise-inner-options w-full">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['flag_type_de']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['flag_type_de']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="flex flex-row gap-2 mt-3 flex-wrap">
+                    <?php foreach ($flag_de_mode as $de_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[flag_de_type]"
+                                value="<?php echo esc_attr($de_mode['value']); ?>"
+                                data-linguise-radio="flag_de_type"
+                                <?php echo isset($options['flag_de_type']) ? (checked($options['flag_de_type'], $de_mode['value'])) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($de_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-row w-full gap-2 mt-2 flex-auto-wrap">
+            <div class="flex flex-col linguise-inner-options w-full">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['flag_type_tw']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['flag_type_tw']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="flex flex-row gap-2 mt-2 flex-wrap">
+                    <?php foreach ($flag_tw_mode as $tw_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[flag_tw_type]"
+                                value="<?php echo esc_attr($tw_mode['value']); ?>"
+                                data-linguise-radio="flag_tw_type"
+                                <?php echo isset($options['flag_tw_type']) ? (checked($options['flag_tw_type'], $tw_mode['value'])) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($tw_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="flex flex-col linguise-inner-options w-full">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['flag_type_pt']['title']); ?>
+                    <span
+                        class="material-icons help-tooltip"
+                        data-tippy="<?php echo esc_attr($translation_strings['flag_type_pt']['help']) ?>"
+                    >
+                        help_outline
+                    </span>
+                </h3>
+                <div class="flex flex-row gap-2 mt-2 flex-wrap">
+                    <?php foreach ($flag_pt_mode as $pt_mode) : ?>
+                        <label class="linguise-radio rounder">
+                            <input 
+                                type="radio"
+                                name="linguise_options[flag_pt_type]"
+                                value="<?php echo esc_attr($pt_mode['value']); ?>"
+                                data-linguise-radio="flag_pt_type"
+                                <?php echo isset($options['flag_pt_type']) ? (checked($options['flag_pt_type'], $pt_mode['value'])) : (''); ?> />
+                            <span class="material-icons no-select">check</span>
+                            <span class="text-label font-semibold"><?php echo esc_html($pt_mode['label']); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col linguise-inner-options mt-2 w-full">
+            <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                <?php echo esc_html($translation_strings['flag_type_es']['title']); ?>
+                <span
+                    class="material-icons help-tooltip"
+                    data-tippy="<?php echo esc_attr($translation_strings['flag_type_es']['help']) ?>"
+                >
+                    help_outline
+                </span>
+            </h3>
+            <div class="flex flex-row mt-2 gap-2 flex-wrap">
+                <?php foreach ($flag_es_mode as $es_mode) : ?>
+                    <label class="linguise-radio rounder">
+                        <input 
+                            type="radio"
+                            name="linguise_options[flag_es_type]"
+                            value="<?php echo esc_attr($es_mode['value']); ?>"
+                            data-linguise-radio="flag_es_type"
+                            <?php echo isset($options['flag_es_type']) ? (checked($options['flag_es_type'], $es_mode['value'])) : (''); ?> />
+                        <span class="material-icons no-select">check</span>
+                        <span class="text-label font-semibold"><?php echo esc_html($es_mode['label']); ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="flag_de_type" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Use the Austria or German Flag for german', 'linguise'); ?>"><?php esc_html_e('German flag type', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[flag_de_type]"
-                    class="linguise-select right-select original-color flag_de_type">
-                <option value="de" <?php echo isset($options['flag_de_type']) ? (selected($options['flag_de_type'], 'de', false)) : (''); ?>><?php esc_html_e('German Flag', 'linguise'); ?></option>
-                <option value="de-at" <?php echo isset($options['flag_de_type']) ? (selected($options['flag_de_type'], 'de-at', false)) : (''); ?>><?php esc_html_e('Austria Flag', 'linguise'); ?></option>
-            </select>
+    <!-- [BLOCK] Appearance -->
+    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+        <div class="disabled-warning-inset"></div>
+        <div class="disabled-warning">
+            <h2 class="disabled-warning-text">
+                <?php echo esc_html($translation_strings_root['settings-hidden']['banner']); ?>
+            </h2>
         </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="flag_es_type" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Use the Mexico or Spanish Flag for spanish', 'linguise'); ?>"><?php esc_html_e('Spanish flag type', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[flag_es_type]"
-                    class="linguise-select right-select original-color flag_es_type">
-                <option value="es" <?php echo isset($options['flag_es_type']) ? (selected($options['flag_es_type'], 'es', false)) : (''); ?>><?php esc_html_e('Spanish Flag', 'linguise'); ?></option>
-                <option value="es-mx" <?php echo isset($options['flag_es_type']) ? (selected($options['flag_es_type'], 'es-mx', false)) : (''); ?>><?php esc_html_e('Mexico Flag', 'linguise'); ?></option>
-                <option value="es-pu" <?php echo isset($options['flag_es_type']) ? (selected($options['flag_es_type'], 'es-pu', false)) : (''); ?>><?php esc_html_e('Peruvian Flag', 'linguise'); ?></option>
-            </select>
+        <h2 class="m-0 text-2xl font-bold text-black">
+            <?php echo esc_html($translation_strings['appearance']); ?>
+        </h2>
+        <div class="flex flex-col mt-4 linguise-inner-options">
+            <div class="flex flex-row gap-2">
+                <div>
+                    <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                        <?php echo esc_html($translation_strings['flag_border']['title']); ?>
+                        <small class="text-muted">(px)</small>
+                        <span
+                            class="material-icons help-tooltip"
+                            data-tippy="<?php echo esc_attr($translation_strings['flag_border']['help']) ?>"
+                        >
+                            help_outline
+                        </span>
+                    </h3>
+                    <input
+                        type="number"
+                        class="linguise-input rounder mt-2"
+                        name="linguise_options[flag_border_radius]"
+                        value="<?php echo esc_attr((int)$options['flag_border_radius']); ?>"
+                        min="0" step="1"
+                        data-linguise-int="flag_border_radius"
+                        data-validate-target="flag-border-radius">
+                </div>
+                <div>
+                    <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                        <?php echo esc_html($translation_strings['flag_size']['title']); ?>
+                        <small class="text-muted">(px)</small>
+                        <span
+                            class="material-icons help-tooltip"
+                            data-tippy="<?php echo esc_attr($translation_strings['flag_size']['help']) ?>"
+                        >
+                            help_outline
+                        </span>
+                    </h3>
+                    <input
+                        type="number"
+                        class="linguise-input rounder mt-2"
+                        name="linguise_options[flag_width]"
+                        value="<?php echo esc_attr((int)$options['flag_width']); ?>"
+                        min="0"
+                        step="1"
+                        data-linguise-int="flag_width"
+                        data-validate-target="flag-width">
+                </div>
+            </div>
+            <label
+                data-validate-warn="flag-border-radius"
+                data-prefix="[<?php echo esc_attr($translation_strings['flag_border']['title']); ?>]">
+            </label>
+            <label
+                data-validate-warn="flag-width"
+                data-prefix="[<?php echo esc_attr($translation_strings['flag_size']['title']); ?>]">
+            </label>
+            <hr class="w-full mt-4 mb-3" />
+            <div class="flex flex-col gap-2">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['text_color']['title']); ?>
+                </h3>
+                <?php echo renderColorToggle('language_name_color', $options['language_name_color'], $translation_strings['text_color']['name_title'], $translation_strings['text_color']['name_help']); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+                <?php echo renderColorToggle('language_name_hover_color', $options['language_name_hover_color'], $translation_strings['text_color']['hover_title'], $translation_strings['text_color']['hover_help']); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+            </div>
+            <div class="flex flex-col gap-2 mt-4">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['popup_text_color']['title']); ?>
+                </h3>
+                <?php echo renderColorToggle('popup_language_name_color', $options['popup_language_name_color'], $translation_strings['popup_text_color']['name_title'], $translation_strings['popup_text_color']['name_help']); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+                <?php echo renderColorToggle('popup_language_name_hover_color', $options['popup_language_name_hover_color'], $translation_strings['popup_text_color']['hover_title'], $translation_strings['popup_text_color']['hover_help']); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+            </div>
         </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="flag_pt_type" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Use the Portuguese or Brazilian Flag for Portuguese', 'linguise'); ?>"><?php esc_html_e('Portuguese flag type', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[flag_pt_type]"
-                    class="linguise-select right-select original-color flag_pt_type">
-                <option value="pt" <?php echo isset($options['flag_pt_type']) ? (selected($options['flag_pt_type'], 'pt', false)) : (''); ?>><?php esc_html_e('Portuguese Flag', 'linguise'); ?></option>
-                <option value="pt-br" <?php echo isset($options['flag_pt_type']) ? (selected($options['flag_pt_type'], 'pt-br', false)) : (''); ?>><?php esc_html_e('Brazilian Flag', 'linguise'); ?></option>
-            </select>
-        </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="flag_tw_type" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Use the Taiwanese or Chinese Flag for Taiwanese', 'linguise'); ?>"><?php esc_html_e('Taiwanese flag type', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <select name="linguise_options[flag_tw_type]"
-                    class="linguise-select right-select original-color flag_tw_type">
-                <option value="zh-tw" <?php echo isset($options['flag_tw_type']) ? (selected($options['flag_tw_type'], 'zh-tw', false)) : (''); ?>><?php esc_html_e('Taiwanese Flag', 'linguise'); ?></option>
-                <option value="zh-cn" <?php echo isset($options['flag_tw_type']) ? (selected($options['flag_tw_type'], 'zh-cn', false)) : (''); ?>><?php esc_html_e('Chinese Flag', 'linguise'); ?></option>
-            </select>
-        </div>
-    </div>
-
-    <div class="break"></div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="id-flag_border_radius"
-               class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('If you\'re using the rectangle flag shape you can apply a custom border radius in pixels', 'linguise'); ?>"><?php esc_html_e('Flag border radius (px)', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <input type="number" name="linguise_options[flag_border_radius]" class="flag_border_radius"
-               value="<?php echo (int)$options['flag_border_radius'] ?>" style="margin: 10px 15px; width: 100px; float: right">
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="id-flag_width"
-               class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Select flags size in pixels. That doesn\'t change the image weight as it\'s a .svg format', 'linguise'); ?>"><?php esc_html_e('Flag size (px)', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <input type="number" name="linguise_options[flag_width]" class="flag_width"
-               value="<?php echo (int)$options['flag_width'] ?>" style="margin: 10px 15px; width: 100px; float: right">
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="language_name_color" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Select a default text color for your language names', 'linguise'); ?>"><?php esc_html_e('Language name color', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <input type="text" name="linguise_options[language_name_color]" value="<?php echo esc_attr($options['language_name_color']) ?>" class="language_name_color linguise-color-field" data-default-color="#222" />
-        </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="language_name_hover_color" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Select a mouse hover text color for your language names', 'linguise'); ?>"><?php esc_html_e('Language name hover color', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <input type="text" name="linguise_options[language_name_hover_color]" value="<?php echo esc_attr($options['language_name_hover_color']) ?>" class="language_name_hover_color linguise-color-field" data-default-color="#222" />
-        </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="popup_language_name_color" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Color of the language title in the popup or in the dropdown areas', 'linguise'); ?>"><?php esc_html_e('Popup language color', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <input type="text" name="linguise_options[popup_language_name_color]" value="<?php echo esc_attr($options['popup_language_name_color'] ?? '#222') ?>" class="popup_language_name_color linguise-color-field" data-default-color="#222" />
-        </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="popup_language_name_hover_color" class="linguise-setting-label label-bolder linguise-label-inline linguise-tippy" data-tippy="<?php esc_html_e('Select a mouse hover text color of the language title in the popup or in the dropdown areas', 'linguise'); ?>"><?php esc_html_e('Popup language hover color', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="items">
-            <input type="text" name="linguise_options[popup_language_name_hover_color]" value="<?php echo esc_attr($options['popup_language_name_hover_color'] ?? '#222') ?>" class="popup_language_name_hover_color linguise-color-field" data-default-color="#222" />
-        </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="language_name_color" class="linguise-setting-label label-bolder full-width linguise-tippy" data-tippy="<?php esc_html_e('Color and shadow size for your language flags', 'linguise'); ?>"><?php esc_html_e('Flag box shadow', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="flag_shadow_element full-width">
-            <p>
-                <label><?php esc_html_e('Shadow H offset (px)', 'linguise'); ?></label>
-                <input type="range" min="-50" max="50" value="<?php echo esc_attr($options['flag_shadow_h']) ?>" step="1" class="flag_shadow_h" onchange="window.linguiseUpdateTextInput(this.value, 'flag_shadow_h');">
-                <input type="number" id="flag_shadow_h" name="linguise_options[flag_shadow_h]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_shadow_h');" value="<?php echo esc_attr($options['flag_shadow_h']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow V offset (px)', 'linguise'); ?></label>
-                <input type="range" min="-50" max="50" value="<?php echo esc_attr($options['flag_shadow_v']) ?>" step="1" class="flag_shadow_v" onchange="window.linguiseUpdateTextInput(this.value, 'flag_shadow_v');">
-                <input type="number" id="flag_shadow_v" name="linguise_options[flag_shadow_v]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_shadow_v');" value="<?php echo esc_attr($options['flag_shadow_v']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow blur (px)', 'linguise'); ?></label>
-                <input type="range" min="0" max="50" value="<?php echo esc_attr($options['flag_shadow_blur']) ?>" step="1" class="flag_shadow_blur" onchange="window.linguiseUpdateTextInput(this.value, 'flag_shadow_blur');">
-                <input type="number" id="flag_shadow_blur" name="linguise_options[flag_shadow_blur]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_shadow_blur');" value="<?php echo esc_attr($options['flag_shadow_blur']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow spread (px)', 'linguise'); ?></label>
-                <input type="range" min="0" max="50" value="<?php echo esc_attr($options['flag_shadow_spread']) ?>" step="1" class="flag_shadow_spread" onchange="window.linguiseUpdateTextInput(this.value, 'flag_shadow_spread');">
-                <input type="number" id="flag_shadow_spread" name="linguise_options[flag_shadow_spread]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_shadow_spread');" value="<?php echo esc_attr($options['flag_shadow_spread']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow color', 'linguise'); ?></label>
-                <input type="text" name="linguise_options[flag_shadow_color]" value="<?php echo esc_attr($options['flag_shadow_color']) ?>" class="flag_shadow_color linguise-color-field" data-default-color="#bfbfbf" />
-            </p>
-        </div>
-    </div>
-
-    <div class="linguise-settings-option width-50-15">
-        <label for="language_name_color" class="linguise-setting-label label-bolder full-width linguise-tippy" data-tippy="<?php esc_html_e('Color and shadow size for your language flags on mouse hover', 'linguise'); ?>"><?php esc_html_e('Flag box shadow on hover', 'linguise'); ?><span class="material-icons">help_outline</span></label>
-        <div class="flag_shadow_element full-width">
-            <p>
-                <label><?php esc_html_e('Shadow H offset (px)', 'linguise'); ?></label>
-                <input type="range" min="-50" max="50" value="<?php echo esc_attr($options['flag_hover_shadow_h']) ?>" step="1" class="flag_hover_shadow_h" onchange="window.linguiseUpdateTextInput(this.value, 'flag_hover_shadow_h');">
-                <input type="number" id="flag_hover_shadow_h" name="linguise_options[flag_hover_shadow_h]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_hover_shadow_h');" value="<?php echo esc_attr($options['flag_hover_shadow_h']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow V offset (px)', 'linguise'); ?></label>
-                <input type="range" min="-50" max="50" value="<?php echo esc_attr($options['flag_hover_shadow_v']) ?>" step="1" class="flag_hover_shadow_v" onchange="window.linguiseUpdateTextInput(this.value, 'flag_hover_shadow_v');">
-                <input type="number" id="flag_hover_shadow_v" name="linguise_options[flag_hover_shadow_v]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_hover_shadow_v');" value="<?php echo esc_attr($options['flag_hover_shadow_v']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow blur (px)', 'linguise'); ?></label>
-                <input type="range" min="0" max="50" value="<?php echo esc_attr($options['flag_hover_shadow_blur']) ?>" step="1" class="flag_hover_shadow_blur" onchange="window.linguiseUpdateTextInput(this.value, 'flag_hover_shadow_blur');">
-                <input type="number" id="flag_hover_shadow_blur" name="linguise_options[flag_hover_shadow_blur]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_hover_shadow_blur');" value="<?php echo esc_attr($options['flag_hover_shadow_blur']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow spread (px)', 'linguise'); ?></label>
-                <input type="range" min="0" max="50" value="<?php echo esc_attr($options['flag_hover_shadow_spread']) ?>" step="1" class="flag_hover_shadow_spread" onchange="window.linguiseUpdateTextInput(this.value, 'flag_hover_shadow_spread');">
-                <input type="number" id="flag_hover_shadow_spread" name="linguise_options[flag_hover_shadow_spread]" onchange="window.linguiseUpdateSliderInput(this.value, 'flag_hover_shadow_spread');" value="<?php echo esc_attr($options['flag_hover_shadow_spread']) ?>">
-            </p>
-            <p>
-                <label><?php esc_html_e('Shadow color', 'linguise'); ?></label>
-                <input type="text" name="linguise_options[flag_hover_shadow_color]" value="<?php echo esc_attr($options['flag_hover_shadow_color']) ?>" class="flag_hover_shadow_color linguise-color-field" data-default-color="#bfbfbf" />
-            </p>
+        <div class="flex flex-col mt-4 linguise-inner-options">
+            <!-- TARGET: FLAG_SHADOW -->
+            <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                <?php echo esc_html($translation_strings['flag_shadow']['title']); ?>
+                <span
+                    class="material-icons help-tooltip"
+                    data-tippy="<?php echo esc_attr($translation_strings['flag_shadow']['help']) ?>"
+                >
+                    help_outline
+                </span>
+            </h3>
+            <div class="flex flex-row flex-wrap gap-3 mt-2">
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_shadow']['x']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_shadow_h]" value="<?php echo esc_attr((int)$options['flag_shadow_h']); ?>" min="-50" max="50" step="1" data-linguise-int="flag_shadow_h" data-validate-target="flag_shadow_h">
+                </div>
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_shadow']['y']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_shadow_v]" value="<?php echo esc_attr((int)$options['flag_shadow_v']); ?>" min="-50" max="50" step="1" data-linguise-int="flag_shadow_v" data-validate-target="flag_shadow_v">
+                </div>
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_shadow']['blur']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_shadow_blur]" value="<?php echo esc_attr((int)$options['flag_shadow_blur']); ?>" min="0" max="50" step="1" data-linguise-int="flag_shadow_blur" data-validate-target="flag_shadow_blur">
+                </div>
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_shadow']['spread']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_shadow_spread]" value="<?php echo esc_attr((int)$options['flag_shadow_spread']); ?>" min="0" max="50" step="1" data-linguise-int="flag_shadow_spread" data-validate-target="flag_shadow_spread">
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <label
+                    data-validate-warn="flag_shadow_h"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['x']); ?>]"></label>
+                <label
+                    data-validate-warn="flag_shadow_v"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['y']); ?>]"></label>
+                <label
+                    data-validate-warn="flag_shadow_blur"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['blur']); ?>]"></label>
+                <label
+                    data-validate-warn="flag_shadow_spread"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['spread']); ?>]"></label>
+            </div>
+            <div class="mt-4">
+                <?php echo renderColorTranslucentToggle('flag_shadow_color', $options['flag_shadow_color'], $options['flag_shadow_color_alpha'], $translation_strings['flag_shadow']['color'], $translation_strings['flag_shadow']['help']); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+            </div>
+            <hr class="w-full mt-4 mb-3">
+            <!-- TARGET: FLAG_SHADOW_HOVER -->
+            <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                <?php echo esc_html($translation_strings['flag_hover_shadow']['title']); ?>
+                <span
+                    class="material-icons help-tooltip"
+                    data-tippy="<?php echo esc_attr($translation_strings['flag_hover_shadow']['help']) ?>"
+                >
+                    help_outline
+                </span>
+            </h3>
+            <div class="flex flex-row flex-wrap gap-3 mt-2">
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_hover_shadow']['x']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_hover_shadow_h]" value="<?php echo esc_attr((int)$options['flag_hover_shadow_h']); ?>" min="-50" max="50" step="1" data-linguise-int="flag_hover_shadow_h" data-validate-target="flag_hover_shadow_h">
+                </div>
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_hover_shadow']['y']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_hover_shadow_v]" value="<?php echo esc_attr((int)$options['flag_hover_shadow_v']); ?>" min="-50" max="50" step="1" data-linguise-int="flag_hover_shadow_v" data-validate-target="flag_hover_shadow_v">
+                </div>
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_hover_shadow']['blur']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_hover_shadow_blur]" value="<?php echo esc_attr((int)$options['flag_hover_shadow_blur']); ?>" min="0" max="50" step="1" data-linguise-int="flag_hover_shadow_blur" data-validate-target="flag_hover_shadow_blur">
+                </div>
+                <div class="flag-shadow-wrapper">
+                    <h3 class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['flag_hover_shadow']['spread']); ?>
+                        <small class="text-muted">(px)</small>
+                    </h3>
+                    <input type="number" class="linguise-input rounder mt-2" name="linguise_options[flag_hover_shadow_spread]" value="<?php echo esc_attr((int)$options['flag_hover_shadow_spread']); ?>" min="0" max="50" step="1" data-linguise-int="flag_hover_shadow_spread" data-validate-target="flag_hover_shadow_spread">
+                </div>
+            </div>
+            <div class="flex flex-col">
+                <label
+                    data-validate-warn="flag_hover_shadow_h"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['x']); ?>]"></label>
+                <label
+                    data-validate-warn="flag_hover_shadow_v"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['y']); ?>]"></label>
+                <label
+                    data-validate-warn="flag_hover_shadow_blur"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['blur']); ?>]"></label>
+                <label
+                    data-validate-warn="flag_hover_shadow_spread"
+                    data-prefix="[<?php echo esc_attr($translation_strings['flag_shadow']['spread']); ?>]"></label>
+            </div>
+            <div class="mt-4">
+                <?php echo renderColorTranslucentToggle('flag_hover_shadow_color', $options['flag_hover_shadow_color'], $options['flag_hover_shadow_color_alpha'], $translation_strings['flag_hover_shadow']['color'], $translation_strings['flag_hover_shadow']['help']); /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-sanitized */ ?>
+            </div>
         </div>
     </div>
 </div>
-
-<p class="submit" style="margin-top: 10px;margin-right: 10px;display: inline-block; float: right; width: 100%;"><input
-            type="submit"
-            name="linguise_submit"
-            id="submit"
-            class="button button-primary"
-            value="<?php esc_html_e('Save Settings', 'linguise'); ?>">
-</p>

@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.42
+ * Version:2.1.43
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -164,11 +164,13 @@ function linguiseGetOptions()
         'flag_shadow_blur' => 12,
         'flag_shadow_spread' => 0,
         'flag_shadow_color' => '#eee',
+        'flag_shadow_color_alpha' => (float)1.0, // we use 100% scaling, 0.0-1.0
         'flag_hover_shadow_h' => 3,
         'flag_hover_shadow_v' => 3,
         'flag_hover_shadow_blur' => 6,
         'flag_hover_shadow_spread' => 0,
         'flag_hover_shadow_color' => '#bfbfbf',
+        'flag_hover_shadow_color_alpha' => (float)1.0,
         'search_translation' => 0,
         'debug' => false,
         'woocommerce_emails_translation' => 0,
@@ -344,6 +346,7 @@ include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'thir
 if (wp_doing_ajax()) {
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
     if (empty($_REQUEST['action']) || strpos($_REQUEST['action'], 'wc_emailer') === false) {
+        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'config-iframe.php');
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'debug.php');
         include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'cache.php');
         return;

@@ -1,5 +1,27 @@
 <?php
+
 defined('ABSPATH') || die('');
+
+use Linguise\WordPress\Admin\Helper as AdminHelper;
+
+// Admin helper
+include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'Helper.php');
+
+$translation_strings_root = [
+    'expert' => [
+        'title' => __('Expert mode', 'linguise'),
+        'help' => __('You can modify additional Linguise configuration here. Please be careful, as this is an advanced feature.', 'linguise'),
+    ],
+
+    'save' => __('Save settings', 'linguise'),
+    'go-back' => __('Go back', 'linguise'),
+
+    'multisite' => [
+        'header' => __('You are using a multisite installation.', 'linguise'),
+        'warning' => __('Please modify Linguise settings from your main site.', 'linguise'),
+        'button' => __('Go to main site', 'linguise'),
+    ],
+];
 
 $configuration = linguiseGetConfiguration();
 $options = linguiseGetOptions();
@@ -43,17 +65,18 @@ $validConfiguration['api_port'] = [
     'key' => 'api_port'
 ];
 
-$is_multsite_and_not_main = false;
-if (is_multisite()) {
-    $current_network_id = get_current_network_id();
-    $main_site_id = get_main_site_id($current_network_id);
-    $current_blog_id = get_current_blog_id();
-    $is_multsite_and_not_main = $main_site_id !== $current_blog_id;
-}
+$validConfiguration['dashboard_host'] = [
+    'value' => isset($expert_mode['dashboard_host']) ? $expert_mode['dashboard_host'] : '',
+    'doc' => 'The host of the Linguise Dashboard. Default is dashboard.linguise.com',
+    'key' => 'dashboard_host'
+];
+$validConfiguration['dashboard_port'] = [
+    'value' => isset($expert_mode['dashboard_port']) ? (int)$expert_mode['dashboard_port'] : '443',
+    'doc' => 'The port of the Linguise Dashboard. Default is 443',
+    'key' => 'dashboard_port'
+];
 
-linguiseSwitchMainSite();
-$wp_main_site = admin_url('admin.php?page=linguise&ling_mode=expert');
-linguiseRestoreMultisite();
+$multisite_data = AdminHelper::getMultisiteInfo('expert');
 
 /**
  * Convert key to "word"-like
@@ -67,130 +90,70 @@ function keyToWord($key)
     return ucwords(str_replace('_', ' ', $key));
 }
 
+$main_root = admin_url('admin.php?page=linguise');
+
 ?>
 
-<div class="linguise-main-wrapper" style="visibility: hidden">
-<?php if ($is_multsite_and_not_main) : ?>
-    <div class="linguise-multisite-backdrop">
-        <!-- multisite warning -->
-        <div class="linguise-multisite-wrapper">
-            <div class="linguise-multisite-text">
-                <?php echo esc_html__('Please modify Linguise settings in the main site.', 'linguise'); ?>
-            </div>
-            <!-- Button to go back to main site -->
-            <div class="debug-button-wrapper">
-                <a href="<?php echo esc_url($wp_main_site); ?>" class="linguise-button blue-button waves-effect waves-light small-radius small-button linguise-button-multisite">
-                    <?php echo esc_html__('Go back', 'linguise'); ?>
-                </a>
+<div class="linguise-config-wrapper only-single">
+<?php if ($multisite_data['multisite']) : ?>
+    <div class="multisite-warning">
+        <!-- Multisite warning area -->
+        <div class="backdrop"></div>
+        <div class="multisite-wrapper">
+            <div class="flex flex-col items-center">
+                <h2 class="m-0 text-2xl font-bold text-black">
+                    <?php echo esc_html($translation_strings_root['multisite']['header']); ?>
+                </h2>
+                <div class="my-2 mb-4">
+                    <?php echo esc_html($translation_strings_root['multisite']['warning']); ?>
+                </div>
+                <div class="mt-4">
+                    <a href="<?php echo esc_url($multisite_data['main_site']); ?>" class="linguise-btn rounder" target="_blank" rel="noreferrer noopener">
+                        <?php echo esc_html($translation_strings_root['multisite']['button']); ?>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 <?php endif; ?>
-    <div class="linguise-left-panel-toggle">
-        <i class="dashicons dashicons-leftright linguise-left-panel-toggle-icon"></i>
-    </div>
-    <div class="linguise-left-panel linguise-full-panel">
-        <div class="linguise-top-tabs-wrapper">
-            <div class="mdc-tab-bar" role="tablist">
-                <div class="mdc-tab-scroller">
-                    <div class="mdc-tab-scroller__scroll-area">
-                        <div class="mdc-tab-scroller__scroll-content">
-                            <button class="mdc-tab mdc-tab--active"
-                                    role="tab"
-                                    aria-selected="false"
-                                    data-index="1"
-                                    id="expert_mode">
-                                    <span class="mdc-tab__content">
-                                        <span class="mdc-tab__text-label">
-                                            <i class="material-icons mi wpsol-icon-menu menu-tab-icon">code</i>
-                                            Expert Mode
-                                        </span>
-                                    </span>
-                                <span class="mdc-tab-indicator mdc-tab-indicator--active">
-                                    <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+    <form action="" method="post" class="content-area">
+        <?php wp_nonce_field('linguise-expert-settings', 'linguise_nonce'); ?>
+        <div class="tab-content active">
+            <div class="tab-linguise-options">
+                <div class="linguise-options full-width">
+                    <h2 class="m-0 text-2xl font-bold text-black">
+                        <?php echo esc_html($translation_strings_root['expert']['title']); ?>
+                        <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings_root['expert']['help']); ?>" data-tippy-direction="right">
+                            help_outline
+                        </span>
+                    </h2>
+                    <div class="flex flex-col w-full gap-2 mt-4 flex-auto-wrap">
+                        <?php foreach ($validConfiguration as $key => $data) { ?>
+                        <div class="flex flex-row items-center gap-4 mt-2">
+                            <label for="<?php echo esc_attr($key); ?>" class="m-0 text-base text-neutral linguise-expert">
+                                <?php echo esc_html(keyToWord($key)) ?>
+                                <?php if ($data['doc'] !== null) { ?>
+                                <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($data['doc']); ?>">
+                                    help_outline
                                 </span>
-                                <span class="mdc-tab__ripple mdc-ripple-upgraded"></span>
-                            </button>
+                                <?php } ?>
+                            </label>
+                            <?php if (is_bool($data['value'])) { ?>
+                            <input id="<?php echo esc_attr($key); ?>" type="checkbox" class="linguise-input !m-0 align-middle" name="expert_linguise[<?php echo esc_attr($key); ?>]" value="1" <?php checked($data['value'], true); ?>>
+                            <?php } else { ?>
+                            <input id="<?php echo esc_attr($key); ?>" type="text" class="linguise-input rounder" name="expert_linguise[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($data['value']); ?>">
+                            <?php } ?>
                         </div>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
         </div>
-        <form action="" method="post">
-            <div class="linguise-content-wrapper">
-                <div class="linguise-tab-content linguise-content-active" id="expert_mode">
-                    <div class="content">
-                        <ul>
-                            <?php foreach ($validConfiguration as $key => $data) { ?>
-                                <li class="linguise-settings-option full-width">
-                                    <label for="<?php echo esc_attr($key); ?>"
-                                           class="linguise-setting-label label-bolder linguise-tippy"
-                                           <?php if ($data['doc'] !== null) { ?>
-                                           data-tippy="<?php echo esc_attr($data['doc']); ?>"
-                                           <?php } ?>>
-                                           <?php echo esc_html(keyToWord($key)); ?>
-                                           <?php if ($data['doc'] !== null) { ?>
-                                           <span class="material-icons">help_outline</span>
-                                           <?php } ?>
-                                    </label>
-                                    <div style="padding: 10px;">
-                                    <!-- Input type depends on the type of the value -->
-                                    <?php if (is_bool($data['value'])) { ?>
-                                        <input type="checkbox"
-                                               name="expert_linguise[<?php echo esc_attr($key); ?>]"
-                                               id="<?php echo esc_attr($key); ?>"
-                                               value="<?php echo $data['value'] ? '1' : '0'; ?>"
-                                               class="linguise-checkbox custom-checkbox"
-                                               style="margin-left: 0.5rem; margin-right: 0.5rem;"
-                                               <?php checked($data['value'], true); ?>>
-                                    <?php } else { ?>
-                                        <input type="text"
-                                               name="expert_linguise[<?php echo esc_attr($key); ?>]"
-                                               id="<?php echo esc_attr($key); ?>"
-                                               class="linguise-input custom-input"
-                                               style="margin-left: 0.5rem; margin-right: 0.5rem;"
-                                               value="<?php echo esc_attr($data['value']); ?>">
-                                    <?php } ?>
-                                    </div>
-                                </li>
-                            <?php } ?>
-                        </ul>
-                    </div>
-                    <p class="submit" style="margin-top: 10px; margin-right: 10px;display: inline-block; float: right; width: 100%;">
-                        <input type="submit"
-                               name="linguise_submit"
-                               id="submit"
-                               class="button button-primary"
-                               value="<?php esc_html_e('Save Settings', 'linguise'); ?>">
-                    </p>
-                </div>
-            </div>
-        </form>
-    </div>
+        <div class="flex flex-row w-full justify-end box-border gap-4 px-4 save-settings-btn">
+            <a href="<?php echo esc_url($main_root); ?>" class="linguise-btn rounder outlined">
+                <?php echo esc_html($translation_strings_root['go-back']); ?>
+            </a>
+            <input type="submit" class="linguise-btn rounder save-settings-input" value="<?php echo esc_attr($translation_strings_root['save']); ?>" />
+        </div>
+    </form>
 </div>
-
-<script type="text/javascript">
-    (function () {
-        function checkboxValueInterceptor(event) {
-            const checkbox = event.target;
-            if (checkbox.checked) {
-                checkbox.value = "1";
-            } else {
-                checkbox.value = "0";
-            }
-        }
-
-        function init() {
-            const allElements = document.querySelectorAll('.linguise-checkbox');
-            allElements.forEach((element) => {
-                element.addEventListener('change', checkboxValueInterceptor);
-            });
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
-    })();
-</script>

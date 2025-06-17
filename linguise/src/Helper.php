@@ -180,6 +180,58 @@ class Helper
     }
 
     /**
+     * Get the Linguise locale from WordPress locale
+     *
+     * @param string $locale The WordPress locale to convert
+     *
+     * @return string|null The Linguise locale or null if not found
+     */
+    public static function getLinguiseCodeFromWPLocale($locale)
+    {
+        $languages = self::getLanguagesInfos();
+        foreach ($languages as $lang_key => $language) {
+            if (isset($language->wp_code) && $language->wp_code === $locale) {
+                return $lang_key;
+            }
+
+            if (self::localeCompare($lang_key, $locale)) {
+                return $lang_key;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Locale compare check with country code ignore check supported.
+     *
+     * @param string $locale      The current locale being checked
+     * @param string $test_locale The locale to test against
+     *
+     * @return boolean
+     */
+    public static function localeCompare($locale, $test_locale)
+    {
+        if (strcasecmp($locale, $test_locale) === 0) {
+            return true;
+        }
+
+        // trim until _ or -
+        $test_substr = substr($test_locale, 0, strpos($test_locale, '_'));
+        $test_substr = substr($test_substr, 0, strpos($test_substr, '-'));
+
+        if (strcasecmp($locale, $test_substr) === 0) {
+            return true;
+        }
+
+        // trim $locale until _ or -
+        $locale = substr($locale, 0, strpos($locale, '_'));
+        $locale = substr($locale, 0, strpos($locale, '-'));
+
+        return strcasecmp($locale, $test_locale) === 0;
+    }
+
+    /**
      * Create a URL path to our script
      *
      * @param string $path Path to our script
@@ -214,5 +266,58 @@ class Helper
         }
 
         return false;
+    }
+
+    /**
+     * Parse a HEX color to RGB
+     *
+     * @param string $color The HEX color to parse
+     *
+     * @return array|null The parsed color as an array with 'r', 'g', and 'b' keys, or null if invalid
+     */
+    public static function parseHexColor($color)
+    {
+        $hex_color = ltrim($color, '#');
+
+        if (strlen($hex_color) === 3) {
+            $hex_color = $hex_color[0] . $hex_color[0] . $hex_color[1] . $hex_color[1] . $hex_color[2] . $hex_color[2];
+        } elseif (strlen($hex_color) !== 6) {
+            return null;
+        }
+    
+        if (!ctype_xdigit($hex_color)) {
+            return null;
+        }
+    
+        $r = hexdec(substr($hex_color, 0, 2));
+        $g = hexdec(substr($hex_color, 2, 2));
+        $b = hexdec(substr($hex_color, 4, 2));
+    
+        return [
+            'r' => $r,
+            'g' => $g,
+            'b' => $b,
+        ];
+    }
+
+    /**
+     * Mix and blend $color HEX code with $alpha value
+     *
+     * This will create a RGBA color from a HEX color
+     * and a alpha value
+     *
+     * @param string $color The HEX color to parse
+     * @param float  $alpha The alpha value to use (0.0 to 1.0)
+     *
+     * @return string The parsed color as an RGBA string, if fails returns the original color
+     */
+    public static function mixColorAlpha($color, $alpha = 1.0)
+    {
+        $color_p = self::parseHexColor($color);
+        if ($color_p === null) {
+            return $color;
+        }
+
+        return 'rgba(' . $color_p['r'] . ', ' . $color_p['g'] . ', ' . $color_p['b'] . ', ' . $alpha . ')';
     }
 }

@@ -32,8 +32,6 @@ class LinguiseConfiguration
         add_action('admin_enqueue_scripts', array($this, 'enqueueScripts'));
     }
 
-
-
     /**
      * Function custom menu icon
      *
@@ -78,11 +76,11 @@ class LinguiseConfiguration
             return;
         }
 
-        $errors = [];
+        $api_web_errors = [];
 
         if (isset($_POST['linguise_options'])) {
-            if (empty($_POST['main_settings'])
-                || !wp_verify_nonce($_POST['main_settings'], 'linguise-settings')) {
+            if (empty($_POST['linguise_nonce'])
+                || !wp_verify_nonce($_POST['linguise_nonce'], 'linguise-settings')) {
                 die();
             }
 
@@ -101,7 +99,7 @@ class LinguiseConfiguration
 
             $token = sanitize_text_field($_POST['linguise_options']['token']);
             $dynamic_translations = [
-                'enabled' => $_POST['linguise_options']['dynamic_translations'] === '1' ? 1 : 0,
+                'enabled' => isset($_POST['linguise_options']['dynamic_translations']) && $_POST['linguise_options']['dynamic_translations'] === '1' ? 1 : 0,
                 'public_key' => '',
             ];
 
@@ -130,12 +128,12 @@ class LinguiseConfiguration
                     }
                 } else {
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
-                        $errors[] = [
+                        $api_web_errors[] = [
                             'type' => 'error',
                             'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), linguiseGetSite()),
                         ];
                     } else {
-                        $errors[] = [
+                        $api_web_errors[] = [
                             'type' => 'error',
                             'message' => __('Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist.', 'linguise'),
                         ];
@@ -174,12 +172,12 @@ class LinguiseConfiguration
                     }
                 } else {
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
-                        $errors[] = [
+                        $api_web_errors[] = [
                             'type' => 'error',
                             'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), linguiseGetSite()),
                         ];
                     } else {
-                        $errors[] = [
+                        $api_web_errors[] = [
                             'type' => 'error',
                             'message' => __('Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist.', 'linguise'),
                         ];
@@ -189,18 +187,19 @@ class LinguiseConfiguration
 
             $pre_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($_POST['linguise_options']['pre_text']));
             $post_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($_POST['linguise_options']['post_text']));
-            $add_flag_automatically = $_POST['linguise_options']['add_flag_automatically'] === '1' ? 1 : 0;
-            $alternate_link = $_POST['linguise_options']['alternate_link'] === '1' ? 1 : 0;
-            $enable_flag = $_POST['linguise_options']['enable_flag'] === '1' ? 1 : 0;
-            $enable_language_name = $_POST['linguise_options']['enable_language_name'] === '1' ? 1 : 0;
-            $enable_language_short_name = $_POST['linguise_options']['enable_language_short_name'] === '1' ? 1 : 0;
-            $browser_redirect = $_POST['linguise_options']['browser_redirect'] === '1' ? 1 : 0;
-            $ukraine_redirect = $_POST['linguise_options']['ukraine_redirect'] === '1' ? 1 : 0;
-            $cache_enabled = $_POST['linguise_options']['cache_enabled'] === '1' ? 1 : 0;
+            $add_flag_automatically = isset($_POST['linguise_options']['add_flag_automatically']) && $_POST['linguise_options']['add_flag_automatically'] === '1' ? 1 : 0;
+            $alternate_link = isset($_POST['linguise_options']['alternate_link']) && $_POST['linguise_options']['alternate_link'] === '1' ? 1 : 0;
+            $enable_flag = isset($_POST['linguise_options']['enable_flag']) && $_POST['linguise_options']['enable_flag'] === '1' ? 1 : 0;
+            $enable_language_name = isset($_POST['linguise_options']['enable_language_name']) && $_POST['linguise_options']['enable_language_name'] === '1' ? 1 : 0;
+            $short_name_input = $_POST['linguise_options']['enable_language_short_name'];
+            $enable_language_short_name = ($short_name_input === '1' || $short_name_input === 'short') ? 1 : 0;
+            $browser_redirect = isset($_POST['linguise_options']['browser_redirect']) && $_POST['linguise_options']['browser_redirect'] === '1' ? 1 : 0;
+            $ukraine_redirect = isset($_POST['linguise_options']['ukraine_redirect']) && $_POST['linguise_options']['ukraine_redirect'] === '1' ? 1 : 0;
+            $cache_enabled = isset($_POST['linguise_options']['cache_enabled']) && $_POST['linguise_options']['cache_enabled'] === '1' ? 1 : 0;
             $cache_max_size = isset($_POST['linguise_options']['cache_max_size']) ? (int)$_POST['linguise_options']['cache_max_size'] : 200;
-            $search_translation = $_POST['linguise_options']['search_translation'] === '1' ? 1 : 0;
-            $woocommerce_emails_translation = $_POST['linguise_options']['woocommerce_emails_translation'] === '1' ? 1 : 0;
-            $debug = $_POST['linguise_options']['debug'] === '1' ? 1 : 0;
+            $search_translation = isset($_POST['linguise_options']['search_translation']) && $_POST['linguise_options']['search_translation'] === '1' ? 1 : 0;
+            $woocommerce_emails_translation = isset($_POST['linguise_options']['woocommerce_emails_translation']) && $_POST['linguise_options']['woocommerce_emails_translation'] === '1' ? 1 : 0;
+            $debug = isset($_POST['linguise_options']['debug']) && $_POST['linguise_options']['debug'] === '1' ? 1 : 0;
 
             $linguise_options = array(
                 'token' => $token,
@@ -234,11 +233,13 @@ class LinguiseConfiguration
                 'flag_shadow_blur' => isset($_POST['linguise_options']['flag_shadow_blur']) ? (int)$_POST['linguise_options']['flag_shadow_blur'] : 12,
                 'flag_shadow_spread' => isset($_POST['linguise_options']['flag_shadow_spread']) ? (int)$_POST['linguise_options']['flag_shadow_spread'] : 0,
                 'flag_shadow_color' => isset($_POST['linguise_options']['flag_shadow_color']) ? $_POST['linguise_options']['flag_shadow_color'] : '#eee',
+                'flag_shadow_color_alpha' => isset($_POST['linguise_options']['flag_shadow_color_alpha']) ? (float)$_POST['linguise_options']['flag_shadow_color_alpha'] : 1.0,
                 'flag_hover_shadow_h' => isset($_POST['linguise_options']['flag_hover_shadow_h']) ? (int)$_POST['linguise_options']['flag_hover_shadow_h'] : 3,
                 'flag_hover_shadow_v' => isset($_POST['linguise_options']['flag_hover_shadow_v']) ? (int)$_POST['linguise_options']['flag_hover_shadow_v'] : 3,
                 'flag_hover_shadow_blur' => isset($_POST['linguise_options']['flag_hover_shadow_blur']) ? (int)$_POST['linguise_options']['flag_hover_shadow_blur'] : 6,
                 'flag_hover_shadow_spread' => isset($_POST['linguise_options']['flag_hover_shadow_spread']) ? (int)$_POST['linguise_options']['flag_hover_shadow_spread'] : 0,
                 'flag_hover_shadow_color' => isset($_POST['linguise_options']['flag_hover_shadow_color']) ? $_POST['linguise_options']['flag_hover_shadow_color'] : '#bfbfbf',
+                'flag_hover_shadow_color_alpha' => isset($_POST['linguise_options']['flag_hover_shadow_color_alpha']) ? (float)$_POST['linguise_options']['flag_hover_shadow_color_alpha'] : 1.0,
                 'browser_redirect' => $browser_redirect,
                 'ukraine_redirect' => $ukraine_redirect,
                 'cache_enabled' => $cache_enabled,
@@ -250,15 +251,22 @@ class LinguiseConfiguration
                 'expert_mode' => $expert_mode_conf,
             );
 
+            linguiseSwitchMainSite();
             update_option('linguise_options', $linguise_options);
+            linguiseRestoreMultisite();
 
-            // After updating options, we want to reload integrations
+            // Reload the third party loader
             ThirdPartyLoader::getInstance()->reload();
 
-            echo '<div class="linguise_saved_wrap"><span class="material-icons"> done </span> '. esc_html__('Linguise settings saved!', 'linguise') .'</div>';
+            echo '<div class="linguise-notification-popup"><span class="material-icons"> done </span> '. esc_html__('Linguise settings saved!', 'linguise') .'</div>';
         }
 
         if (isset($_POST['expert_linguise'])) {
+            if (empty($_POST['linguise_nonce'])
+            || !wp_verify_nonce($_POST['linguise_nonce'], 'linguise-expert-settings')) {
+                die();
+            }
+
             // create ConfigurationLocal object
             $expert_config = $_POST['expert_linguise'];
             $original_config = linguiseGetConfiguration();
@@ -294,18 +302,22 @@ class LinguiseConfiguration
                 $patched_options['expert_mode'][$key] = $value;
             }
 
+            linguiseSwitchMainSite();
             update_option('linguise_options', $patched_options);
+            linguiseRestoreMultisite();
 
-            echo '<div class="linguise_saved_wrap"><span class="material-icons"> done </span> '. esc_html__('Linguise settings saved!', 'linguise') .'</div>';
+            echo '<div class="linguise-notification-popup"><span class="material-icons"> done </span> '. esc_html__('Linguise settings saved!', 'linguise') .'</div>';
         };
 
         if (isset($_POST['linguise_debug_disable']) && wp_verify_nonce($_POST['debug_banner_nonce'], 'linguise-settings')) {
             $options = linguiseGetOptions();
             $options['debug'] = false;
 
+            linguiseSwitchMainSite();
             update_option('linguise_options', $options);
+            linguiseRestoreMultisite();
 
-            echo '<div class="linguise_saved_wrap"><span class="material-icons"> done </span> '. esc_html__('Disabled debug!', 'linguise') .'</div>';
+            echo '<div class="linguise-notification-popup"><span class="material-icons"> done </span> '. esc_html__('Disabled debug!', 'linguise') .'</div>';
         }
 
         // get URL query
@@ -408,34 +420,32 @@ class LinguiseConfiguration
     {
         global $current_screen;
         if (!empty($current_screen) && $current_screen->id === 'toplevel_page_linguise') {
+            // Required script
             wp_enqueue_script('jquery-ui-sortable');
-            wp_enqueue_style('wp-color-picker');
-            wp_enqueue_script('wp-color-picker');
-            wp_enqueue_script(
-                'linguise_chosen_sortable_script',
-                Helper::getScriptUrl('/assets/js/jquery-chosen-sortable.min.js'),
-                array('jquery'),
-                LINGUISE_VERSION,
-                true
-            );
-            wp_enqueue_script(
-                'linguise_admin_script',
-                Helper::getScriptUrl('/assets/js/admin.bundle.js'),
-                array('jquery'),
-                LINGUISE_VERSION,
-                true
-            );
-            wp_localize_script('linguise_admin_script', 'linguise', array(
-                'linguise_nonce' => wp_create_nonce('linguise_nonce'),
-                'ajaxurl'               => admin_url('admin-ajax.php')
-            ));
-            wp_enqueue_style(
-                'linguise_admin_script',
-                Helper::getScriptUrl('/assets/css/admin.bundle.css'),
-                array(),
-                LINGUISE_VERSION
-            );
+            wp_enqueue_script('iris');
             wp_enqueue_style('linguise_switcher', Helper::getScriptUrl('/assets/css/front.bundle.css'), array(), LINGUISE_VERSION);
+
+            wp_enqueue_script(
+                'linguise_admin_script_v2',
+                Helper::getScriptUrl('/assets/js/admin-v2.bundle.js'),
+                array('jquery'),
+                filemtime(LINGUISE_PLUGIN_PATH . '/assets/js/admin-v2.bundle.js'),
+                true
+            );
+            wp_enqueue_style(
+                'linguise_admin_script_v2',
+                Helper::getScriptUrl('/assets/css/admin-v2.bundle.css'),
+                array(),
+                filemtime(LINGUISE_PLUGIN_PATH . '/assets/css/admin-v2.bundle.css')
+            );
+            wp_localize_script('linguise_admin_script_v2', 'linguise_admin_iframe', array(
+                'nonce' => wp_create_nonce('linguise_update_config_iframe'),
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'action' => 'linguise_update_config_iframe',
+                'action_get_headers' => 'linguise_get_headers',
+                // get the admin page for linguise
+                'root_page' => admin_url('admin.php?page=linguise'),
+            ));
         }
     }
 }

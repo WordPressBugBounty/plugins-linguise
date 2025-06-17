@@ -65,6 +65,15 @@ add_action('init', function () use ($languages_names) {
         $linguise_options
     );
 
+    // We do color mixing for shadow
+    $flag_shadow_color = $config['flag_shadow_color'] ?? '#000000';
+    $flag_hover_shadow_color = $config['flag_hover_shadow_color'] ?? '#000000';
+    $flag_shadow_color_alpha = $config['flag_shadow_color_alpha'] ?? 1.0;
+    $flag_hover_shadow_color_alpha = $config['flag_hover_shadow_color_alpha'] ?? 1.0;
+
+    $config['flag_shadow_color'] = Helper::mixColorAlpha($flag_shadow_color, $flag_shadow_color_alpha);
+    $config['flag_hover_shadow_color'] = Helper::mixColorAlpha($flag_hover_shadow_color, $flag_hover_shadow_color_alpha);
+
     // Remove content we don't want to share
     // fixme: we should remove all config which is not actually used
     unset($config['token']);
