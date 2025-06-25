@@ -1,0 +1,398 @@
+{
+  "af": {
+    "name": "Afrikaans",
+    "original_name": "Afrikaans",
+    "code": "af"
+  },
+  "sq": {
+    "name": "Albanian",
+    "original_name": "Shqip",
+    "code": "sq"
+  },
+  "am": {
+    "name": "Amharic",
+    "original_name": "አማርኛ",
+    "code": "am"
+  },
+  "ar": {
+    "name": "Arabic",
+    "original_name": "العربية",
+    "code": "ar"
+  },
+  "hy": {
+    "name": "Armenian",
+    "original_name": "Հայերեն",
+    "code": "hy"
+  },
+  "az": {
+    "name": "Azerbaijani",
+    "original_name": "Azərbaycanca",
+    "code": "az"
+  },
+  "be": {
+    "name": "Belarusian",
+    "original_name": "Беларуская",
+    "code": "be"
+  },
+  "bn": {
+    "name": "Bengali",
+    "original_name": "বাংলা",
+    "code": "bn"
+  },
+  "bs": {
+    "name": "Bosnian",
+    "original_name": "Bosanski",
+    "code": "bs"
+  },
+  "bg": {
+    "name": "Bulgarian",
+    "original_name": "Български",
+    "code": "bg"
+  },
+  "ca": {
+    "name": "Catalan",
+    "original_name": "Català",
+    "code": "ca"
+  },
+  "hr": {
+    "name": "Croatian",
+    "original_name": "Hrvatski",
+    "code": "hr"
+  },
+  "cs": {
+    "name": "Czech",
+    "original_name": "Čeština",
+    "code": "cs"
+  },
+  "da": {
+    "name": "Danish",
+    "original_name": "Dansk",
+    "code": "da"
+  },
+  "nl": {
+    "name": "Dutch",
+    "original_name": "Nederlands",
+    "code": "nl"
+  },
+  "en": {
+    "name": "English",
+    "original_name": "English",
+    "code": "en"
+  },
+  "et": {
+    "name": "Estonian",
+    "original_name": "Eesti",
+    "code": "et"
+  },
+  "tl": {
+    "name": "Filipino",
+    "original_name": "Pilipino",
+    "code": "tl",
+    "rtl": false
+  },
+  "fi": {
+    "name": "Finnish",
+    "original_name": "Suomi",
+    "code": "fi"
+  },
+  "fr": {
+    "name": "French",
+    "original_name": "Français",
+    "code": "fr"
+  },
+  "de": {
+    "name": "German",
+    "original_name": "Deutsch",
+    "code": "de"
+  },
+  "el": {
+    "name": "Greek",
+    "original_name": "Ελληνικά",
+    "code": "el"
+  },
+  "gu": {
+    "name": "Gujarati",
+    "original_name": "ગુજરાતી",
+    "code": "gu"
+  },
+  "ht": {
+    "name": "Haitian",
+    "original_name": "Kreyòl Ayisyen",
+    "code": "ht"
+  },
+  "he": {
+    "name": "Hebrew",
+    "original_name": "עברית",
+    "code": "he"
+  },
+  "hi": {
+    "name": "Hindi",
+    "original_name": "हिन्दी",
+    "code": "hi"
+  },
+  "hu": {
+    "name": "Hungarian",
+    "original_name": "Magyar",
+    "code": "hu"
+  },
+  "id": {
+    "name": "Indonesian",
+    "original_name": "Bahasa Indonesia",
+    "code": "id"
+  },
+  "ga": {
+    "name": "Irish",
+    "original_name": "Gaeilge",
+    "code": "ga"
+  },
+  "is": {
+    "name": "Icelandic",
+    "original_name": "Íslenska",
+    "code": "is"
+  },
+  "it": {
+    "name": "Italian",
+    "original_name": "Italiano",
+    "code": "it"
+  },
+  "ja": {
+    "name": "Japanese",
+    "original_name": "日本語",
+    "code": "ja"
+  },
+  "ka": {
+    "name": "Georgian",
+    "original_name": "ქართული",
+    "code": "ka"
+  },
+  "kn": {
+    "name": "Kannada",
+    "original_name": "ಕನ್ನಡ",
+    "code": "kn"
+  },
+  "kk": {
+    "name": "Kazakh",
+    "original_name": "Қазақша",
+    "code": "kk"
+  },
+  "km": {
+    "name": "Khmer",
+    "original_name": "ភាសាខ្មែរ",
+    "code": "km"
+  },
+  "ko": {
+    "name": "Korean",
+    "original_name": "한국어",
+    "code": "ko"
+  },
+  "ku": {
+    "name": "Kurdish",
+    "original_name": "Kurdî",
+    "code": "ku"
+  },
+  "lb": {
+    "name": "Luxembourgish",
+    "original_name": "Lëtzebuergesch",
+    "code": "lb"
+  },
+  "lo": {
+    "name": "Lao",
+    "original_name": "ພາສາລາວ",
+    "code": "lo"
+  },
+  "lt": {
+    "name": "Lithuanian",
+    "original_name": "Lietuvių",
+    "code": "lt"
+  },
+  "lv": {
+    "name": "Latvian",
+    "original_name": "Latviešu",
+    "code": "lv"
+  },
+  "mk": {
+    "name": "Macedonian",
+    "original_name": "Македонски",
+    "code": "mk"
+  },
+  "mg": {
+    "name": "Malagasy",
+    "original_name": "Malagasy",
+    "code": "mg"
+  },
+  "ms": {
+    "name": "Malay",
+    "original_name": "Bahasa Melayu",
+    "code": "ms"
+  },
+  "ml": {
+    "name": "Malayalam",
+    "original_name": "മലയാളം",
+    "code": "ml"
+  },
+  "mt": {
+    "name": "Maltese",
+    "original_name": "Malti",
+    "code": "mt"
+  },
+  "mr": {
+    "name": "Marathi",
+    "original_name": "मराठी",
+    "code": "mr"
+  },
+  "mn": {
+    "name": "Mongolian",
+    "original_name": "Монгол",
+    "code": "mn"
+  },
+  "ne": {
+    "name": "Nepali",
+    "original_name": "नेपाली",
+    "code": "ne"
+  },
+  "no": {
+    "name": "Norwegian",
+    "original_name": "Norsk",
+    "code": "no"
+  },
+  "pa": {
+    "name": "Panjabi",
+    "original_name": "ਪੰਜਾਬੀ",
+    "code": "pa"
+  },
+  "fa": {
+    "name": "Persian",
+    "original_name": "فارسی",
+    "code": "fa"
+  },
+  "pl": {
+    "name": "Polish",
+    "original_name": "Polski",
+    "code": "pl"
+  },
+  "ps": {
+    "name": "Pashto",
+    "original_name": "پښتو",
+    "code": "pu"
+  },
+  "pt": {
+    "name": "Portuguese",
+    "original_name": "Português",
+    "code": "pt"
+  },
+  "ro": {
+    "name": "Romanian",
+    "original_name": "Română",
+    "code": "ro"
+  },
+  "ru": {
+    "name": "Russian",
+    "original_name": "Русский",
+    "code": "ru"
+  },
+  "sm": {
+    "name": "Samoan",
+    "original_name": "Gagana Sāmoa",
+    "code": "sm"
+  },
+  "sr": {
+    "name": "Serbian",
+    "original_name": "Српски",
+    "code": "sr"
+  },
+  "sk": {
+    "name": "Slovak",
+    "original_name": "Slovenčina",
+    "code": "sk"
+  },
+  "sl": {
+    "name": "Slovene",
+    "original_name": "Slovenščina",
+    "code": "sl"
+  },
+  "es": {
+    "name": "Spanish",
+    "original_name": "Español",
+    "code": "es"
+  },
+  "sw": {
+    "name": "Swahili",
+    "original_name": "Kiswahili",
+    "code": "sw"
+  },
+  "sv": {
+    "name": "Swedish",
+    "original_name": "Svenska",
+    "code": "sv"
+  },
+  "ta": {
+    "name": "Tamil",
+    "original_name": "தமிழ்",
+    "code": "ta"
+  },
+  "te": {
+    "name": "Telugu",
+    "original_name": "తెలుగు",
+    "code": "te"
+  },
+  "tg": {
+    "name": "Tajik",
+    "original_name": "Тоҷикӣ",
+    "code": "tg"
+  },
+  "th": {
+    "name": "Thai",
+    "original_name": "ภาษาไทย",
+    "code": "th"
+  },
+  "tr": {
+    "name": "Turkish",
+    "original_name": "Türkçe",
+    "code": "tr"
+  },
+  "uk": {
+    "name": "Ukrainian",
+    "original_name": "Українська",
+    "code": "uk"
+  },
+  "ur": {
+    "name": "Urdu",
+    "original_name": "اردو",
+    "code": "ur"
+  },
+  "vi": {
+    "name": "Vietnamese",
+    "original_name": "Tiếng Việt",
+    "code": "vi"
+  },
+  "cy": {
+    "name": "Welsh",
+    "original_name": "Cymraeg",
+    "code": "cy"
+  },
+  "hmn": {
+    "name": "Hmong",
+    "original_name": "Hmong",
+    "code": "hmn"
+  },
+  "mi": {
+    "name": "Maori",
+    "original_name": "Māori",
+    "code": "mi"
+  },
+  "zh-cn": {
+    "name": "Chinese",
+    "original_name": "中文",
+    "code": "zh-cn"
+  },
+  "zh-tw": {
+    "name": "Taiwanese",
+    "original_name": "台語",
+    "code": "zh-tw"
+  },
+  "zu": {
+    "name": "Zulu",
+    "original_name": "isiZulu",
+    "code": "zu"
+  }
+}

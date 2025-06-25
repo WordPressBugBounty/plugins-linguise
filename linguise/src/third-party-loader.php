@@ -55,6 +55,7 @@ class ThirdPartyLoader
         'elementor' => 'ElementorIntegration',
         'elementor-pro' => 'ElementorProIntegration',
         'facetwp' => 'FacetWPIntegration',
+        'jet-engine' => 'JetEngineIntegration',
         'wc/woocommerce' => 'WooCommerceIntegration',
         'wc/emails' => 'WooCommerceEmailsIntegration',
         'wc/admin-emails' => 'WooCommerceAdminEmailsIntegration',

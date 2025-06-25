@@ -21,7 +21,7 @@ class Request
     protected $trailing_slashes;
     protected $metadata;
 
-    private function __construct()
+    private function __construct($silent_debug = \false)
     {
         $this->parseBaseDirectory();
 
@@ -39,7 +39,9 @@ class Request
         // Create an empty metadata
         $this->metadata = [];
 
-        Debug::log('Requested url: ' . $this->getRequestedUrl());
+        if (!$silent_debug) {
+            Debug::log('Requested url: ' . $this->getRequestedUrl());
+        }
     }
 
     protected function parseBaseDirectory() {
@@ -82,12 +84,11 @@ class Request
     /**
      * Retrieve singleton instance
      *
-     * @return Request|null
+     * @return Request
      */
-    public static function getInstance() {
-
-        if(is_null(self::$_instance)) {
-            self::$_instance = new Request();
+    public static function getInstance($silent_debug = \false) {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new Request($silent_debug);
         }
 
         return self::$_instance;

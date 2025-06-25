@@ -6,6 +6,8 @@
  */
 namespace Linguise\Vendor\Linguise\Script\Core;
 
+defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+
 /**
  * Set-Cookie object
  */

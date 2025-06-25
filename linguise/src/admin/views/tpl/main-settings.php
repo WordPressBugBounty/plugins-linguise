@@ -64,6 +64,8 @@ $translation_strings = [
         'label' => __('Show language names', 'linguise'),
         'full' => __('Full names (English, Spanish...)', 'linguise'),
         'short' => __('Short names (EN, ES...)', 'linguise'),
+        'label_popup' => __('Show language names in Popup', 'linguise'),
+        'help_popup' => __('Display the language names in the popup box when clicking on the language switcher, "%1s" will take priority over this!', 'linguise'),
     ],
     'language_prefer' => [
         'label' => __('Language names display', 'linguise'),
@@ -572,6 +574,8 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
                                 name="linguise_options[flag_display_type]"
                                 value="<?php echo esc_attr($disp_mode['value']); ?>"
                                 data-linguise-radio="flag_display_type"
+                                data-target-hideable="enable_language_name_popup"
+                                data-hideable-is="popup"
                                 <?php checked($options['flag_display_type'], $disp_mode['value']) ?> />
                             <span class="material-icons no-select">check</span>
                             <span class="text-label font-semibold"><?php echo esc_html($disp_mode['label']); ?></span>
@@ -604,6 +608,20 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
                         <input type="checkbox" class="slider-input" data-int-checkbox="enable_language_name" name="linguise_options[enable_language_name]" value="1" <?php echo isset($options['enable_language_name']) ? (checked($options['enable_language_name'], 1)) : (''); ?> />
                         <span class="slider"></span>
                         <span class="slider-label font-semibold"><?php echo esc_html($translation_strings['language_names']['label']); ?></span>
+                    </label>
+                </div>
+                <div class="mt-2" data-hideable="enable_language_name_popup"<?php if (isset($options['flag_display_type']) && $options['flag_display_type'] !== 'popup') {
+                    echo ' style="display: none;"';
+                                                                            } ?>>
+                    <label class="linguise-slider-checkbox">
+                        <input type="checkbox" class="slider-input" data-int-checkbox="enable_language_name_popup" name="linguise_options[enable_language_name_popup]" value="1" <?php echo isset($options['enable_language_name_popup']) ? (checked($options['enable_language_name_popup'], 1)) : (''); ?> />
+                        <span class="slider"></span>
+                        <span class="slider-label font-semibold"><?php echo esc_html($translation_strings['language_names']['label_popup']); ?></span>
+                        <span class="material-icons help-tooltip ml-1"
+                            data-tippy="<?php echo esc_attr(sprintf(esc_attr($translation_strings['language_names']['help_popup']), esc_attr($translation_strings['language_names']['label']))) ?>"
+                            data-tippy-direction="right">
+                            help_outline
+                        </span>
                     </label>
                 </div>
             </div>

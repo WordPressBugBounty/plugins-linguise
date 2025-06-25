@@ -191,9 +191,11 @@ class LinguiseConfiguration
             $alternate_link = isset($_POST['linguise_options']['alternate_link']) && $_POST['linguise_options']['alternate_link'] === '1' ? 1 : 0;
             $enable_flag = isset($_POST['linguise_options']['enable_flag']) && $_POST['linguise_options']['enable_flag'] === '1' ? 1 : 0;
             $enable_language_name = isset($_POST['linguise_options']['enable_language_name']) && $_POST['linguise_options']['enable_language_name'] === '1' ? 1 : 0;
-            $short_name_input = $_POST['linguise_options']['enable_language_short_name'];
+            $enable_language_name_popup = isset($_POST['linguise_options']['enable_language_name_popup']) && $_POST['linguise_options']['enable_language_name_popup'] === '1' ? 1 : 0;
+            $short_name_input = isset($_POST['linguise_options']['enable_language_short_name']) ? $_POST['linguise_options']['enable_language_short_name'] : '0';
             $enable_language_short_name = ($short_name_input === '1' || $short_name_input === 'short') ? 1 : 0;
             $browser_redirect = isset($_POST['linguise_options']['browser_redirect']) && $_POST['linguise_options']['browser_redirect'] === '1' ? 1 : 0;
+            $cookies_redirect = isset($_POST['linguise_options']['cookies_redirect']) && $_POST['linguise_options']['cookies_redirect'] === '1' ? 1 : 0;
             $ukraine_redirect = isset($_POST['linguise_options']['ukraine_redirect']) && $_POST['linguise_options']['ukraine_redirect'] === '1' ? 1 : 0;
             $cache_enabled = isset($_POST['linguise_options']['cache_enabled']) && $_POST['linguise_options']['cache_enabled'] === '1' ? 1 : 0;
             $cache_max_size = isset($_POST['linguise_options']['cache_max_size']) ? (int)$_POST['linguise_options']['cache_max_size'] : 200;
@@ -210,6 +212,7 @@ class LinguiseConfiguration
                 'alternate_link' => $alternate_link,
                 'enable_flag' => $enable_flag,
                 'enable_language_name' => $enable_language_name,
+                'enable_language_name_popup' => $enable_language_name_popup,
                 'enable_language_short_name' => $enable_language_short_name,
                 'add_flag_automatically' => $add_flag_automatically,
                 'custom_css' => isset($_POST['linguise_options']['custom_css']) ? $_POST['linguise_options']['custom_css'] : '',
@@ -241,6 +244,7 @@ class LinguiseConfiguration
                 'flag_hover_shadow_color' => isset($_POST['linguise_options']['flag_hover_shadow_color']) ? $_POST['linguise_options']['flag_hover_shadow_color'] : '#bfbfbf',
                 'flag_hover_shadow_color_alpha' => isset($_POST['linguise_options']['flag_hover_shadow_color_alpha']) ? (float)$_POST['linguise_options']['flag_hover_shadow_color_alpha'] : 1.0,
                 'browser_redirect' => $browser_redirect,
+                'cookies_redirect' => $cookies_redirect,
                 'ukraine_redirect' => $ukraine_redirect,
                 'cache_enabled' => $cache_enabled,
                 'cache_max_size' => $cache_max_size,

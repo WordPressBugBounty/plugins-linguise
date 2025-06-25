@@ -1,0 +1,91 @@
+@import "./colors.scss";
+@import "./common.scss";
+
+body {
+    color: $neutral-700;
+}
+
+.linguise-container {
+    // in login page, the container will be squished to the middle of the screen
+    // and the background will be white
+    background-color: $white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+
+    position: relative;
+    min-height: 100vh;
+
+    font-family: Roboto, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+}
+
+.logo-container {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    .linguise-logo {
+        width: auto;
+        height: 2.5rem;
+
+        color: $logo-black;
+
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+.linguise-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    height: fit-content;
+
+    > .linguise-form-area {
+        background-color: $neutral-10;
+        color: $neutral-900;
+    
+        border-radius: 8px;
+        padding: 1rem;
+    
+        box-sizing: border-box;
+        height: fit-content;
+        min-width: 42.75rem;
+    }
+}
+
+.submit-container {
+    /* submit container should put content on the right side */
+    display: flex;
+    flex-direction: row;
+
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.text-neutral {
+    color: $neutral-700;
+}
+
+.text-neutral-deep {
+    color: $neutral-900;
+}
+
+.text-muted {
+    color: $neutral-500;
+}
+
+@import "./shared-form.scss";
+@import "./utils.scss";

@@ -2,6 +2,8 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
+defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+
 class CmsDetect {
     /**
      * Check for the current CMS and return it

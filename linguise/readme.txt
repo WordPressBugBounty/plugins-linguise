@@ -3,12 +3,12 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag:2.1.44
+Stable tag:2.1.48
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Linguise is a top quality automatic translation with front-end translation editor. 5' install, SEO optimized translations, 80+ languages
+Linguise is a top quality automatic translation with front-end translation editor. 5' install, SEO optimized translations, 85+ languages
 
 == Description ==
 
@@ -27,7 +27,7 @@ Linguise plugin offers a direct connection to our automatic, high-quality transl
 * 90% of a human translator quality
 * Automatic translation of all your WordPress websites
 * Full content, SEO ranked translations including URLs
-* 85 languages available
+* 85+ languages available
 * Uses the latest and updated cloud AI translation models
 * Translate all your website content in 5 minutes
 * Make search queries in any languages including in WooCommerce content
@@ -69,10 +69,12 @@ Linguise plugin offers a direct connection to our automatic, high-quality transl
 * Automatically get Linguise language configuration with the API Key
 * Local cache option for translations and translated URLs
 * Automatic redirect based on browser language
+* WooCommerce email translation based on client language
 * Possibility to display language names in English or in original language
 * Load several language switchers on the same page
 * Multi platform: works on Apache, Litespeed, Nginx and IIS servers
 * 100% tested with Elementor Pro, DIVI
+* Option to translate dynamic AJAX content
 
 
 ##Translation prices details
@@ -101,6 +103,18 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.1.48 =
+- Feature: Translation support for JetEngine
+
+= 2.1.47 =
+- Feature: Translation support for JetEngine
+
+= 2.1.46 =
+- Feature: Translation support for JetEngine
+
+= 2.1.45 =
+- Feature: Language name on popup only
+
 = 2.1.44 =
 - Fix: Use latest Script-JS
 
@@ -764,12 +778,12 @@ Yes, as Linguise is fully SEO optimized with all the requirements asked by inter
 == Screenshots ==
 
 1. Instant high-quality translation for your website in 85+ languages
-2. Edit your translation from frontend with the Live editor
-3. Manage all translation settings and SEO from the dashboard
-4. WordPress multilingual translation plugin preview in administration
-5. Register and translate 400 000 words for free in 5 minutes
-6. Frontend Live editor with user access roles to edit translations
-7. Advanced rule to exclude or replace content in translation by URL, language…
+2. Manage all translations from the plugin settings or the Linguise dashboard
+3. Edit your translation from frontend with the Live editor
+4. Advanced WordPress plugin settings: language redirect, email translation...
+5. Design your language switcher with tons of options
+6. Advanced rule to exclude or replace content in translation by URL, language…
+7. Add/remove languages and translate dynamic content
 
 
 == Upgrade Notice ==

@@ -203,11 +203,12 @@ class AttributeHandler extends FragmentHandler
 
                 if (isset($matcher['mode']) && $matcher['mode'] === 'string') {
                     // If the mode is a string we just pass the string as is
+                    $cast_data = isset($matcher['cast']) ? $matcher['cast'] : 'html-main';
                     $collected_temp = [
                         [
                             'key' => $matcher['key'],
                             'value' => $key_data,
-                            'format' => 'html-main', // in case we need to format it later
+                            'format' => $cast_data,
                         ]
                     ];
                 } else {

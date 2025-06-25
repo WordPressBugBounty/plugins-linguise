@@ -1,92 +1,73 @@
 <?php
-/* Prohibit direct script loading */
+
+namespace Linguise\WordPress\Frontend;
+
 defined('ABSPATH') || die('No direct script access allowed!');
 
 /**
- * Class LinguiseUkrainianRedirection
+ * Ukrainian redirection handler
+ *
+ * If enabled, this will always redirect to the Ukrainian language
  */
-class LinguiseUkrainianRedirection
+class LinguiseUkrainianRedirection extends LinguiseRedirector
 {
     /**
-     * LinguiseUkrainianRedirection constructor.
+     * The name of the cookie used to store (and check) the redirect
      *
-     * @return void
+     * For Ukrainian redirection, we use different cookie name
+     *
+     * @var string
      */
-    public function __construct()
+    public static $cookie_name = 'LINGUISE_UKRAINE_REDIRECT';
+
+    /**
+     * Check if the redirector is enabled
+     *
+     * This function should be overridden in the child class
+     *
+     * @param array $options Provided linguise options
+     *
+     * @return boolean
+     */
+    public static function isEnabled($options)
     {
-        add_action('init', array($this, 'linguiseInit'), 10);
+        return !empty($options['ukraine_redirect']);
     }
 
     /**
-     * Init
+     * Get the target redirection language
      *
-     * @return void
+     * This function should be overridden in the child class,
+     * you should always normalize the language before returning it
+     *
+     * @param array $options Provided linguise options
+     *
+     * @return string|null Language to redirect to
      */
-    public function linguiseInit()
+    public static function getRedirectLanguage($options)
     {
-        if (empty($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] !== 'GET' || is_admin() || wp_doing_ajax() || $GLOBALS['pagenow'] === 'wp-login.php') {
-            return;
+        $default_lang = isset($options['default_language']) ? $options['default_language'] : 'en';
+        if ($default_lang === 'uk') {
+            // Don't enable redirection if the default language is Ukrainian
+            return null;
         }
 
-        $options = linguiseGetOptions();
-
-        if (empty($options['ukraine_redirect'])) {
-            return;
-        }
-
-        if (!empty($_COOKIE['LINGUISE_UKRAINE_REDIRECT'])) {
-            return;
-        }
-
-        $home_url = home_url();
-
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $home_url) === 0) {
-            // Do not redirect if we call from internally
-            return;
-        }
-
-        $default_language = $options['default_language'] ?? 'en';
-
-        // Get the language the visitor loaded the page from
-        if (isset($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'])) {
-            $requested_language = $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'];
-        } else {
-            $requested_language = $default_language;
-        }
-
-        if ($requested_language === 'uk') {
-            // No need to redirect if the visitor already loaded ukrainian language
-            return;
-        }
-
-        // Get from module parameters the enable languages
         $languages_enabled = isset($options['enabled_languages']) ? $options['enabled_languages'] : array();
+        return self::normalizeAndCheckLanguage('uk', $languages_enabled);
+    }
 
-        if (!in_array('uk', $languages_enabled, true) && $default_language !== 'uk') {
-            // No need to redirect if ukrainian language is not enabled
-            return;
-        }
-
-        $base = rtrim(linguiseForceRelativeUrl(linguiseGetSite()), '/');
-        $original_path = rtrim(substr(rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'), strlen($base)), '/');
-        $protocol = 'http';
-        if (strpos($home_url, 'https') === 0) {
-            $protocol = 'https';
-        }
-
-        if (!$base) {
-            $base = '';
-        }
-        $url_auto_redirect = $protocol . '://' . $_SERVER['HTTP_HOST'] . $base . ($default_language === 'uk' ? '' : '/uk') . $original_path;
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            $url_auto_redirect .= '/?' . $_SERVER['QUERY_STRING'];
-        }
-        setcookie('LINGUISE_UKRAINE_REDIRECT', 1, time() + 20);
-        header('Linguise-Translated-Redirect: 1');
-        header('Cache-Control: no-cache, must-revalidate, max-age=0');
-        header('Location: ' . $url_auto_redirect, true, 302);
-        exit();
+    /**
+     * Check if the current language is the target language
+     *
+     * The default behaviour is to just check if the two languages are the same
+     *
+     * @param string $target_lang  Target language, the one we want to redirect to
+     * @param string $current_lang Current language, the one we are currently in
+     *
+     * @return boolean
+     */
+    public static function isInTargetLanguage($target_lang, $current_lang)
+    {
+        return $current_lang === 'uk';
     }
 }
-
-new LinguiseUkrainianRedirection();

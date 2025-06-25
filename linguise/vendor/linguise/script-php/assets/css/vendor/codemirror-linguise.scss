@@ -1,0 +1,64 @@
+/* Based on 3024-day theme from CodeMirror */
+
+@import "../colors.scss";
+
+.CodeMirror-wrap {
+    width: 100%;
+}
+
+.cm-s-linguise-day.CodeMirror {
+    background: $white;
+    color: $neutral-900;
+}
+
+.cm-s-linguise-day div.CodeMirror-selected {
+    background: $neutral-50;
+}
+
+.cm-s-linguise-day .CodeMirror-line::selection,
+.cm-s-linguise-day .CodeMirror-line > span::selection,
+.cm-s-linguise-day .CodeMirror-line > span > span::selection {
+    background: $neutral-50;
+}
+.cm-s-linguise-day .CodeMirror-line::-moz-selection,
+.cm-s-linguise-day .CodeMirror-line > span::-moz-selection,
+.cm-s-linguise-day .CodeMirror-line > span > span::selection {
+    background: $neutral-100;
+}
+
+.cm-s-linguise-day .CodeMirror-gutters {
+    background: $white;
+    border-right: 0px;
+}
+.cm-s-linguise-day .CodeMirror-guttermarker {
+    color: $red-500;
+}
+.cm-s-linguise-day .CodeMirror-guttermarker-subtle {
+    color: $neutral-700;
+}
+.cm-s-linguise-day .CodeMirror-linenumber {
+    color: $neutral-700;
+}
+
+.cm-s-linguise-day .CodeMirror-cursor {
+    border-left: 1px solid $neutral-500;
+}
+
+.cm-s-linguise-day span.cm-comment { color: #cdab53; }
+.cm-s-linguise-day span.cm-atom { color: #a16a94; }
+.cm-s-linguise-day span.cm-number { color: #a16a94; }
+
+.cm-s-linguise-day span.cm-property, .cm-s-linguise-day span.cm-attribute { color: #01a252; }
+.cm-s-linguise-day span.cm-keyword { color: #db2d20; }
+.cm-s-linguise-day span.cm-string { color: #fded02; }
+
+.cm-s-linguise-day span.cm-variable { color: #01a252; }
+.cm-s-linguise-day span.cm-variable-2 { color: #01a0e4; }
+.cm-s-linguise-day span.cm-def { color: #e8bbd0; }
+.cm-s-linguise-day span.cm-bracket { color: #3a3432; }
+.cm-s-linguise-day span.cm-tag { color: #db2d20; }
+.cm-s-linguise-day span.cm-link { color: #a16a94; }
+.cm-s-linguise-day span.cm-error { background: #db2d20; color: #5c5855; }
+
+.cm-s-linguise-day .CodeMirror-activeline-background { background: $neutral-10; }
+.cm-s-linguise-day .CodeMirror-matchingbracket { text-decoration: underline; color: #a16a94 !important; }

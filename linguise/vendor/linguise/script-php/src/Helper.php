@@ -1,9 +1,29 @@
 <?php
+
 namespace Linguise\Vendor\Linguise\Script\Core;
 
 defined('LINGUISE_SCRIPT_TRANSLATION') or die();
 
 class Helper {
+    /**
+     * Languages information
+     *
+     * @var null|array
+     */
+    protected static $languages_information = null;
+
+    /**
+     * CSRF token key
+     *
+     * @var string
+     */
+    public static $csrf_token_key = '_linguise_csrf_token';
+    /**
+     * CSRF token timing key
+     *
+     * @var string
+     */
+    public static $csrf_token_time_key = '_linguise_csrf_token_time';
 
     public static function getIpAddress()
     {
@@ -36,14 +56,49 @@ class Helper {
         if (Configuration::getInstance()->get('data_dir') === null) {
             $data_folder = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR . md5('data' . Configuration::getInstance()->get('token'));
             if (!file_exists($data_folder)) {
-                mkdir($data_folder);
-                mkdir($data_folder . DIRECTORY_SEPARATOR . 'database');
-                mkdir($data_folder . DIRECTORY_SEPARATOR . 'cache');
-                mkdir($data_folder . DIRECTORY_SEPARATOR . 'tmp');
+                mkdir($data_folder, 0766, true);
+                mkdir($data_folder . DIRECTORY_SEPARATOR . 'database', 0766, true);
+                mkdir($data_folder . DIRECTORY_SEPARATOR . 'cache', 0766, true);
+                mkdir($data_folder . DIRECTORY_SEPARATOR . 'tmp', 0766, true);
                 file_put_contents($data_folder . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all');
             }
             Configuration::getInstance()->set('data_dir', $data_folder);
         }
+    }
+
+    public static function checkDataDirAvailable()
+    {
+        $data_dir = Configuration::getInstance()->get('data_dir');
+        if (!empty($data_dir)) {
+            return true;
+        }
+
+        $data_folder = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR . md5('data' . Configuration::getInstance()->get('token'));
+        if (file_exists($data_folder)) {
+            return true;
+        }
+
+        if (!mkdir($data_folder)) {
+            return false;
+        }
+
+        // Check if writeable
+        if (!is_writable($data_folder)) {
+            return false;
+        }
+
+        $db_data_folder = $data_folder . DIRECTORY_SEPARATOR . 'database';
+        if (!file_exists($db_data_folder)) {
+            if (!mkdir($db_data_folder, 0766, true)) {
+                return false;
+            }
+        }
+
+        if (!is_writable($db_data_folder)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -138,5 +193,43 @@ class Helper {
         }
 
         return $final_url;
+    }
+
+    /**
+     * Return all languages information
+     *
+     * @return array
+     */
+    public static function getLanguagesInfos() {
+        if (self::$languages_information !== null) {
+            return self::$languages_information;
+        }
+
+        // Root dir + assets/languages.json
+        $languages_file = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'languages.json');
+
+        $languages = file_get_contents($languages_file);
+        self::$languages_information = json_decode($languages, true);
+        return self::$languages_information;
+    }
+
+    /**
+     * Sanitizes a string key.
+     *
+     * Keys are used as internal identifiers. Lowercase alphanumeric characters,
+     * dashes, and underscores are allowed.
+     *
+     * @param string $key String key
+     *
+     * @return string Sanitized key
+     */
+    public static function sanitizeKey($key)
+    {
+        if (is_scalar($key)) {
+            $sanitized_key = strtolower($key);
+            $sanitized_key = preg_replace('/[^a-z0-9_\-]/', '', $sanitized_key);
+            return $sanitized_key;
+        }
+        return $key;
     }
 }

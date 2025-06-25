@@ -133,6 +133,24 @@ class Helper
     }
 
     /**
+     * Check if the passed language is RTL
+     *
+     * @param string $language_code Language code to check
+     *
+     * @return boolean
+     */
+    public static function getLanguageIsRtl($language_code)
+    {
+        $languages = self::getLanguagesInfos();
+
+        if (isset($languages->$language_code)) {
+            return $languages->$language_code->rtl ?? false;
+        }
+
+        return false;
+    }
+
+    /**
      * Map Linguise language to WordPress locale
      *
      * @param string $language Linguise language

@@ -122,5 +122,4 @@ class CurlMulti
 
         return $ch;
     }
-
 }

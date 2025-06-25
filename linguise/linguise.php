@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.44
+ * Version:2.1.48
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -136,6 +136,7 @@ function linguiseGetOptions()
         'display_position' => 'bottom_right',
         'enable_flag' => 1,
         'enable_language_name' => 1,
+        'enable_language_name_popup' => 1,
         'enable_language_short_name' => 0,
         'flag_shape' => 'rounded',
         'flag_en_type' => 'en-us',
@@ -147,6 +148,7 @@ function linguiseGetOptions()
         'flag_width' => 24,
         'browser_redirect' => 0,
         'ukraine_redirect' => 0,
+        'cookies_redirect' => 0,
         'language_name_display' => 'en',
         'pre_text' => '',
         'post_text' => '',
@@ -360,8 +362,10 @@ $languages_names = \Linguise\WordPress\Helper::getLanguagesInfos();
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'install.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'switcher.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin/menu.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php');
-include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/browser_language.php');
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/redirector.php'); // Main redirector/base class
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/ukrainian_redirection.php'); // Ukrainian redirection
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/cookies_language.php'); // Cookies-based redirection
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'frontend/browser_language.php'); // Browser language-based redirection
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'configuration.php');
 
 register_deactivation_hook(__FILE__, 'linguiseUnInstall');
@@ -614,6 +618,53 @@ add_action('plugins_loaded', 'linguiseHookLanguage', 2);
 add_action('init', function () {
     load_plugin_textdomain('linguise', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
+
+// Redirection, cookies, and more.
+add_action('init', function () {
+    $options = linguiseGetOptions();
+    if (empty($options['token'])) {
+        // Don't allow this to be run if the token is not set
+        return;
+    }
+
+    \Linguise\WordPress\Frontend\LinguiseUkrainianRedirection::startRedirect();
+    \Linguise\WordPress\Frontend\LinguiseCookiesLanguage::startRedirect();
+    \Linguise\WordPress\Frontend\LinguiseBrowserLanguage::startRedirect();
+
+    // Either we inject the `linguise_lang` if WP_CACHE is enabled OR cookies_redirect is enabled
+    if ((defined('WP_CACHE') && WP_CACHE) || !empty($options['cookies_redirect'])) {
+        /**
+         * Check for LINGUISE_NO_COOKIE constant, if defined we don't set the cookie
+         *
+         * This can be added in wp-config.php
+         *
+         * @disregard P1011
+         */
+        if (defined('LINGUISE_NO_COOKIE') && LINGUISE_NO_COOKIE) {
+            return;
+        }
+
+        $allowed_request_methods = array('GET', 'HEAD', 'OPTIONS');
+
+        if (empty($_SERVER['REQUEST_METHOD']) || !in_array($_SERVER['REQUEST_METHOD'], $allowed_request_methods) || is_admin() || wp_doing_ajax() || $GLOBALS['pagenow'] === 'wp-login.php') {
+            // Do not set cookie if we are in admin, ajax or login page
+            return;
+        }
+
+        // Add linguise_lang header
+        $current_lang = WPHelper::getLanguage();
+        if (empty($current_lang)) {
+            $current_lang = WPHelper::getLanguageFromUrl($_SERVER['REQUEST_URI']);
+        }
+
+        if (empty($current_lang) && !empty($options['default_language'])) {
+            $current_lang = $options['default_language'];
+        }
+
+        // cache for a month
+        setcookie('linguise_lang', $current_lang, time() + MONTH_IN_SECONDS, '/', COOKIE_DOMAIN);
+    }
+}, 11);
 
 /**
  * If the website behind cloudflare

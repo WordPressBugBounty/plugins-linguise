@@ -15,9 +15,13 @@ $translation_strings = [
     ],
 
     'translation_extra' => __('Translation Settings', 'linguise'),
-    'redirect' => [
+    'browser_redirect' => [
         'title' => __('Browser Language Redirect', 'linguise'),
         'help' => __('Automatically redirect users based on the browser language. The user will still be able to change the language manually but this is NOT recommended as users may use various browser languages or speak several languages', 'linguise'),
+    ],
+    'cookies_redirect' => [
+        'title' => __('Cookies Language Redirect', 'linguise'),
+        'help' => __('Automatically redirect user to their last-used languages, useful for Newsletter and more. The user will still be able to change the language manually. This takes priority compared to %s', 'linguise'),
     ],
     'emails' => [
         'title' => __('Translate emails', 'linguise'),
@@ -166,8 +170,18 @@ $active_integrations = $integrations->getActiveIntegrations();
                 <input type="checkbox" class="slider-input" name="linguise_options[browser_redirect]" value="1" <?php echo isset($options['browser_redirect']) ? (checked($options['browser_redirect'], 1)) : (''); ?> />
                 <span class="slider"></span>
                 <span class="slider-label font-semibold">
-                    <?php echo esc_html($translation_strings['redirect']['title']); ?>
-                    <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['redirect']['help']); ?>">
+                    <?php echo esc_html($translation_strings['browser_redirect']['title']); ?>
+                    <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['browser_redirect']['help']); ?>">
+                        help_outline
+                    </span>
+                </span>
+            </label>
+            <label class="linguise-slider-checkbox">
+                <input type="checkbox" class="slider-input" name="linguise_options[cookies_redirect]" value="1" <?php echo isset($options['cookies_redirect']) ? (checked($options['cookies_redirect'], 1)) : (''); ?> />
+                <span class="slider"></span>
+                <span class="slider-label font-semibold">
+                    <?php echo esc_html($translation_strings['cookies_redirect']['title']); ?>
+                    <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['cookies_redirect']['help']); ?>">
                         help_outline
                     </span>
                 </span>
@@ -227,7 +241,7 @@ $active_integrations = $integrations->getActiveIntegrations();
                         help_outline
                     </span>
                 </label>
-                <textarea id="popup-pre-text" name="linguise_options[pre_text]" placeholder="<?php echo esc_attr($translation_strings['placeholder_popup']); ?>" class="linguise-input min-h-text rounder mt-2 w-full"><?php echo esc_html($options['pre_text']); ?></textarea>
+                <textarea id="popup-pre-text" name="linguise_options[pre_text]" placeholder="<?php echo esc_attr($translation_strings['placeholder_popup']); ?>" class="linguise-input min-h-text rounder mt-2 w-full" data-linguise-text="pre_text"><?php echo esc_html($options['pre_text']); ?></textarea>
             </div>
             <div>
                 <label for="popup-post-text" class="text-base text-neutral">
@@ -236,7 +250,7 @@ $active_integrations = $integrations->getActiveIntegrations();
                         help_outline
                     </span>
                 </label>
-                <textarea id="popup-post-text" name="linguise_options[post_text]" placeholder="<?php echo esc_attr($translation_strings['placeholder_popup']); ?>" class="linguise-input min-h-text rounder mt-2 w-full"><?php echo esc_html($options['post_text']); ?></textarea>
+                <textarea id="popup-post-text" name="linguise_options[post_text]" placeholder="<?php echo esc_attr($translation_strings['placeholder_popup']); ?>" class="linguise-input min-h-text rounder mt-2 w-full" data-linguise-text="post_text"><?php echo esc_html($options['post_text']); ?></textarea>
             </div>
         </div>
     </div>
@@ -338,7 +352,7 @@ $active_integrations = $integrations->getActiveIntegrations();
                 <?php foreach ($loaded_integrations as $integration) : ?>
                 <li class="linguise-tp-item">
                     <?php echo esc_html($integration); ?><?php if (in_array($integration, $active_integrations)) :
-                        ?>&nbsp;<strong><?php echo esc_html($translation_strings['third-party']['active']); ?></strong><?php
+                        ?>&nbsp;<strong class="font-bold"><?php echo esc_html($translation_strings['third-party']['active']); ?></strong><?php
                     endif; ?>
                 </li>
                 <?php endforeach; ?>

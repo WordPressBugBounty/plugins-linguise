@@ -127,9 +127,8 @@ class Translation {
     }
 
     public function _translate(&$ch, &$boundary) {
-
         $request =  Request::getInstance();
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http' . ((int)Configuration::getInstance()->get('port')===443?'s':''). '://'.Configuration::getInstance()->get('host').':'.Configuration::getInstance()->get('port'));
         curl_setopt($ch, CURLOPT_HEADER, 0);

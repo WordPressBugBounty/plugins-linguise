@@ -1,112 +1,46 @@
 <?php
-/* Prohibit direct script loading */
+
+namespace Linguise\WordPress\Frontend;
+
 defined('ABSPATH') || die('No direct script access allowed!');
 
 /**
- * Class LinguiseBrowserLanguage
+ * Browser language redirector handler
+ *
+ * Compare the Accept-Language header with the available languages
  */
-class LinguiseBrowserLanguage
+class LinguiseBrowserLanguage extends LinguiseRedirector
 {
     /**
-     * Normalization of some languages
+     * Check if the redirector is enabled
      *
-     * @var string[]
-     */
-    private static $normalization = [
-        'nb' => 'no',
-        'nn' => 'no',
-        'mri' => 'mi',
-        'bel' => 'be',
-    ];
-
-    /**
-     * LinguiseBrowserLanguage constructor.
+     * This function should be overridden in the child class
      *
-     * @return void
+     * @param array $options Provided linguise options
+     *
+     * @return boolean
      */
-    public function __construct()
+    public static function isEnabled($options)
     {
-        add_action('init', array($this, 'linguiseInit'), 11);
+        return !empty($options['browser_redirect']);
     }
 
     /**
-     * Init
+     * Get the target redirection language
      *
-     * @return void
+     * This function should be overridden in the child class,
+     * you should always normalize the language before returning it
+     *
+     * @param array $options Provided linguise options
+     *
+     * @return string|null Language to redirect to
      */
-    public function linguiseInit()
+    public static function getRedirectLanguage($options)
     {
-        if (empty($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] !== 'GET' || is_admin() || wp_doing_ajax() || $GLOBALS['pagenow'] === 'wp-login.php') {
-            return;
-        }
-
-        $options = linguiseGetOptions();
-
-        if (empty($options['browser_redirect'])) {
-            return;
-        }
-
         if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && !isset($_SERVER['HTTP_CF_IPCOUNTRY'])) { //phpcs:ignore
-            return;
+            return null;
         }
 
-        if (!empty($_COOKIE['LINGUISE_REDIRECT'])) {
-            return;
-        }
-
-        $home_url = home_url();
-
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], $home_url) === 0) {
-            // Do not redirect if we call from internally
-            return;
-        }
-
-        $browser_language = $this->getNormalizedBrowserLanguage($options);
-        if (empty($browser_language)) {
-            // No matching browser language found
-            return;
-        }
-
-        if (isset($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'])) {
-            $url_language = $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'];
-        } else {
-            $url_language = isset($options['default_language']) ? $options['default_language'] : 'en';
-        }
-
-        if ($url_language === $browser_language) {
-            return;
-        }
-
-        $base = rtrim(linguiseForceRelativeUrl(linguiseGetSite()), '/');
-        $original_path = rtrim(substr(rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/'), strlen($base)), '/');
-        $protocol = 'http';
-        if (strpos($home_url, 'https') === 0) {
-            $protocol = 'https';
-        }
-
-        if (!$base) {
-            $base = '';
-        }
-        $url_auto_redirect = $protocol . '://' . $_SERVER['HTTP_HOST'] . $base . '/' . $browser_language . $original_path;
-        if (!empty($_SERVER['QUERY_STRING'])) {
-            $url_auto_redirect .= '/?' . $_SERVER['QUERY_STRING'];
-        }
-        setcookie('LINGUISE_REDIRECT', 1, time() + 20);
-        header('Linguise-Translated-Redirect: 1');
-        header('Cache-Control: no-cache, must-revalidate, max-age=0');
-        header('Location: ' . $url_auto_redirect, true, 302);
-        exit();
-    }
-
-    /**
-     * Gets the browser language from the header and try to normalize it.
-     *
-     * @param array $options Linguise options
-     *
-     * @return string|null
-     */
-    private function getNormalizedBrowserLanguage($options)
-    {
         // Get from module parameters for the enabled languages
         $languages_enabled = isset($options['enabled_languages']) ? $options['enabled_languages'] : array();
         $current_language = isset($options['default_language']) ? $options['default_language'] : null;
@@ -118,7 +52,7 @@ class LinguiseBrowserLanguage
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $accept_language = sanitize_text_field($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            $accept_languages = $this->splitAcceptLanguage($accept_language);
+            $accept_languages = self::splitAcceptLanguage($accept_language);
             if (empty($accept_languages)) {
                 return null;
             }
@@ -135,8 +69,9 @@ class LinguiseBrowserLanguage
                     continue;
                 }
 
-                $language = $this->normalizeAndCheckLanguage($accept_language['lang'], $languages_enabled);
+                $language = self::normalizeAndCheckLanguage($accept_language['lang'], $languages_enabled);
                 if (!empty($language)) {
+                    // Found a match
                     return $language;
                 }
             }
@@ -152,46 +87,11 @@ class LinguiseBrowserLanguage
                 return null;
             }
 
-            return $this->normalizeAndCheckLanguage($cf_ipcountry, $languages_enabled);
+            return self::normalizeAndCheckLanguage($cf_ipcountry, $languages_enabled);
         } else {
             // Nothing
             return null;
         }
-    }
-
-    /**
-     * Normalize and check if a language is enabled.
-     *
-     * @param string $language            Language to check
-     * @param array  $supported_languages Languages enabled
-     *
-     * @return string|null Language if enabled, null otherwise
-     */
-    private function normalizeAndCheckLanguage($language, $supported_languages)
-    {
-        // Lowercase it
-        $language = strtolower($language);
-        // Replace underscore with dash
-        $language = str_replace('_', '-', $language);
-
-        if (isset(self::$normalization[$language])) {
-            $language = self::$normalization[$language];
-        }
-
-        // Try to split the language
-        $lang_simple = substr($language, 0, 2);
-
-        // Check if the language is enabled
-        if (in_array($lang_simple, $supported_languages)) {
-            return $lang_simple;
-        }
-
-        // Check if the language is enabled
-        if (in_array($language, $supported_languages)) {
-            return $language;
-        }
-
-        return null;
     }
 
     /**
@@ -206,7 +106,7 @@ class LinguiseBrowserLanguage
      * @return array Array of languages with their weights
      *               e.g. [['lang' => 'en', 'weight' => 1.0], ['lang' => 'fr', 'weight' => 0.8]]
      */
-    private function splitAcceptLanguage($accept_language)
+    private static function splitAcceptLanguage($accept_language)
     {
         $accept_languages = array_map('trim', explode(',', $accept_language));
 
@@ -235,5 +135,3 @@ class LinguiseBrowserLanguage
         return $languages_weighted;
     }
 }
-
-new LinguiseBrowserLanguage;

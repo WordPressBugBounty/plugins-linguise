@@ -24,14 +24,21 @@ class Mysql
     protected $_dbprefix;
 
     /**
-     * @var null
+     * @var \mysqli
      */
     protected $_database;
 
     /**
+     * Database connection status
+     *
+     * @var boolean
+     */
+    protected $_ready = false;
+
+    /**
      * Retrieve singleton instance
      *
-     * @return Mysql|null
+     * @return Mysql
      */
     public static function getInstance() {
 
@@ -47,6 +54,16 @@ class Mysql
     }
 
     /**
+     * Check if the database is connected
+     *
+     * @return boolean
+     */
+    public function isConnected()
+    {
+        return $this->_ready;
+    }
+
+    /**
      * Connect to the mysql database
      *
      * @param $config Array configuration
@@ -55,6 +72,10 @@ class Mysql
      */
     public function connect($config)
     {
+        if ($this->_ready) {
+            return true;
+        }
+
         $port = !empty($config->db_port) ? $config->db_port : 3306;
         $host = $config->host;
 
@@ -92,11 +113,14 @@ class Mysql
             $database->query($install_query);
         }
 
+        $this->_ready = true;
+
         return true;
     }
 
     public function getInstallQuery($table_name)
     {
+        // todo: number of url usage
         return 'CREATE TABLE IF NOT EXISTS '. $table_name .' (
                   `id` BIGINT NOT NULL AUTO_INCREMENT,
                   `language` varchar(5) NOT NULL,
@@ -109,7 +133,6 @@ class Mysql
                   UNIQUE INDEX (hash_source, language),
                   UNIQUE INDEX (hash_translation, language)
                 );';
-        // todo: number of url usage
     }
 
     public function getSourceUrl($url) {
@@ -219,6 +242,45 @@ class Mysql
         }
 
         return $params->$param_name;
+    }
+
+    public function installOptions() {
+        $table_name = mysqli_real_escape_string($this->_database, $this->_dbprefix . 'linguise_meta');
+        $queries = 'CREATE TABLE IF NOT EXISTS ' . $table_name . ' (
+                  `id` BIGINT NOT NULL AUTO_INCREMENT,
+                  `name` varchar(100) NOT NULL,
+                  `value` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+                  PRIMARY KEY (id),
+                  UNIQUE INDEX (name)
+                );';
+        $this->_database->query($queries);
+    }
+
+    public function retrieveOtherParam($param_name) {
+        $result = $this->_database->query('SELECT value from '.mysqli_real_escape_string($this->_database, $this->_dbprefix . 'linguise_meta').' WHERE name="' . mysqli_real_escape_string($this->_database, $param_name) . '" LIMIT 0, 1');
+
+        if (!$result->num_rows) {
+            return false;
+        }
+
+        $params = $result->fetch_object();
+
+        if (empty($params)) {
+            return false;
+        }
+
+        // Parse into array if possible
+        $params = @unserialize($params->value);
+        if (empty($params)) {
+            return null;
+        }
+        return $params;
+    }
+
+    public function saveOtherParam($param_name, $param_value) {
+        $serialized = mysqli_real_escape_string($this->_database, serialize($param_value));
+        $query = 'INSERT INTO '.mysqli_real_escape_string($this->_database, $this->_dbprefix . 'linguise_meta') . ' (name, value) VALUES ("'.mysqli_real_escape_string($this->_database, $param_name).'", "' . $serialized . '") ON DUPLICATE KEY UPDATE value=VALUES(value)';
+        $this->_database->query($query);
     }
 
     public function close() {

@@ -327,6 +327,18 @@ jQuery(document).ready(($) => {
             }
             updateConfigDemoScript(globalConfig);
         }
+
+        // Check if it has data-target-hideable
+        const targetHideable = ev.currentTarget.dataset.targetHideable;
+        const targetHideIs = ev.currentTarget.dataset.hideableIs;
+        if (targetHideable && targetHideIs) {
+            const $target = $(`[data-hideable="${targetHideable}"]`);
+            if (ev.currentTarget.value === targetHideIs) {
+                $target.show();
+            } else {
+                $target.hide();
+            }
+        }
     });
     // Radio buttons with number casting
     $("[data-linguise-radio-int]").on('change', (ev) => {
@@ -356,7 +368,16 @@ jQuery(document).ready(($) => {
                 updateConfigDemoScript(globalConfig);
             }
         }
-    })
+    });
+
+    // Pre/post-text inputs
+    $("[data-linguise-text]").on('change', (ev) => {
+        const targetName = ev.currentTarget.dataset.linguiseText;
+        if (targetName) {
+            globalConfig[targetName] = ev.currentTarget.value;
+            updateConfigDemoScript(globalConfig);
+        }
+    });
 
     /**
      * Parse hex color string into RGB object

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit74a5eeab8750b90edc7c9ac0714d09a6
+class ComposerStaticInit6329850e3b1bbb9ea6293208a7ba2176
 {
     public static $files = array (
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
@@ -107,13 +107,16 @@ class ComposerStaticInit74a5eeab8750b90edc7c9ac0714d09a6
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Helper' => __DIR__ . '/..' . '/linguise/script-php/src/Helper.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Hook' => __DIR__ . '/..' . '/linguise/script-php/src/Hook.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\JsonWalker' => __DIR__ . '/..' . '/linguise/script-php/src/JsonWalker.php',
+        'Linguise\\Vendor\\Linguise\\Script\\Core\\Management' => __DIR__ . '/..' . '/linguise/script-php/src/Management.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\OpenCart' => __DIR__ . '/..' . '/linguise/script-php/src/Platforms/OpenCart.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\PrestaShop' => __DIR__ . '/..' . '/linguise/script-php/src/Platforms/PrestaShop.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Platforms\\Zencart' => __DIR__ . '/..' . '/linguise/script-php/src/Platforms/Zencart.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Processor' => __DIR__ . '/..' . '/linguise/script-php/src/Processor.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Request' => __DIR__ . '/..' . '/linguise/script-php/src/Request.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Response' => __DIR__ . '/..' . '/linguise/script-php/src/Response.php',
+        'Linguise\\Vendor\\Linguise\\Script\\Core\\Session' => __DIR__ . '/..' . '/linguise/script-php/src/Session.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\SetCookie' => __DIR__ . '/..' . '/linguise/script-php/src/SetCookie.php',
+        'Linguise\\Vendor\\Linguise\\Script\\Core\\Templates\\Helper' => __DIR__ . '/..' . '/linguise/script-php/src/templates/Helper.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Translation' => __DIR__ . '/..' . '/linguise/script-php/src/Translation.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Updater' => __DIR__ . '/..' . '/linguise/script-php/src/Updater.php',
         'Linguise\\Vendor\\Linguise\\Script\\Core\\Url' => __DIR__ . '/..' . '/linguise/script-php/src/Url.php',
@@ -150,9 +153,9 @@ class ComposerStaticInit74a5eeab8750b90edc7c9ac0714d09a6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit74a5eeab8750b90edc7c9ac0714d09a6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit74a5eeab8750b90edc7c9ac0714d09a6::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit74a5eeab8750b90edc7c9ac0714d09a6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit6329850e3b1bbb9ea6293208a7ba2176::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit6329850e3b1bbb9ea6293208a7ba2176::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit6329850e3b1bbb9ea6293208a7ba2176::$classMap;
 
         }, null, ClassLoader::class);
     }

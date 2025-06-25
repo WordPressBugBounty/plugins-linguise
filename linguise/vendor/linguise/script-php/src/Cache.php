@@ -7,7 +7,7 @@ defined('LINGUISE_SCRIPT_TRANSLATION') or die();
 class Cache
 {
     /**
-     * @var null|Cache
+     * @var Cache|null
      */
     private static $_instance = null;
 
@@ -124,7 +124,7 @@ class Cache
         $cache_file = $cache_path . $this->_language . '_' . $this->_hash . '.php';
 
         if (!file_exists($cache_path)) {
-            mkdir($cache_path);
+            mkdir($cache_path, 0766, true);
         }
 
         file_put_contents($cache_file, '<?php die(); ?>' . $content);

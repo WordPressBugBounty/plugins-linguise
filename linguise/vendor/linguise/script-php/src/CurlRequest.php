@@ -174,6 +174,16 @@ class CurlRequest
             $input_headers[] = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($header_name, 5))))) . ': ' . $header_value;
         }
 
+        $additional_headers = [];
+        Hook::trigger('onBeforeRequestHeaders', $additional_headers);
+        if (is_array($additional_headers) && count($additional_headers)) {
+            foreach ($additional_headers as $header_name => $header_value) {
+                if (is_string($header_value) || is_numeric($header_value) || is_float($header_value) || is_int($header_value)) {
+                    $input_headers[] = $header_name . ': ' . $header_value;
+                }
+            }
+        }
+
         $input_headers[] = 'Linguise-Original-Language: ' . preg_replace('[^a-zA-Z-]', '', Request::getInstance()->getLanguage());
 
         // Add real user IP

@@ -15,31 +15,40 @@ class Database
     private static $_instance = null;
 
     /**
-     * @var null|Mysql
+     * @var null|Mysql|Sqlite
      */
     protected $_database;
 
     private $_configuration = null;
 
-    private function __construct()
+    private function __construct($skip_connect = \false)
     {
         $cms = CmsDetect::detect();
 
+        $connection_result = false;
         if ($cms === 'joomla') {
             $this->_configuration = $this->retrieveJoomlaConfiguration();
             $this->_database = Mysql::getInstance();
-            $connection_result = $this->_database->connect($this->_configuration);
+            if (!$skip_connect) {
+                $connection_result = $this->_database->connect($this->_configuration);
+            }
         } elseif ($cms === 'wordpress') {
             $this->_configuration = $this->retrieveWordPressConfiguration();
             $this->_database = Mysql::getInstance();
-            $connection_result = $this->_database->connect($this->_configuration);
+            if (!$skip_connect) {
+                $connection_result = $this->_database->connect($this->_configuration);
+            }
         } elseif (Configuration::getInstance()->get('db_host')) {
             $this->_database = Mysql::getInstance();
             $this->_configuration = $this->retrieveMysqlConfiguration();
-            $connection_result = $this->_database->connect($this->_configuration);
+            if (!$skip_connect) {
+                $connection_result = $this->_database->connect($this->_configuration);
+            }
         } else {
             $this->_database = Sqlite::getInstance();
-            $connection_result = $this->_database->connect();
+            if (!$skip_connect) {
+                $connection_result = $this->_database->connect();
+            }
         }
 
         if (!$connection_result) {
@@ -50,12 +59,12 @@ class Database
     /**
      * Retrieve singleton instance
      *
-     * @return Database|null
+     * @return Database
      */
-    public static function getInstance() {
-
-        if(is_null(self::$_instance)) {
-            self::$_instance = new Database();
+    public static function getInstance($skip_connect = \false, $reconnect = \false)
+    {
+        if (is_null(self::$_instance) || $reconnect) {
+            self::$_instance = new Database($skip_connect);
         }
 
         return self::$_instance;
@@ -192,6 +201,22 @@ class Database
         return $config;
     }
 
+    /**
+     * Ensure connection is ready, return the class again
+     * @return Database
+     */
+    public function ensureConnection()
+    {
+        // Check if class is MySQL or Sqlite
+        if ($this->_database instanceof Mysql) {
+            $this->_database->connect($this->_configuration);
+        } else if ($this->_database instanceof Sqlite) {
+            $this->_database->connect();
+        }
+
+        return $this;
+    }
+
     public function getSourceUrl($url) {
         return $this->_database->getSourceUrl($url);
     }
@@ -234,6 +259,18 @@ class Database
 
     public function retrieveJoomlaParam($option_name) {
         return $this->_database->retrieveJoomlaParam($option_name);
+    }
+
+    public function retrieveOtherParam($option_name) {
+        return $this->_database->retrieveOtherParam($option_name);
+    }
+
+    public function saveOtherParam($option_name, $option_value) {
+        return $this->_database->saveOtherParam($option_name, $option_value);
+    }
+
+    public function installOptions() {
+        return $this->_database->installOptions();
     }
 
     public function close() {

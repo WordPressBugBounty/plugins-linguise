@@ -66,6 +66,10 @@ class Configuration {
     private $host = 'translate.linguise.com';
     /** The PHP script update URL */
     private $update_url = 'https://www.linguise.com/php_script_update.json';
+    /** The Linguise API server host, default to api.linguise.com */
+    private $api_host = 'api.linguise.com';
+    /** The Linguise API server port, default to 443 */
+    private $api_port = 443;
 
     private function __construct()
     {
