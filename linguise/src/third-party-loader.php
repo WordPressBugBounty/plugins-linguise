@@ -50,12 +50,17 @@ class ThirdPartyLoader
      * @var array<string, string|array<string>>
      */
     private $native_integrations = [
+        'ajax-search-lite' => 'AjaxSearchLiteIntegration',
         'ameliabooking' => 'AmeliaBookingIntegration',
         'bookingpress' => 'BookingPressIntegration',
         'elementor' => 'ElementorIntegration',
         'elementor-pro' => 'ElementorProIntegration',
         'facetwp' => 'FacetWPIntegration',
+        'fluentcrm' => 'FluentCRMIntegration',
         'jet-engine' => 'JetEngineIntegration',
+        'kickflip-customizer' => 'KickflipCustomizerIntegration',
+        'page-scroll-to-id' => 'PageScrollToIdIntegration',
+        'surecart' => 'SurecartIntegration',
         'wc/woocommerce' => 'WooCommerceIntegration',
         'wc/emails' => 'WooCommerceEmailsIntegration',
         'wc/admin-emails' => 'WooCommerceAdminEmailsIntegration',
@@ -65,10 +70,7 @@ class ThirdPartyLoader
         'wc/payment-plugin-paypal' => 'WCPaymentPluginPaypalIntegration',
         'wc/klarna-checkout' => 'WCKlarnaCheckoutIntergration',
         'wc/product-addons' => 'WCProductAddonsIntegration',
-        'surecart' => 'SurecartIntegration',
-        'fluentcrm' => 'FluentCRMIntegration',
-        'wp-rocket' => 'WPRocketIntegration',
-        'page-scroll-to-id' => 'PageScrollToIdIntegration'
+        'wp-rocket' => 'WPRocketIntegration'
     ];
 
     /**

@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag:2.1.48
+Stable tag:2.1.49
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -103,6 +103,10 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.1.49 =
+- Feature: Translation support for Ajax Search Lite
+- Feature: Translation support for kickflip
+
 = 2.1.48 =
 - Feature: Translation support for JetEngine
 

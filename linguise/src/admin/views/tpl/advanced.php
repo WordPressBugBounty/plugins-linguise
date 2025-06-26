@@ -181,7 +181,7 @@ $active_integrations = $integrations->getActiveIntegrations();
                 <span class="slider"></span>
                 <span class="slider-label font-semibold">
                     <?php echo esc_html($translation_strings['cookies_redirect']['title']); ?>
-                    <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['cookies_redirect']['help']); ?>">
+                    <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr(sprintf($translation_strings['cookies_redirect']['help'], $translation_strings['browser_redirect']['title'])); ?>">
                         help_outline
                     </span>
                 </span>

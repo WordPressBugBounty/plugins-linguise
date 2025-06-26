@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.48
+ * Version:2.1.49
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -67,7 +67,51 @@ function linguiseIsMultisiteFolder()
     // Is multisite subdomains mode or subfolders mode
     $linguise_multisite_subdomains = defined('SUBDOMAIN_INSTALL') && SUBDOMAIN_INSTALL;
 
-    return is_multisite() && !$linguise_multisite_subdomains;
+    if (is_multisite()) {
+        if ($linguise_multisite_subdomains) {
+            return false;
+        }
+
+        $cached_is_subdomain = get_transient('linguise_multisite_subdomain');
+        if ($cached_is_subdomain === '1') {
+            return false;
+        } elseif ($cached_is_subdomain === '0') {
+            // Cached as false, so we need to check the sites
+            return true;
+        }
+
+        // Not cached yet, so we need to check the sites
+        /**
+         * Get all sites in the multisite network
+         *
+         * @var \WP_Site[]
+         */
+        $sites = get_sites();
+        $main_site_id = get_main_site_id();
+        $current_site_id = get_current_blog_id();
+
+        $current_site_domain = null;
+        $main_site_domain = null;
+        foreach ($sites as $site) {
+            if ((int)$site->blog_id === $current_site_id) {
+                $current_site_domain = $site->domain;
+            }
+            if ((int)$site->blog_id === $main_site_id) {
+                $main_site_domain = $site->domain;
+            }
+        }
+
+        // If we are in subdomain multisite, we need to check if the current site domain is different from the main site domain
+        if (!empty($current_site_domain) && !empty($main_site_domain) && $current_site_domain !== $main_site_domain) {
+            set_transient('linguise_multisite_subdomain', '1', DAY_IN_SECONDS);
+            return false;
+        }
+
+        set_transient('linguise_multisite_subdomain', '0', DAY_IN_SECONDS);
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -391,6 +435,9 @@ function linguiseUnInstall()
             $wp_filesystem->put_contents($htaccess_path, $htaccess_content);
         }
     }
+
+    // Delete transient
+    delete_transient('linguise_multisite_subdomain');
 }
 
 add_action('admin_notices', function () {
