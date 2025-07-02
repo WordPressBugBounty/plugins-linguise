@@ -5,7 +5,7 @@ use Linguise\Vendor\Linguise\Script\Core\Session;
 defined('LINGUISE_MANAGEMENT') or die('No access to this page.');
 
 $has_token_already = defined('LINGUISE_OOBE_TOKEN_EXIST') && LINGUISE_OOBE_TOKEN_EXIST;
-$has_oobe_already = defined('LINGUISE_OOBE_DONE') && LINGUISE_OOBE_DONE;
+$has_oobe_already = Session::getInstance()->oobeComplete();
 
 $translation_strings_root = [
     'header' => [
@@ -24,7 +24,7 @@ $translation_strings_root = [
     ],
     'database' => [
         'label' => __('Database', 'linguise'),
-        'help' => __('Please select your preferred database here, use SQLite3 if you have the modules installed.', 'linguise'),
+        'help' => __('Please select your preferred database here, use SQLite3 if you have the modules installed. SQLite is a local, lightweight disk-based database.', 'linguise'),
     ],
 
     'mysql' => [
@@ -112,6 +112,7 @@ if (extension_loaded('sqlite3') && class_exists('SQLite3')) {
 <!-- oobe page -->
 <form id="register-page" action="" method="post" class="linguise-form-container">
     <input type="hidden" name="_token" value="<?php echo esc_attr(Session::getInstance()->getCsrfToken('linguise_oobe_register')); ?>" />
+    <input type="hidden" name="linguise_action" value="activate-linguise" />
     <div class="linguise-form-area flex flex-col gap-2">
         <div>
             <h3 class="m-0 text-base text-neutral-deep font-semibold">
@@ -210,7 +211,7 @@ if (extension_loaded('sqlite3') && class_exists('SQLite3')) {
     </div>
     <div class="submit-container">
         <button type="button" class="linguise-btn rounder" data-action="test-connection"><?php echo esc_html($translation_strings_root['register']['test']); ?></button>
-        <input type="submit" class="linguise-btn rounder" value="<?php echo esc_attr($translation_strings_root['register']['label']); ?>" disabled data-action="register" />
+        <input type="submit" class="linguise-btn rounder" value="<?php echo esc_attr($translation_strings_root['register']['label']); ?>" data-action="register" style="display: none;" />
     </div>
 </form>
 <?php endif; ?>

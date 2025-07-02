@@ -407,6 +407,15 @@ function registerIframe() {
                     metadata.original = globalConfig.original_default;
                 }
 
+                if (Array.isArray(metadata.languages) && metadata.languages.length <= 0) {
+                    // delete key
+                    try {
+                        delete metadata.languages;
+                    } catch (e) {
+                        // do nothing
+                    }
+                }
+
                 // Send message to iframe
                 console.log('Plugin request init!', metadata);
                 iframe.contentWindow.postMessage(

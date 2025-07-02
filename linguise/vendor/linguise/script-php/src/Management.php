@@ -167,10 +167,10 @@ class Management {
                 'enabled' => isset($linguise_options['dynamic_translations']) && $linguise_options['dynamic_translations'] === '1' ? 1 : 0,
                 'public_key' => '',
             ];
-    
+
             $default_language = Helper::sanitizeKey($linguise_options['default_language']);
             $translate_languages = [];
-    
+
             $queried_api = false;
             if ($old_options['token'] !== $token && $token !== '') {
                 $api_result = $this->getRemoteData($token);
@@ -178,14 +178,14 @@ class Management {
                 if (!$api_result !== false && isset($api_result['data'])) {
                     $default_language = Helper::sanitizeKey($api_result['data']['language']);
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
-    
+
                     $translation_languages = $api_result['data']['languages'];
                     if (!empty($translation_languages)) {
                         foreach ($translation_languages as $translation_language) {
                             $translate_languages[] = Helper::sanitizeKey($translation_language['code']);
                         }
                     }
-    
+
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
                 } else if (!$api_result !== false && isset($api_result['status_code'])) {
                     $api_web_errors[] = [
@@ -198,7 +198,7 @@ class Management {
                         'message' => 'Unable to load configuration from Linguise, please try again later or contact our support team if the problem persist.',
                     ];
                 }
-    
+
                 // Has error and we don't have any languages? We just use the old ones
                 if (!empty($api_web_errors) && !empty($old_options['enabled_languages'])) {
                     $translate_languages = $old_options['enabled_languages'];
@@ -219,11 +219,11 @@ class Management {
                     }
                 }
             }
-    
+
             if (empty($dynamic_translations['public_key']) && !empty($old_options['dynamic_translations']['public_key'])) {
                 $dynamic_translations['public_key'] = $old_options['dynamic_translations']['public_key'];
             }
-    
+
             $pre_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($linguise_options['pre_text']));
             $post_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($linguise_options['post_text']));
             $enable_flag = isset($linguise_options['enable_flag']) && $linguise_options['enable_flag'] === '1' ? 1 : 0;
@@ -236,7 +236,7 @@ class Management {
             $cache_max_size = isset($linguise_options['cache_max_size']) ? (int)$linguise_options['cache_max_size'] : 200;
             $search_translation = isset($linguise_options['search_translation']) && $linguise_options['search_translation'] === '1' ? 1 : 0;
             $debug = isset($linguise_options['debug']) && $linguise_options['debug'] === '1' ? 1 : 0;
-    
+
             $linguise_options = [
                 'token' => $token,
                 'cache_enabled' => $cache_enabled,
@@ -244,11 +244,11 @@ class Management {
                 'search_translations' => $search_translation,
                 'debug' => $debug,
                 'dynamic_translations' => $dynamic_translations,
-    
+
                 // Languages selected
                 'default_language' => $default_language,
                 'enabled_languages' => $translate_languages,
-    
+
                 // Flag related
                 'display_position' => isset($linguise_options['display_position']) ? $linguise_options['display_position'] : 'no',
                 'flag_display_type' => isset($linguise_options['flag_display_type']) ? $linguise_options['flag_display_type'] : 'popup',
@@ -285,10 +285,10 @@ class Management {
                 'flag_hover_shadow_color' => isset($linguise_options['flag_hover_shadow_color']) ? $linguise_options['flag_hover_shadow_color'] : '#bfbfbf',
                 'flag_hover_shadow_color_alpha' => isset($linguise_options['flag_hover_shadow_color_alpha']) ? (float)$linguise_options['flag_hover_shadow_color_alpha'] : 1.0,
                 'language_flag_order' => $translate_languages,
-    
+
                 'expert_mode' => $expert_mode_conf,
             ];
-    
+
             $db->saveOtherParam('linguise_options', $linguise_options);
 
             if (!$queried_api && !empty($linguise_options['token'])) {
@@ -371,7 +371,7 @@ class Management {
                     // Skip if value is the same as original
                     continue;
                 }
-                
+
                 if ($original['value'] === null && empty($value)) {
                     // If original is null and value is empty, we don't need to save it
                     continue;
@@ -522,9 +522,7 @@ class Management {
         }
 
         // Authenticate ourself, get the token or password
-        $has_oobe_already = defined('LINGUISE_OOBE_DONE') && LINGUISE_OOBE_DONE;
-
-        if (!empty($_POST['password']) && $has_oobe_already) {
+        if ($sess->oobeComplete() && !empty($_POST['password'])) {
             $existing_password = Database::getInstance()->ensureConnection()->retrieveOtherParam('linguise_password');
             if ($existing_password && password_verify($_POST['password'], $existing_password)) {
                 // Set session
@@ -606,48 +604,56 @@ class Management {
         }
     }
 
+    private function oobeRunError($message_str, $status_code = 200)
+    {
+        $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>' . $message_str . '</div>';
+        http_response_code($status_code);
+        $this->oobeRun($message);
+        die();
+    }
+
     public function activateLinguise()
     {
         // Check if OOBE
         if (defined('LINGUISE_OOBE_DONE') && LINGUISE_OOBE_DONE) {
-            $this->errorJSON('Not allowed', 403);
+            $this->oobeRunError('Not allowed', 403);
         } elseif (!defined('LINGUISE_OOBE_DONE')) {
             // Missing data
-            $this->errorJSON('Unknown status', 500);
+            $this->oobeRunError('Unknown status', 500);
         }
 
         if (!isset($_POST['_token'])) {
-            $this->errorJSON('Missing CSRF token', 400);
+            $this->oobeRunError('Missing CSRF token', 400);
         }
         $sess = Session::getInstance()->start();
         if (!$sess->verifyCsrfToken('linguise_oobe_register', $_POST['_token'])) {
-            $this->errorJSON('Invalid CSRF token', 403);
+            $this->oobeRunError('Invalid CSRF token', 403);
         }
 
         $new_pass = isset($_POST['password']) ? $_POST['password'] : null;
         if (empty($new_pass)) {
-            $this->errorJSON('Missing password', 400);
+            $this->oobeRunError('Missing password', 400);
         }
 
         // == Password check ==
         // Must be at least 10 characters long
         if (strlen($new_pass) < 10) {
-            $this->errorJSON('Password must be at least 10 characters long', 400);
+            $this->oobeRunError('Password must be at least 10 characters long', 400);
         }
 
         if ($sess->hasSession()) {
-            $this->errorJSON('Already activated', 403);
+            $this->oobeRunError('Already activated', 403);
         }
 
         $is_token = defined('LINGUISE_OOBE_TOKEN_EXIST') && LINGUISE_OOBE_TOKEN_EXIST;
         if ($is_token) {
             if (!isset($_POST['token'])) {
-                $this->errorJSON('Missing token', 400);
+                $this->oobeRunError('Missing token', 400);
             }
 
             $token = $_POST['token'];
             if ($token !== Configuration::getInstance()->get('token')) {
-                $this->errorJSON('Invalid token provided in session', 401);
+                $this->oobeRunError('Invalid token provided in session', 401);
             }
 
             // This will automatically return error response
@@ -670,7 +676,7 @@ class Management {
 
                 $sqlite_test = $this->prepareRootDatabaseSQLite();
                 if ($sqlite_test !== true) {
-                    $this->errorJSON($sqlite_test, 500);
+                    $this->oobeRunError($sqlite_test, 500);
                 }
             }
 
@@ -719,9 +725,11 @@ class Management {
                 $db->saveOtherParam('linguise_options', $db_options);
             }
 
-            // Set the session with the password
-            $sess->setSession($hashed_pass, true);
-            $this->successJSON(true, 'Password set successfully, please login again', 200);
+            // Set session, and login the user.
+            $sess->setOobeForced();
+            $sess->setSession($hashed_pass, true); // Set session with password mode
+            $this->run();
+            die();
         } else {
             // This will automatically return error response
             $database_store = $this->storeDatabaseConnection(false);
@@ -743,7 +751,7 @@ class Management {
 
                 $sqlite_test = $this->prepareRootDatabaseSQLite();
                 if ($sqlite_test !== true) {
-                    $this->errorJSON($sqlite_test, 500);
+                    $this->oobeRunError($sqlite_test, 500);
                 }
             }
 
@@ -755,7 +763,7 @@ class Management {
             // No token, we just set it immediately
             $existing_password = $db->retrieveOtherParam('linguise_password');
             if ($existing_password) {
-                $this->errorJSON('Password already set', 400);
+                $this->oobeRunError('Password already set', 400);
             }
 
             // Set the password
@@ -763,13 +771,18 @@ class Management {
 
             // Create
             $db->saveOtherParam('linguise_password', $hashed_pass);
+            // Create the options
+            $this->createOptionsWithToken(''); // Empty token since no token provided yet.
 
             // Write OOBE config
             $this->writeOOBE($database_store);
 
-            // Unset session, then redirect to login page again!
-            $sess->setSession($hashed_pass, true);
-            $this->successJSON(true, 'Password set successfully', 200);
+
+            // Set session, and login the user.
+            $sess->setOobeForced();
+            $sess->setSession($hashed_pass, true); // Set session with password mode
+            $this->run();
+            die();
         }
     }
 
@@ -814,7 +827,7 @@ class Management {
                     }
                     $this->successJSON(true, 'MySQL connection test successful', 200);
                 }
-                
+
                 return [
                     'MYSQL' => true,
                     'MYSQL_DB_HOST' => $host,
@@ -892,7 +905,7 @@ class Management {
         // Check if we can write in LINGUISE_BASE_DIR / .linguise-main.db
         $sqlite_test = $this->prepareRootDatabaseSQLite();
         if ($sqlite_test !== true) {
-            return $sqlite_test;            
+            return $sqlite_test;
         }
 
         if (!Helper::checkDataDirAvailable()) {

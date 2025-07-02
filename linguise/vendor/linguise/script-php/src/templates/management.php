@@ -138,7 +138,6 @@ $config_array = ['vars' => ['configs' => $config_array]];
 
 ?>
 
-
 <div class="linguise-config-wrapper">
     <div class="drawer-area">
         <div class="drawer-header">

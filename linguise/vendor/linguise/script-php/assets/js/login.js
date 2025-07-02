@@ -126,69 +126,29 @@ async function registerPageEntrypoint(formEl, $) {
                 return;
             }
             if (input === databaseBox) {
-                if (databaseBox.dataset.alwaysDisable) {
+                if (databaseBox.dataset.alwaysDisable === '1') {
                     return;
                 }
             }
 
             if (submitting) {
-                input.setAttribute('disabled', 'disabled');
+                input.setAttribute('aria-disabled', 'true');
             } else {
-                input.removeAttribute('disabled');
+                input.removeAttribute('aria-disabled');
             }
         });
 
         if (submitting) {
             testConnection.setAttribute('disabled', 'disabled');
+            submitButton.setAttribute('disabled', 'disabled');
         } else {
             testConnection.removeAttribute('disabled');
+            submitButton.removeAttribute('disabled');
         }
     }
 
     formEl.addEventListener('submit', (ev) => {
-        // we prevent the actual submission but allow validation
-        ev.preventDefault();
-
-        const formData = new FormData(formEl);
-        const actionUrl = new URL(formEl.action);
-        if (!formData.has(databaseBox.name)) {
-            formData.append(databaseBox.name, databaseBox.value);
-        }
-        actionUrl.searchParams.set('linguise_action', 'activate-linguise');
-
         submitStatus(true);
-
-        $.ajax({
-            type: 'POST',
-            url: actionUrl.href,
-            data: formData,
-            // this should return a JSON object
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            success: (response) => {
-                if (response.error) {
-                    showErrorMessage(response.message);
-                    submitStatus(false);
-                } else {
-                    // reload page, some artificial delay
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 100);
-                }
-            },
-            error: (xhr, status, error) => {
-                // Handle the error response here
-                console.error('Error:', error);
-                const responseData = xhr.responseJSON;
-                if (responseData && responseData.message) {
-                    showErrorMessage(responseData.message);
-                } else {
-                    showErrorMessage('An error occurred while processing your request.');
-                }
-                submitStatus(false);
-            }
-        })
     });
 
     testConnection.addEventListener('click', (ev) => {
@@ -216,10 +176,10 @@ async function registerPageEntrypoint(formEl, $) {
                 submitStatus(false);
                 if (response.error) {
                     showErrorMessage(response.message);
-                    submitButton.setAttribute('disabled', 'disabled');
                 } else {
                     showSuccessMessage(response.message);
-                    submitButton.removeAttribute('disabled');
+                    testConnection.style.display = 'none';
+                    submitButton.style.display = '';
                 }
             },
             error: (xhr, status, error) => {

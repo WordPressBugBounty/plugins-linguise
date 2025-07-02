@@ -118,6 +118,38 @@ class Session {
     }
 
     /**
+     * Check if the OOBE (Out Of Box Experience) is completed
+     *
+     *  @return boolean True if OOBE is completed, false otherwise
+     */
+    public function oobeComplete()
+    {
+        if (defined('LINGUISE_OOBE_DONE') && LINGUISE_OOBE_DONE) {
+            return true;
+        }
+
+        // Check "forced" mode, used after registration
+        if (defined('LINGUISE_OOBE_DONE_FORCED') && LINGUISE_OOBE_DONE_FORCED) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Set the OOBE (Out Of Box Experience) as completed
+     *
+     * This is used to mark the OOBE as done after the initial setup
+     */
+    public function setOobeForced()
+    {
+        // Set the OOBE forced mode, used after registration
+        if (!defined('LINGUISE_OOBE_DONE_FORCED')) {
+            define('LINGUISE_OOBE_DONE_FORCED', true);
+        }
+    }
+
+    /**
      * Check if the session is set and valid
      *
      * @return boolean True if the session is valid, false otherwise
@@ -128,7 +160,8 @@ class Session {
             return false;
         }
 
-        if (defined('LINGUISE_OOBE_DONE') && !LINGUISE_OOBE_DONE) {
+        if (!$this->oobeComplete()) {
+            // OOBE is not completed, so session is not valid
             return false;
         }
 
@@ -138,7 +171,7 @@ class Session {
         $db = Database::getInstance(true, true)->ensureConnection();
         if ($password_mode) {
             $pass = $db->retrieveOtherParam('linguise_password');
-            if ($pass !== $token_data) {
+            if (!hash_equals($pass, $token_data)) { // Use hash_equals to avoid timing attacks
                 // Token does not match the password
                 $this->unsetSession();
                 return false;
