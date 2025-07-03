@@ -41,6 +41,7 @@ class Processor {
             die();
         }
 
+        Database::getInstance()->ensureConnection();
         Debug::log('$_SERVER: ' . print_r(array_merge($_SERVER, ['PHP_AUTH_PW' => '', 'HTTP_AUTHORIZATION' =>  '', 'HTTP_COOKIE' => '']), true), 4);
 
         Hook::trigger('onBeforeMakeRequest');

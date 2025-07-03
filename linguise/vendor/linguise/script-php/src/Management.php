@@ -48,7 +48,7 @@ class Management {
         return self::$_instance;
     }
 
-    public function run($html_message = \null) {
+    public function run($html_message = \null, $api_web_errors = []) {
         // Start session
         $sess = Session::getInstance()->start();
         // Set our CSRF token, always overrides
@@ -73,9 +73,6 @@ class Management {
                     break;
             }
         }
-
-        // XXX: Errors data
-        $api_web_errors = [];
 
         require_once LINGUISE_BASE_DIR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'Helper.php';
         require_once LINGUISE_BASE_DIR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'stubs.php';
@@ -135,25 +132,25 @@ class Management {
         // Start session
         $sess = Session::getInstance()->start();
 
+        // XXX: Errors data
+        $api_web_errors = [];
+
         // Verify session
         if (!$sess->hasSession()) {
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Not authorized</div>';
-            $this->run($message);
+            $this->run($message, $api_web_errors);
         }
         if (!isset($_POST['_token'])) {
             $this->errorJSON('Missing CSRF token', 400);
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Missing CSRF token</div>';
-            $this->run($message);
+            $this->run($message, $api_web_errors);
         }
         if (!$sess->verifyCsrfToken('linguise_config', $_POST['_token'])) {
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Invalid CSRF token</div>';
-            $this->run($message);
+            $this->run($message, $api_web_errors);
         }
 
         $db = Database::getInstance()->ensureConnection();
-
-        // XXX: Errors data
-        $api_web_errors = [];
 
         $notification_popup_msg = null;
         if (isset($_POST['linguise_options'])) {
@@ -175,7 +172,7 @@ class Management {
             if ($old_options['token'] !== $token && $token !== '') {
                 $api_result = $this->getRemoteData($token);
                 $queried_api = true;
-                if (!$api_result !== false && isset($api_result['data'])) {
+                if ($api_result !== false && isset($api_result['data'])) {
                     $default_language = Helper::sanitizeKey($api_result['data']['language']);
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
 
@@ -187,7 +184,7 @@ class Management {
                     }
 
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
-                } else if (!$api_result !== false && isset($api_result['status_code'])) {
+                } else if ($api_result !== false && isset($api_result['status_code'])) {
                     $api_web_errors[] = [
                         'type' => 'error',
                         'message' => 'The API key provided has been rejected, make sure you use the right key with the associated domain ' . Request::getInstance(true)->getBaseUrl(),
@@ -385,7 +382,7 @@ class Management {
         }
 
         // Re-render
-        $this->run($notification_popup_msg);
+        $this->run($notification_popup_msg, $api_web_errors);
     }
 
     public function updateConfigIframe()
@@ -527,7 +524,7 @@ class Management {
             if ($existing_password && password_verify($_POST['password'], $existing_password)) {
                 // Set session
                 $sess->setSession($existing_password, true);
-                $this->run();
+                $this->run(\null, []);
             } else {
                 $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Invalid password</div>';
                 $this->oobeRun($message);
@@ -1168,10 +1165,12 @@ class Management {
      *
      * @return boolean True if the token is valid, false otherwise
      */
-    public function verifyRemoteToken($jwt_token)
+    public function verifyRemoteToken($jwt_token, $api_url = null)
     {
-        // Sync verify is api.linguise.com/api/sync/verify
-        $api_url = $this->getApiRoot() . '/api/sync/verify';
+        if (empty($api_url)) {
+            // Sync verify is api.linguise.com/api/sync/verify
+            $api_url = $this->getApiRoot() . '/api/sync/verify';
+        }
 
         $ch = curl_init($api_url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1254,13 +1253,16 @@ class Management {
      *
      * @param array  $data  The data to push
      * @param string $token The token to use for authentication
+     * @param string|null $api_url The URL to push the data to
      *
      * @return array|false The response from the server, or false on failure
      */
-    public function pushRemoteSync($data, $token)
+    public function pushRemoteSync($data, $token, $api_url = null)
     {
-        // Push remote sync is api.linguise.com/api/sync/domain
-        $api_url = $this->getApiRoot() . '/api/sync/domain';
+        if (empty($api_url)) {
+            // Push remote sync is api.linguise.com/api/sync/domain
+            $api_url = $this->getApiRoot() . '/api/sync/domain';
+        }
 
         $headers = [
             'Authorization: ' . $token,

@@ -158,20 +158,31 @@ class Cache
         $files = glob($cache_path . '*.php');
 
         usort($files, function($x, $y) {
-            return (filemtime($x) < filemtime($y)) ? -1 : 1;
+            $x_mtime = @filemtime($x); // Silent both errors if the file does not exist or is not readable
+            $y_mtime = @filemtime($y);
+            if ($x_mtime === false || $y_mtime === false) {
+                return 0; // If we cannot get the modification time, consider them equal
+            }
+            return ($x_mtime < $y_mtime) ? -1 : 1;
         });
 
         $max_size = Configuration::getInstance()->get('cache_max_size') * 1024 * 1024;
         $total_size = 0;
         $total_cleared = 0;
-        foreach($files as $file) {
-            if ($total_size > $max_size) {
-                unlink($file);
+        foreach ($files as $file) {
+            if (!is_file($file)) {
                 continue;
             }
-            $size = filesize($file);
-            $total_cleared += $size;
+            $size = @filesize($file); // Silent the error if the file does not exist or is not readable
+            if ($size === false) {
+                continue; // If we cannot get the size, skip this file
+            }
             $total_size += $size;
+            if ($total_size > $max_size) {
+                $total_cleared += $size;
+                @unlink($file); // silent the error if the file cannot be deleted
+                continue;
+            }
         }
 
         file_put_contents($cache_path . 'clear.txt', time());
@@ -189,9 +200,13 @@ class Cache
         $files = glob($cache_path . '*.php');
 
         foreach($files as $file) {
-            if (!in_array($file, ['.', '..'])) {
-                $total_cleared += filesize($file);
-                unlink($file);
+            if (!in_array($file, ['.', '..']) && is_file($file)) {
+                $size = @filesize($file); // Silent the error if the file does not exist or is not readable
+                if ($size === false) {
+                    continue; // If we cannot get the size, skip this file
+                }
+                $total_cleared += $size;
+                @unlink($file); // Silent the error if the file cannot be deleted
             }
         }
 
