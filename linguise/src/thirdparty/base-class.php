@@ -5,6 +5,7 @@ namespace Linguise\WordPress\Integrations;
 use Linguise\Vendor\Linguise\Script\Core\Boundary;
 use Linguise\Vendor\Linguise\Script\Core\Configuration;
 use Linguise\Vendor\Linguise\Script\Core\Database;
+use Linguise\Vendor\Linguise\Script\Core\Debug;
 use Linguise\Vendor\Linguise\Script\Core\Helper;
 use Linguise\Vendor\Linguise\Script\Core\Processor;
 use Linguise\Vendor\Linguise\Script\Core\Request;
@@ -303,17 +304,21 @@ class LinguiseBaseIntegrations
 
         $options = linguiseGetOptions();
 
+        if ($options['debug']) {
+            Debug::enable(5, Configuration::getInstance()->get('debug_ip'));
+        }
+
         Configuration::getInstance()->set('token', $options['token']);
 
         $boundary = new Boundary();
         $request = Request::getInstance();
-    
+
         $boundary->addPostFields('version', Processor::$version);
-        $boundary->addPostFields('url', $request->getBaseUrl());
+        $boundary->addPostFields('url', rtrim(linguiseGetSite(), '/'));
         $boundary->addPostFields('language', $language);
         $boundary->addPostFields('requested_path', $requested_path);
         $boundary->addPostFields('content', $html_content);
-        $boundary->addPostFields('token', Configuration::getInstance()->get('token'));
+        $boundary->addPostFields('token', $options['token']);
         $boundary->addPostFields('ip', Helper::getIpAddress());
         $boundary->addPostFields('response_code', 200);
         $boundary->addPostFields('user_agent', !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '');
@@ -324,12 +329,16 @@ class LinguiseBaseIntegrations
     
         if (!$translated_content || $response_code !== 200) {
             // We failed to translate
+            Debug::saveError('Failed to translate fragments for language: ' . $language . ' with response code: ' . $response_code);
             return false;
         }
 
         $result = json_decode($translated_content);
         // Check if failed to decode JSON
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        $json_error = json_last_error();
+        $json_error_message = json_last_error_msg();
+        if ($json_error !== JSON_ERROR_NONE) {
+            Debug::saveError('Failed to decode JSON for language: ' . $language . ' with error code: ' . $json_error . ' and message: ' . $json_error_message);
             return false;
         }
 

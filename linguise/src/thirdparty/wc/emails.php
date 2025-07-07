@@ -45,7 +45,6 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
      */
     public function init()
     {
-        add_action('woocommerce_new_order', [$this, 'hookWCNewOrder'], 100, 2);
         add_filter('woocommerce_mail_callback_params', [$this, 'hookWCEmail'], 100, 2);
     }
 
@@ -56,7 +55,6 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
      */
     public function destroy()
     {
-        remove_action('woocommerce_new_order', [$this, 'hookWCNewOrder'], 100, 2);
         remove_filter('woocommerce_mail_callback_params', [$this, 'hookWCEmail'], 100, 2);
     }
 
@@ -75,37 +73,6 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
             $language_meta = WPHelper::getLanguageFromReferer();
         }
         return $language_meta;
-    }
-
-    /**
-     * Save the current language at order creation
-     *
-     * @param integer   $order_id The order ID
-     * @param \WC_Order $order    The actual order
-     *
-     * @return void
-     */
-    public function hookWCNewOrder($order_id, $order)
-    {
-        if (WPHelper::isAdminRequest()) {
-            return;
-        }
-
-        $language_meta = WPHelper::getLanguage();
-        if (!$language_meta) {
-            $language_meta = WPHelper::getLanguageFromReferer();
-        }
-
-        if ($language_meta === null) {
-            return;
-        }
-
-        // We add to both post meta and order meta
-        add_post_meta($order_id, 'linguise_language', $language_meta);
-
-        $order->update_meta_data('linguise_language', $language_meta);
-        $order->save_meta_data();
-        $order->apply_changes();
     }
 
     /**
@@ -128,9 +95,12 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
             return $args;
         }
 
-        $language_meta = method_exists($wc_email->object, 'get_meta') ? $wc_email->object->get_meta('linguise_language', true) : '';
-        if (empty($language_meta)) {
-            $language_meta = method_exists($wc_email->object, 'get_id') ? get_post_meta($wc_email->object->get_id(), 'linguise_language', true) : '';
+        $language_meta = null;
+        if (is_a($wc_email->object, 'WC_Order')) {
+            $language_meta = $wc_email->object->get_meta('linguise_language', true);
+            if (empty($language_meta)) {
+                $language_meta = get_post_meta($wc_email->object->get_id(), 'linguise_language', true);
+            }
         }
         if (empty($language_meta)) {
             $language_meta = WPHelper::getLanguage();

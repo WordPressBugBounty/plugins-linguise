@@ -1,18 +1,18 @@
 import $ from 'jquery';
 
 function getDashboardUrlDomain() {
-    const dashboardUrl = process.env.DASHBOARD_URL;
-    if (typeof dashboardUrl === 'string' && dashboardUrl.length > 0) {
-        const url = new URL(dashboardUrl);
-        return `${url.protocol}//${url.host}`;
-    }
-
     const overrideHost = window.linguise_configs.vars.configs.dashboard_url?.host;
     if (typeof overrideHost === 'string' && overrideHost.length > 0) {
         const overridePort = window.linguise_configs.vars.configs.dashboard_url?.port || 443;
         const noPort = [80, 443].includes(overridePort) ? '' : `:${overridePort}`;
         const protocol = overridePort === 443 ? 'https://' : 'http://';
         return `${protocol}${overrideHost}${noPort}`;
+    }
+
+    const dashboardUrl = process.env.DASHBOARD_URL;
+    if (typeof dashboardUrl === 'string' && dashboardUrl.length > 0) {
+        const url = new URL(dashboardUrl);
+        return `${url.protocol}//${url.host}`;
     }
 
     return 'https://dashboard.linguise.com';

@@ -2,6 +2,7 @@
 
 namespace Linguise\WordPress\Integrations;
 
+use Linguise\Vendor\Linguise\Script\Core\Helper;
 use Linguise\WordPress\FragmentHandler;
 use Linguise\WordPress\Helper as WPHelper;
 
@@ -189,11 +190,14 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         remove_action('woocommerce_customer_reset_password', [$this, 'hookWCCustomerResetPassword'], 10);
 
         // We skip removing the ajax methods overrides
+        remove_action('woocommerce_new_order', [$this, 'hookWCNewOrder'], 100, 2);
+        remove_filter('woocommerce_after_order_object_save', [$this, 'hookWCNewOrderSave'], 100, 1);
         remove_filter('woocommerce_update_order_review_fragments', [$this, 'hookWCFragments'], 1000, 1);
         remove_filter('woocommerce_add_to_cart_fragments', [$this, 'hookWCFragments'], 1000, 1);
 
-        remove_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 10, 1);
+        remove_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 10, 2);
         remove_filter('woocommerce_get_endpoint_url', [$this, 'hookWCEndpoint'], 10, 2);
+        // remove_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 10, 2);
         remove_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000, 1);
 
         remove_action('wp_loaded', [$this, 'hookAddCartFragments']);
@@ -223,11 +227,14 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         add_filter('woocommerce_ajax_get_endpoint', [$this, 'hookWCAjaxEndpoint'], 10, 2);
         add_action('woocommerce_customer_reset_password', [$this, 'hookWCCustomerResetPassword'], 10);
 
+        add_action('woocommerce_new_order', [$this, 'hookWCNewOrder'], 100, 2);
+        add_action('woocommerce_after_order_object_save', [$this, 'hookWCNewOrderSave'], 100, 1);
         add_filter('woocommerce_update_order_review_fragments', [$this, 'hookWCFragments'], 1000, 1);
         add_filter('woocommerce_add_to_cart_fragments', [$this, 'hookWCFragments'], 1000, 1);
 
-        add_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 10, 1);
+        add_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 10, 2);
         add_filter('woocommerce_get_endpoint_url', [$this, 'hookWCEndpoint'], 10, 2);
+        // add_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 10, 2);
         add_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000, 1);
 
         add_action('wp_loaded', [$this, 'hookAddCartFragments']);
@@ -244,10 +251,130 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     protected function getWooLanguage()
     {
         $language_meta = WPHelper::getLanguage();
-        if (!$language_meta) {
+        $invalid_methods = array('GET', 'HEAD', 'OPTIONS');
+        if (!$language_meta && !in_array($_SERVER['REQUEST_METHOD'], $invalid_methods)) {
             // Check referer
             $language_meta = WPHelper::getLanguageFromReferer();
         }
+        return $language_meta;
+    }
+
+    /**
+     * Rewrite the WooCommerce URL to include the language code.
+     *
+     * @param string $url      The URL to rewrite
+     * @param string $language The language code to prepend
+     *
+     * @return string The rewritten URL
+     */
+    protected function rewriteWooUrl($url, $language)
+    {
+        $site_url = parse_url(linguiseGetSite());
+        $url = parse_url($url);
+        $site_path = rtrim(isset($site_url['path']) ? $site_url['path'] : '', '/');
+
+        $url_path = isset($url['path']) ? $url['path'] : '';
+        if (!empty($site_path) && $site_path !== '/') {
+            // Remove the site path from the URL path
+            $url_path = str_replace($site_path, '', $url_path);
+        }
+
+        // Check if language already exists in the URL
+        $url_path = ltrim($url_path, '/');
+        if (strpos($url_path, $language . '/') !== 0) {
+            // If not, prepend the language code
+            $url_path = $language . '/' . $url_path;
+        }
+
+        $url['path'] = '/' . $url_path;
+        $result = Helper::buildUrl($url, $site_url, $language);
+        return $result;
+    }
+
+    /**
+     * Save the current language at order creation
+     *
+     * @param integer   $order_id The order ID
+     * @param \WC_Order $order    The actual order
+     *
+     * @return void
+     */
+    public function hookWCNewOrder($order_id, $order)
+    {
+        if (WPHelper::isAdminRequest()) {
+            return;
+        }
+
+        $language_meta = $this->getWooLanguage();
+
+        if (empty($language_meta)) {
+            return;
+        }
+
+        // We add to both post meta and order meta
+        add_post_meta($order_id, 'linguise_language', $language_meta);
+
+        $order->update_meta_data('linguise_language', $language_meta);
+        $order->save_meta_data();
+        $order->apply_changes();
+    }
+
+    /**
+     * Hook WC new order save, this function will save the current language in the order meta
+     *
+     * Used in some cases where some plugin did not trigger the `woocommerce_new_order` action
+     *
+     * @param \WC_Order $order The order object
+     *
+     * @return void
+     */
+    public function hookWCNewOrderSave($order)
+    {
+        $woo_language = $this->getWooLanguage();
+        if (empty($woo_language)) {
+            return;
+        }
+
+        $ling_meta = $order->get_meta('linguise_language', true);
+        if (!empty($ling_meta)) {
+            // If the order already has a language set, we don't need to do anything
+            return;
+        }
+        add_post_meta($order->get_id(), 'linguise_language', $woo_language);
+        $order->update_meta_data('linguise_language', $woo_language);
+
+        // Save the order meta data
+        $order->save_meta_data();
+        $order->apply_changes();
+    }
+
+    /**
+     * Get the order language from the order meta.
+     * If the order meta is not set, it will return the current WooCommerce language.
+     *
+     * @param \WC_Order|null $order The order object
+     *
+     * @return string|null The language code or null if not set
+     */
+    protected function getOrderLanguage($order)
+    {
+        if (empty($order)) {
+            return $this->getWooLanguage();
+        }
+
+        $language_meta = null;
+        if (method_exists($order, 'get_meta')) {
+            $language_meta = $order->get_meta('linguise_language', true);
+        }
+
+        if (empty($language_meta) && isset($order->id)) {
+            $language_meta = get_post_meta($order->id, 'linguise_language', true);
+        }
+
+        if (empty($language_meta)) {
+            $language_meta = $this->getWooLanguage();
+        }
+
         return $language_meta;
     }
 
@@ -285,18 +412,19 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     /**
      * Hook WC return url and add current language to the url
      *
-     * @param string $url The URL itself
+     * @param string         $url   The URL itself
+     * @param \WC_Order|null $order The order object
      *
      * @return string
      */
-    public function hookWCReturnUrl($url)
+    public function hookWCReturnUrl($url, $order)
     {
-        $language_meta = $this->getWooLanguage();
+        $language_meta = $this->getOrderLanguage($order);
         if (empty($language_meta)) {
             return $url;
         }
-        $siteUrl = linguiseGetSite();
-        return preg_replace('/^' . preg_quote($siteUrl, '/') . '/', $siteUrl . '/' . $language_meta, $url);
+
+        return $this->rewriteWooUrl($url, $language_meta);
     }
 
     /**
@@ -320,8 +448,28 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             return $url;
         }
 
-        $siteUrl = linguiseGetSite();
-        return preg_replace('/^' . preg_quote($siteUrl, '/') . '/', $siteUrl . '/' . $language_meta, $url);
+        return $this->rewriteWooUrl($url, $language_meta);
+    }
+
+    /**
+     * Hook WC order URL, this function will override the order URL and add the language metadata in the order meta
+     *
+     * @param string    $order_url The order URL
+     * @param \WC_Order $order     The order object
+     *
+     * @return string The rewritten order URL with the language code
+     */
+    public function hookWCOrderUrl($order_url, $order)
+    {
+        $language_meta = $this->getOrderLanguage($order);
+
+        if (empty($language_meta)) {
+            // No language set, return the original URL
+            return $order_url;
+        }
+
+        // Add the language path to the order URL
+        return $this->rewriteWooUrl($order_url, $language_meta);
     }
 
     /**
@@ -367,12 +515,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             $html_content = $json->messages;
         } elseif (is_array($data)) {
             foreach ($data as $class => $fragment) {
-                $allowed = FragmentHandler::isKeyAllowed($class, $class);
-    
-                if (!is_null($allowed) && !$allowed) {
-                    continue;
-                }
-    
                 $html_content .= '<divlinguise data-wp-linguise-class="' . $class . '">' . $fragment . '</divlinguise>';
             }
         } else {
