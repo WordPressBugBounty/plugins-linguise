@@ -232,4 +232,53 @@ class Helper {
         }
         return $key;
     }
+
+    /**
+     * Transform remote configuration to local configuration
+     *
+     * @param array $local_config local configuration
+     * @param array $remote_config remote configuration
+     *
+     * @return array local configuration
+     */
+    public static function transformToLocalConfig($local_config, $remote_config) {
+        $language_settings = $remote_config['language_settings'];
+        $local_config['flag_display_type'] = $language_settings['display'];
+        $local_config['display_position'] = $language_settings['position'];
+        $local_config['enable_flag'] = isset($language_settings['enabled_flag']) && $language_settings['enabled_flag'] === true ? '1' : '0';
+        $local_config['enable_language_name'] = isset($language_settings['enabled_lang_name']) && $language_settings['enabled_lang_name'] === true ? '1' : '0';
+        $local_config['enable_language_name_popup'] = isset($language_settings['enabled_lang_name_popup']) && $language_settings['enabled_lang_name_popup'] === true ? '1' : '0';
+        $local_config['enable_language_short_name'] = isset($language_settings['enabled_lang_short_name']) && $language_settings['enabled_lang_short_name'] === true ? '1' : '0';
+        $local_config['language_name_display'] = $language_settings['lang_name_display'];
+        $local_config['flag_shape'] = $language_settings['flag_shape'];
+        $local_config['flag_en_type'] = $language_settings['flag_en_type'];
+        $local_config['flag_de_type'] = $language_settings['flag_de_type'];
+        $local_config['flag_es_type'] = $language_settings['flag_es_type'];
+        $local_config['flag_pt_type'] = $language_settings['flag_pt_type'];
+        $local_config['flag_tw_type'] = $language_settings['flag_tw_type'];
+        $local_config['flag_border_radius'] = $language_settings['flag_border_radius'];
+        $local_config['flag_width'] = $language_settings['flag_width'];
+        $local_config['pre_text'] = $language_settings['pre_text'];
+        $local_config['post_text'] = $language_settings['post_text'];
+        $local_config['custom_css'] = $language_settings['custom_css'];
+        $local_config['language_name_color'] = $language_settings['language_name_color'];
+        $local_config['language_name_hover_color'] = $language_settings['language_name_hover_color'];
+        $local_config['popup_language_name_color'] = $language_settings['popup_language_name_color'];
+        $local_config['popup_language_name_hover_color'] = $language_settings['popup_language_name_hover_color'];
+        $local_config['flag_shadow_h'] = $language_settings['flag_shadow_h'];
+        $local_config['flag_shadow_v'] = $language_settings['flag_shadow_v'];
+        $local_config['flag_shadow_blur'] = $language_settings['flag_shadow_blur'];
+        $local_config['flag_shadow_spread'] = $language_settings['flag_shadow_spread'];
+        $local_config['flag_shadow_color'] = $language_settings['flag_shadow_color'];
+        $local_config['flag_shadow_color_alpha'] = $language_settings['flag_shadow_color_alpha'];
+        $local_config['flag_hover_shadow_h'] = $language_settings['flag_hover_shadow_h'];
+        $local_config['flag_hover_shadow_v'] = $language_settings['flag_hover_shadow_v'];
+        $local_config['flag_hover_shadow_blur'] = $language_settings['flag_hover_shadow_blur'];
+        $local_config['flag_hover_shadow_spread'] = $language_settings['flag_hover_shadow_spread'];
+        $local_config['flag_hover_shadow_color'] = $language_settings['flag_hover_shadow_color'];
+        $local_config['flag_hover_shadow_color_alpha'] = $language_settings['flag_hover_shadow_color_alpha'];
+        $local_config['language_flag_order'] = $language_settings['language_flag_order'];
+
+        return $local_config;
+    }
 }

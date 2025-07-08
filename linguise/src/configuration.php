@@ -124,6 +124,13 @@ class LinguiseConfiguration
                             }
                         }
                         $dynamic_translations['public_key'] = $apiResponse->data->public_key;
+
+                        if (isset($apiResponse->data->dynamic_translations) &&
+                            isset($apiResponse->data->dynamic_translations->enabled)
+                        ) {
+                            $dynamic_translations['enabled'] = (int) $apiResponse->data->dynamic_translations->enabled;
+                        }
+
                         $token_changed = true;
                     }
                 } else {
@@ -169,6 +176,12 @@ class LinguiseConfiguration
                     $apiResponse = json_decode($result['body']);
                     if (!empty($apiResponse) && is_object($apiResponse)) {
                         $dynamic_translations['public_key'] = $apiResponse->data->public_key;
+
+                        if (isset($apiResponse->data->dynamic_translations) &&
+                            isset($apiResponse->data->dynamic_translations->enabled)
+                        ) {
+                            $dynamic_translations['enabled'] = (int) $apiResponse->data->dynamic_translations->enabled;
+                        }
                     }
                 } else {
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {

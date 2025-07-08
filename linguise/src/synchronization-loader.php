@@ -28,13 +28,15 @@ add_action('updated_option', function ($option, $old_value, $value) {
         $synchronization = Synchronization::getInstance();
         $configs = $synchronization->buildPayload($options);
         $token = $options['token'];
+        
+        if (!empty($token)) {
+            $management = Management::getInstance();
+            $api_url = $synchronization->getApiRoot($options, '/api/sync/domain');
+            $result = $management->pushRemoteSync($configs, $token, $api_url);
     
-        $management = Management::getInstance();
-        $api_url = $synchronization->getApiRoot($options, '/api/sync/domain');
-        $result = $management->pushRemoteSync($configs, $token, $api_url);
-
-        if (!$result) {
-            Debug::saveError('configuration synchronization to Linguise failed');
+            if (!$result) {
+                Debug::saveError('configuration synchronization to Linguise failed:'. $token);
+            }
         }
     } catch (Exception $e) {
         Debug::saveError('configuration synchronization to Linguise failed: ' . $e->getMessage());

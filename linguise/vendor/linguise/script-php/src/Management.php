@@ -184,6 +184,8 @@ class Management {
                     }
 
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
+                    $linguise_options = Helper::transformToLocalConfig($linguise_options, $api_result['data']);
+                    $dynamic_translations['enabled'] = $api_result['data']['dynamic_translations']['enabled'] === true ? 1 : 0;
                 } else if ($api_result !== false && isset($api_result['status_code'])) {
                     $api_web_errors[] = [
                         'type' => 'error',

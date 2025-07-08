@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.52
+ * Version:2.1.53
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -542,6 +542,13 @@ add_action('parse_query', function ($query_object) {
         return;
     }
 
+    /**
+     * Do not translate if the search was already translated
+     */
+    if (defined('LINGUISE_SEARCH_TRANSLATION_WAS_EXECUTED')) {
+        return;
+    }
+
     if ($query_object->is_search()) {
         $raw_search = $query_object->query['s'];
 
@@ -561,6 +568,7 @@ add_action('parse_query', function ($query_object) {
         }
 
         $query_object->set('s', $translation->search);
+        define('LINGUISE_SEARCH_TRANSLATION_WAS_EXECUTED', 1);
     }
 });
 
