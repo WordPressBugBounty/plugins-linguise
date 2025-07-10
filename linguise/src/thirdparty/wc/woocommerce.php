@@ -542,13 +542,25 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             $json->messages = $matches[1];
             return json_encode($json);
         } elseif (is_array($data)) {
+            // Extract the data
+            preg_match_all('/<divlinguise data-wp-linguise-class="([^"]+)"(?: linguise-ignore="1")?>(.*?)<\/divlinguise>/s', $translated_content->content, $matches, PREG_SET_ORDER);
+            if (!$matches) {
+                // No matches found, return original data
+                return $data;
+            }
+            $matching_fragments = [];
+            foreach ($matches as $match) {
+                $class = $match[1];
+                $content = $match[2];
+                $matching_fragments[$class] = $content;
+            }
             foreach ($data as $class => &$fragment) {
-                preg_match('/<divlinguise data-wp-linguise-class="' . preg_quote($class) . '">(.*?)<\/divlinguise>/s', $translated_content->content, $matches);
-                if (!$matches) {
+                $match = isset($matching_fragments[$class]) ? $matching_fragments[$class] : null;
+                if (empty($match)) {
                     // no match? continue to next fragment
                     continue;
                 }
-                $fragment = $matches[1];
+                $fragment = $match;
             }
         } else {
             preg_match('/<body>(.*)<\/body>/s', $translated_content->content, $matches);
