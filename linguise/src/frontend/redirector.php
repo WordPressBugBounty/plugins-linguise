@@ -117,11 +117,22 @@ class LinguiseRedirector
             return;
         }
 
+        // Cleanup double slashes (or more) in the REQUEST_URI
+        $request_uri = ltrim($_SERVER['REQUEST_URI'], '/');
+        if (empty($request_uri)) {
+            $request_uri = '/';
+        }
+
+        // Check if starts with a slash
+        if (substr($request_uri, 0, 1) !== '/') {
+            $request_uri = '/' . $request_uri;
+        }
+
         $languages_enabled = isset($options['enabled_languages']) ? $options['enabled_languages'] : array();
         if (isset($_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'])) {
             $url_language = $_SERVER['HTTP_LINGUISE_ORIGINAL_LANGUAGE'];
         } else {
-            $url_language = WPHelper::getLanguageFromUrl($_SERVER['REQUEST_URI']);
+            $url_language = WPHelper::getLanguageFromUrl($request_uri);
         }
 
         $url_language = static::normalizeAndCheckLanguage($url_language, $languages_enabled);
@@ -149,7 +160,7 @@ class LinguiseRedirector
 
         $orig_site = parse_url(linguiseGetSite());
 
-        $url_path_orig = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $url_path_orig = parse_url($request_uri, PHP_URL_PATH);
         if (empty($url_path_orig)) {
             $url_path_orig = '/';
         }
