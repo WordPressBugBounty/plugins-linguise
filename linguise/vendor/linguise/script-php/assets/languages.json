@@ -29,6 +29,11 @@
     "original_name": "Azərbaycanca",
     "code": "az"
   },
+  "eu": {
+    "name": "Basque",
+    "original_name": "Euskara",
+    "code": "eu"
+  },
   "be": {
     "name": "Belarusian",
     "original_name": "Беларуская",
@@ -43,6 +48,11 @@
     "name": "Bosnian",
     "original_name": "Bosanski",
     "code": "bs"
+  },
+  "pt-br": {
+    "name": "Brazilian",
+    "original_name": "Brasileiro",
+    "code": "pt-br"
   },
   "bg": {
     "name": "Bulgarian",

@@ -35,6 +35,12 @@
     "code": "az",
     "rtl": true
   },
+  "eu": {
+    "name": "Basque",
+    "original_name": "Euskara",
+    "code": "eu",
+    "rtl": false
+  },
   "be": {
     "name": "Belarusian",
     "original_name": "Беларуская",
@@ -110,12 +116,6 @@
     "rtl": false,
     "wp_code": "en_US"
   },
-  "eo": {
-    "name": "Esperanto",
-    "original_name": "Esperanto",
-    "code": "eo",
-    "rtl": false
-  },
   "et": {
     "name": "Estonian",
     "original_name": "Eesti",
@@ -161,7 +161,6 @@
     "original_name": "Ελληνικά",
     "code": "el",
     "rtl": false
-
   },
   "gu": {
     "name": "Gujarati",
@@ -173,13 +172,6 @@
     "name": "Haitian",
     "original_name": "Kreyòl Ayisyen",
     "code": "ht",
-    "rtl": false,
-    "wp_code": null
-  },
-  "ha": {
-    "name": "Hausa",
-    "original_name": "هَوُسَ",
-    "code": "ha",
     "rtl": false,
     "wp_code": null
   },
@@ -216,13 +208,6 @@
     "original_name": "Gaeilge",
     "code": "ga",
     "rtl": false
-  },
-  "ig": {
-    "name": "Igbo",
-    "original_name": "Igbo",
-    "code": "ig",
-    "rtl": false,
-    "wp_code": null
   },
   "is": {
     "name": "Icelandic",
