@@ -3,7 +3,13 @@ add_action('admin_init', function () {
     $installed_version = get_option('linguise_version', null);
 
     if (!$installed_version) {
-        define('LINGUISE_SCRIPT_TRANSLATION', true);
+        /**
+         * When https://wordpress.org/plugins/backup-backup/ is installed
+         * Linguise throw error on first install.
+         */
+        if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
+            define('LINGUISE_SCRIPT_TRANSLATION', 1);
+        }
         require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Databases' . DIRECTORY_SEPARATOR . 'Mysql.php');
 
         global $wpdb;
