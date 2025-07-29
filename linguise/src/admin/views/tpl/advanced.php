@@ -275,7 +275,7 @@ $active_integrations = $integrations->getActiveIntegrations();
                     </span>
                 </label>
                 <?php if (file_exists($debug_file)) { ?>
-                    <a href="<?php echo esc_url(admin_url('admin.ajax.php')); ?>?action=linguise_download_debug" class="linguise-link ml-2" target="_blank">
+                    <a href="<?php echo esc_url(admin_url('admin-ajax.php')); ?>?action=linguise_download_debug" class="linguise-link ml-2" target="_blank">
                         <?php echo esc_html($translation_strings['debug']['download']); ?>
                     </a>
                     <?php $truncate_url = wp_nonce_url(admin_url('admin-ajax.php') . '?action=linguise_truncate_debug', '_linguise_nonce_'); ?>

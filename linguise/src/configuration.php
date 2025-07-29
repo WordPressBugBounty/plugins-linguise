@@ -163,7 +163,7 @@ class LinguiseConfiguration
                 }
             }
 
-            if ($dynamic_translations['enabled'] === 1 && empty($dynamic_translations['public_key']) && !$token_changed && $token !== '') {
+            if ($dynamic_translations['enabled'] === 1 && empty($dynamic_translations['public_key']) && $token !== '') {
                 $args  = array(
                     'method'              => 'GET',
                     'headers'             => array('Referer' => linguiseGetSite(), 'authorization' => $token)
@@ -178,9 +178,10 @@ class LinguiseConfiguration
                         $dynamic_translations['public_key'] = $apiResponse->data->public_key;
 
                         if (isset($apiResponse->data->dynamic_translations) &&
-                            isset($apiResponse->data->dynamic_translations->enabled)
+                            isset($apiResponse->data->dynamic_translations->enabled) &&
+                            $token_changed // only update if token has changed
                         ) {
-                            $dynamic_translations['enabled'] = (int) $apiResponse->data->dynamic_translations->enabled;
+                            $dynamic_translations['enabled'] = (int)$apiResponse->data->dynamic_translations->enabled;
                         }
                     }
                 } else {
