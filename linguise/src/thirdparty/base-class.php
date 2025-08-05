@@ -380,4 +380,54 @@ class LinguiseBaseIntegrations
         // Return the full result
         return $result;
     }
+
+    /**
+     * Mark the tag as translated to avoid being translated again by dynamic translation
+     *
+     * @param string $html_data The HTML data to mark.
+     * @param string $tag_name  The tag name to mark.
+     *
+     * @return string
+     */
+    protected function markByTag($html_data, $tag_name)
+    {
+        $replacement = preg_replace_callback(
+            '/<(' . preg_quote($tag_name, '/') . ')([^>]*)>/i',
+            function ($matches) {
+                // Add a data-linguise-parent-ignore="1" attribute to the tag
+                return '<' . $matches[1] . $matches[2] . ' data-linguise-parent-ignore="1">';
+            },
+            $html_data
+        );
+        if (is_string($replacement) && !empty($replacement)) {
+            return $replacement;
+        }
+        // fail
+        return $html_data;
+    }
+
+    /**
+     * Mark the tag by attribute to avoid being translated again by dynamic translation
+     *
+     * @param string $html_data      The HTML data to mark.
+     * @param string $attribute_name The attribute name to mark.
+     *
+     * @return string
+     */
+    protected function markByAttribute($html_data, $attribute_name)
+    {
+        $replacement = preg_replace_callback(
+            '/' . preg_quote($attribute_name, '/') . '=(["\'])([^"\']+)\1/',
+            function ($matches) use ($attribute_name) {
+                // Add a data-linguise-parent-ignore="1" attribute to the tag
+                return $attribute_name . '=' . $matches[1] . $matches[2] . $matches[1] . ' data-linguise-parent-ignore="1"';
+            },
+            $html_data
+        );
+        if (is_string($replacement) && !empty($replacement)) {
+            return $replacement;
+        }
+        // fail
+        return $html_data;
+    }
 }

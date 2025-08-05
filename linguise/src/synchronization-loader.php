@@ -85,7 +85,8 @@ function update_config(WP_REST_Request $request)
 
 add_action('rest_api_init', function () {
     register_rest_route('linguise/v1', '/sync', array(
-      'methods' => 'POST',
-      'callback' => 'update_config',
+        'methods' => 'POST',
+        'callback' => 'update_config',
+        'permission_callback' => '__return_true',
     ));
 });

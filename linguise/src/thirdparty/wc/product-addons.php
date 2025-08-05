@@ -54,7 +54,6 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
             'repeater_section_field_label',
             'repeater_section_label',
             'repeater_bind',
-
         ];
         foreach ($key_exact_ignore as $key) {
             $fragment_filters[] = [
@@ -127,6 +126,7 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
     public function init()
     {
         add_filter('linguise_fragment_attributes', [$this, 'filterAttribute'], 100, 2);
+        add_filter('linguise_after_attribute_translation', [$this, 'hookAfterAttributeTranslation'], 100, 1);
     }
 
     /**
@@ -136,7 +136,8 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
      */
     public function destroy()
     {
-        remove_filter('linguise_fragment_attributes', [$this, 'filterAttribute'], 100, 2);
+        remove_filter('linguise_fragment_attributes', [$this, 'filterAttribute'], 100);
+        remove_filter('linguise_after_attribute_translation', [$this, 'hookAfterAttributeTranslation'], 100);
     }
 
     /**
@@ -167,5 +168,19 @@ class WCProductAddonsIntegration extends LinguiseBaseIntegrations
         }
 
         return $fragments;
+    }
+
+    /**
+     * Hook after attribute translation to avoid double translation later with dynamic content
+     *
+     * @param string $html_data The HTML data after attribute translation
+     *
+     * @return string
+     */
+    public function hookAfterAttributeTranslation($html_data)
+    {
+        // find data-wcpa attribute in the HTML data
+        $html_data = $this->markByAttribute($html_data, 'data-wcpa');
+        return $html_data;
     }
 }

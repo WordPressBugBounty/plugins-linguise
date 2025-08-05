@@ -306,6 +306,8 @@ class SurecartIntegration extends LinguiseBaseIntegrations
     {
         // add_filter('render_block_surecart/product-buy-button', [$this, 'translateBlockContent'], 1000, 3);
         // add_filter('render_block_surecart/product-page', [$this, 'translateBlockContent'], 1000, 3);
+        add_filter('render_block_surecart/slide-out-cart-items', [$this, 'markClassBlockContent'], 1000, 3);
+        add_filter('linguise_after_attribute_translation', [$this, 'hookAfterAttributeTranslation'], 100, 1);
     }
 
     /**
@@ -317,6 +319,8 @@ class SurecartIntegration extends LinguiseBaseIntegrations
     {
         // remove_filter('render_block_surecart/product-buy-button', [$this, 'translateBlockContent'], 1000, 3);
         // remove_filter('render_block_surecart/product-page', [$this, 'translateBlockContent'], 1000, 3);
+        remove_filter('render_block_surecart/slide-out-cart-items', [$this, 'markClassBlockContent'], 1000, 3);
+        remove_filter('linguise_after_attribute_translation', [$this, 'hookAfterAttributeTranslation'], 100);
     }
 
     /**
@@ -431,5 +435,54 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         }
 
         return $block_content;
+    }
+
+    /**
+     * Mark the content of a block with a specific tag
+     *
+     * @param string    $block_content The content of the block
+     * @param array     $block         The block data
+     * @param \WP_Block $instance      The block instance
+     *
+     * @return string
+     */
+    public function markClassBlockContent($block_content, $block, $instance)
+    {
+        $repl_block_content = preg_replace_callback(
+            '/class=(["\'])([^"\']+)\1/',
+            function ($matches) {
+                $classes_merge = $matches[2] . ' linguise-parent-ignore';
+
+                return 'class=' . $matches[1] . $classes_merge . $matches[1];
+            },
+            $block_content
+        );
+
+        if (is_string($repl_block_content) && !empty($repl_block_content)) {
+            return $repl_block_content;
+        }
+        return $block_content;
+    }
+
+    /**
+     * Hook after attribute translation to avoid double translation later with dynamic content
+     *
+     * @param string $html_data The HTML data after attribute translation
+     *
+     * @return string
+     */
+    public function hookAfterAttributeTranslation($html_data)
+    {
+        $html_data = $this->markByTag($html_data, 'sc-customer-email');
+        $html_data = $this->markByTag($html_data, 'sc-customer-name');
+        $html_data = $this->markByTag($html_data, 'sc-order-submit');
+        $html_data = $this->markByTag($html_data, 'sc-order-coupon-form');
+        $html_data = $this->markByTag($html_data, 'sc-order-summary');
+        $html_data = $this->markByTag($html_data, 'sc-line-item-trial');
+        $html_data = $this->markByTag($html_data, 'sc-line-item-total');
+        $html_data = $this->markByTag($html_data, 'sc-line-items');
+        $html_data = $this->markByTag($html_data, 'sc-order-shipping-address');
+        $html_data = $this->markByTag($html_data, 'sc-order-billing-address');
+        return $html_data;
     }
 }

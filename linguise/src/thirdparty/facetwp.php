@@ -95,6 +95,7 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
     public function init()
     {
         add_filter('facetwp_render_output', [$this, 'translateRenderOutput'], 1000, 1);
+        add_filter('facetwp_shortcode_html', [$this, 'hookFacetShortcodeMarkIgnore'], 10, 2);
     }
 
     /**
@@ -105,6 +106,7 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
     public function destroy()
     {
         remove_filter('facetwp_render_output', [$this, 'translateRenderOutput'], 1000);
+        remove_filter('facetwp_shortcode_html', [$this, 'hookFacetShortcodeMarkIgnore'], 10);
     }
 
     /**
@@ -198,6 +200,37 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
             return $replaced_content;
         }
 
+        return $output;
+    }
+
+    /**
+     * Hooked into FacetWP's shortcode to mark the shortcode output as ignored for dynamic content.
+     *
+     * @param string $output The output of the shortcode
+     * @param array  $attrs  The attributes of the shortcode
+     *
+     * @return string The output of the shortcode, unchanged
+     */
+    public function hookFacetShortcodeMarkIgnore($output, $attrs)
+    {
+        // extract class and add new class
+        $output_res = preg_replace_callback(
+            '/class="([^"]*)"/',
+            function ($matches) {
+                $classes = explode(' ', $matches[1]);
+                if (!in_array('linguise-ignore', $classes)) {
+                    $classes[] = 'linguise-parent-ignore';
+                }
+                return 'class="' . implode(' ', $classes) . '"';
+            },
+            $output
+        );
+
+        // check if it's a valid string
+        if (is_string($output_res) && !empty($output_res)) {
+            return $output_res;
+        }
+        // fail
         return $output;
     }
 }

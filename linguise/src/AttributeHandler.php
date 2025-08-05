@@ -395,6 +395,11 @@ class AttributeHandler extends FragmentHandler
         // Unmangle stuff like &amp;#xE5;
         $html_data = preg_replace('/&amp;#x([0-9A-Fa-f]+);/', '&#x$1;', $html_data);
 
+        $mod_html_data = apply_filters('linguise_after_attribute_translation', $html_data);
+        if (!empty($mod_html_data)) {
+            $html_data = $mod_html_data;
+        }
+
         return $html_data;
     }
 }

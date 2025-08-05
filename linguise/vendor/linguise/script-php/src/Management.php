@@ -169,6 +169,7 @@ class Management {
             $translate_languages = [];
 
             $queried_api = false;
+            $token_changed = false;
             if ($old_options['token'] !== $token && $token !== '') {
                 $api_result = $this->getRemoteData($token);
                 $queried_api = true;
@@ -185,7 +186,8 @@ class Management {
 
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
                     $linguise_options = Helper::transformToLocalConfig($linguise_options, $api_result['data']);
-                    $dynamic_translations['enabled'] = $api_result['data']['dynamic_translations']['enabled'] === true ? 1 : 0;
+                    $dynamic_translations['enabled'] = $this->boolInt($api_result['data']['dynamic_translations']['enabled']);
+                    $token_changed = true;
                 } else if ($api_result !== false && isset($api_result['status_code'])) {
                     $api_web_errors[] = [
                         'type' => 'error',
@@ -221,6 +223,29 @@ class Management {
 
             if (empty($dynamic_translations['public_key']) && !empty($old_options['dynamic_translations']['public_key'])) {
                 $dynamic_translations['public_key'] = $old_options['dynamic_translations']['public_key'];
+            }
+
+            if (empty($dynamic_translations['public_key']) && $dynamic_translations['enabled'] === 1 && $token !== '') {
+                $api_result = $this->getRemoteData($token);
+
+                if ($api_result !== false && isset($api_result['data'])) {
+                    $dynamic_translations['public_key'] = $api_result['data']['public_key'];
+
+                    if ($token_changed) {
+                        // If token changed, we update enabled state
+                        $dynamic_translations['enabled'] = $this->boolInt($api_result['data']['dynamic_translations']['enabled']);
+                    }
+                } else if ($api_result !== false && isset($api_result['status_code'])) {
+                    $api_web_errors[] = [
+                        'type' => 'error',
+                        'message' => 'The API key provided has been rejected, make sure you use the right key with the associated domain ' . Request::getInstance(true)->getBaseUrl(),
+                    ];
+                } else {
+                    $api_web_errors[] = [
+                        'type' => 'error',
+                        'message' => 'Unable to load configuration from Linguise, please try again later or contact our support team if the problem persist.',
+                    ];
+                }
             }
 
             $pre_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($linguise_options['pre_text']));

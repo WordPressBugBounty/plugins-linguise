@@ -1404,6 +1404,11 @@ class FragmentHandler
                 }
             }
         }
+
+        $mod_html_data = apply_filters('linguise_after_fragment_translation', $html_data);
+        if (!empty($mod_html_data)) {
+            $html_data = $mod_html_data;
+        }
         return $html_data;
     }
 }
