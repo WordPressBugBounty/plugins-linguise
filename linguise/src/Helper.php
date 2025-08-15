@@ -230,6 +230,9 @@ class Helper
      */
     public static function localeCompare($locale, $test_locale)
     {
+        // Normalize underscore and dash to a dash
+        $locale = str_replace('_', '-', $locale);
+        $test_locale = str_replace('_', '-', $test_locale);
         if (strcasecmp($locale, $test_locale) === 0) {
             return true;
         }
