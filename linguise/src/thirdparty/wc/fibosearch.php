@@ -78,7 +78,7 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
      */
     public function shouldLoad()
     {
-        return is_plugin_active('ajax-search-for-woocommerce/ajax-search-for-woocommerce.php');
+        return is_plugin_active('ajax-search-for-woocommerce/ajax-search-for-woocommerce.php') || is_plugin_active('ajax-search-for-woocommerce-premium/ajax-search-for-woocommerce.php');
     }
 
     /**
