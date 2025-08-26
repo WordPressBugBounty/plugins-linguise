@@ -212,6 +212,7 @@ class LinguiseRedirector
         }
 
         $final_url = Helper::buildUrl($parsed_url);
+        $final_url = preg_replace('#(?<!:)//+#', '/', $final_url);
         setcookie(static::$cookie_name, '1', time() + 60);
         header('Linguise-Translated-Redirect: 1');
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');

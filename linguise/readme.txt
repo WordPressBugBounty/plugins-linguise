@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag:2.1.65
+Stable tag:2.1.66
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -103,6 +103,9 @@ Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and
 
 
 == Changelog ==
+= 2.1.66 =
+- Fix: Double slash in redirect URL
+
 = 2.1.65 =
 - Fix: FiboSearch is not marked as active when user use FiboSearch Pro
 
