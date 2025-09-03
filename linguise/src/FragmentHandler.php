@@ -207,6 +207,11 @@ class FragmentHandler
             'mode' => 'regex_full',
             'kind' => 'deny',
         ],
+        [
+            'key' => 'currency',
+            'mode' => 'exact',
+            'kind' => 'deny',
+        ],
     ];
 
     /**
@@ -1291,6 +1296,11 @@ class FragmentHandler
             }
 
             $replaced_json = $json_data->getJson();
+
+            if (function_exists('apply_filters')) {
+                $replaced_json = apply_filters('linguise_after_apply_translated_fragments_override', $fragment_name, $replaced_json);
+            }
+
             if ($should_encode) {
                 $replaced_json = rawurlencode($replaced_json);
             }
@@ -1391,6 +1401,11 @@ class FragmentHandler
                 }
 
                 $replaced_json = self::applyTranslatedFragmentsForAuto(json_decode('{' . $html_matches[3] . '}', true), $fragment_list['fragments']);
+
+                if (function_exists('apply_filters')) {
+                    $replaced_json = apply_filters('linguise_after_apply_translated_fragments_auto', $fragment_name, $replaced_json);
+                }
+
                 if ($replaced_json === false) {
                     throw new \LogicException('FragmentHandler -> Injection -> ' . $fragment_name . '/' . $fragment_param . ' -> JSON data is empty!');
                 }

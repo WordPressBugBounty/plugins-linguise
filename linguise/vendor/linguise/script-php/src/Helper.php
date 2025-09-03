@@ -242,6 +242,13 @@ class Helper {
      * @return array local configuration
      */
     public static function transformToLocalConfig($local_config, $remote_config) {
+        /**
+         * If API-JS return language setting null, just return local config
+         */
+        if (!isset($remote_config['language_settings']) || is_null($remote_config['language_settings']) || empty($remote_config['language_settings'])) {
+            return $local_config;
+        }
+
         $language_settings = $remote_config['language_settings'];
         $local_config['flag_display_type'] = $language_settings['display'];
         $local_config['display_position'] = $language_settings['position'];
@@ -280,5 +287,58 @@ class Helper {
         $local_config['language_flag_order'] = $language_settings['language_flag_order'];
 
         return $local_config;
+    }
+
+    /**
+     * Convert a boolean value to an integer (0 or 1)
+     *
+     * @param mixed $value The value to convert
+     *
+     * @return mixed The converted value (0 or 1), or original
+     */
+    static function boolInt($value)
+    {
+        if (is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Convert an integer (0 or 1) to a boolean value
+     *
+     * @param mixed $value The value to convert
+     *
+     * @return mixed The converted value (true or false), or original
+     */
+    static function intBool($value)
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+
+        return $value;
+    }
+
+    static function defineConstants($is_logged_in = false)
+    {
+        if (!defined('LINGUISE_MANAGEMENT')) {
+            define('LINGUISE_MANAGEMENT', 1);
+        }
+
+        if ($is_logged_in && !defined('LINGUISE_AUTHORIZED')) {
+            define('LINGUISE_AUTHORIZED', 1);
+        }
+
+        // Silent debug noises
+        $request = Request::getInstance(true);
+        $base_dir = rtrim($request->getBaseDir(), '/');
+        if (!defined('LINGUISE_BASE_URL')) {
+            define('LINGUISE_BASE_URL', $base_dir . '/linguise');
+        }
     }
 }

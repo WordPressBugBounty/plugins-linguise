@@ -21,6 +21,34 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
     public static $name = 'WooCommerce Gateway Stripe';
 
     /**
+     * A collection of fragment keys that will be translated
+     *
+     * @var array{key:string, mode:'exact'|'path'|'wildcard'|'regex'|'regex_full',kind:'allow'|'deny'}
+     */
+    protected static $fragment_keys = [
+        [
+            'key' => 'allowed_shipping_countries\..*',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'checkout\.((?:country|currency)_code|needs_shipping)$',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'baseLocation\.(country|state)$',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ],
+        [
+            'key' => 'blocksAppearance\.rules\..*',
+            'mode' => 'regex_full',
+            'kind' => 'deny',
+        ]
+    ];
+
+    /**
      * Decides if the integration should be loaded.
      *
      * @return boolean
@@ -41,6 +69,9 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
         add_filter('wc_stripe_upe_params', [$this, 'hookTranslateParams'], 10, 1);
         // Block checkout
         add_filter('wc_stripe_params', [$this, 'hookTranslateParams'], 10, 1);
+
+        add_filter('linguise_after_apply_translated_fragments_auto', [$this, 'restoreOriginalConfigClassicCheckout'], 10, 2);
+        add_filter('linguise_after_apply_translated_fragments_override', [$this, 'restoreOriginalConfigBlockCheckout'], 10, 2);
     }
 
     /**
@@ -54,6 +85,9 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
         remove_filter('wc_stripe_upe_params', [$this, 'hookTranslateParams'], 10);
         // Block checkout
         remove_filter('wc_stripe_params', [$this, 'hookTranslateParams'], 10);
+
+        remove_filter('linguise_after_apply_translated_fragments_auto', [$this, 'restoreOriginalConfigClassicCheckout'], 10, 2);
+        remove_filter('linguise_after_apply_translated_fragments_override', [$this, 'restoreOriginalConfigBlockCheckout'], 10, 2);
     }
 
     /**
@@ -147,5 +181,74 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
         $params['locale'] = $stripe_code;
 
         return $params;
+    }
+
+    /**
+     * Restore the original block appearance structure that was accidentally
+     * changed into an array
+     *
+     * @param string $fragment_name The name of the fragment being translated.
+     * @param array  $replaced_json The fragment being translated.
+     *
+     * @return array The original block appearance structure.
+     */
+    public function restoreOriginalConfigClassicCheckout($fragment_name, $replaced_json)
+    {
+        if ($fragment_name === 'wc-stripe-upe-classic') {
+            if (array_key_exists('blocksAppearance', $replaced_json)) {
+                $replaced_json['blocksAppearance'] = $this->arrayToObject($replaced_json['blocksAppearance']);
+            }
+        }
+
+        return $replaced_json;
+    }
+
+    /**
+     * Restore the original block appearance structure that was accidentally
+     * changed into an array
+     *
+     * @param string $fragment_name The name of the fragment being translated.
+     * @param string $replaced_json The fragment being translated.
+     *
+     * @return array The original block appearance structure.
+     */
+    public function restoreOriginalConfigBlockCheckout($fragment_name, $replaced_json)
+    {
+        $replaced_json = json_decode($replaced_json);
+        if ($fragment_name === 'wc-settings-encoded') {
+            if (isset($replaced_json->paymentMethodData->stripe->blocksAppearance)) {
+                $rules = $replaced_json->paymentMethodData->stripe->blocksAppearance->rules;
+                $replaced_json->paymentMethodData->stripe->blocksAppearance->rules = $this->arrayToObject($rules);
+            }
+        }
+
+        return json_encode($replaced_json);
+    }
+
+    /**
+     * Recursive convert an array into an object.
+     *
+     * @param array $data The data to convert.
+     *
+     * @return object The converted object.
+     */
+    public function arrayToObject($data)
+    {
+        if (is_array($data)) {
+            if (empty($data)) {
+                return new \stdClass(); // convert empty array to object
+            }
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->arrayToObject($value);
+            }
+            return (object) $data;
+        } elseif ($data instanceof \stdClass) {
+            foreach ($data as $key => $value) {
+                $data->$key = $this->arrayToObject($value);
+            }
+            return $data;
+        }
+
+        return $data;
     }
 }
