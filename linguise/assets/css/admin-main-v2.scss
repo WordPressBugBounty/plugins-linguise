@@ -1083,29 +1083,45 @@ label.linguise-expert {
             background-image: unset !important;
             font-size: 0.875rem !important;
             font-weight: 600;
+            line-height: 12px !important;
 
             display: flex !important;
 
-            .search-choice-close {
-                margin-left: .5rem;
-                position: relative !important;
-                top: unset !important;
-                right: unset !important;
-                width: 10px !important;
-                height: 10px !important;
-                margin-top: .125rem;
+            // .search-choice-close {
+            //     margin-left: .5rem;
+            //     position: relative !important;
+            //     top: unset !important;
+            //     right: unset !important;
+            //     width: 10px !important;
+            //     height: 10px !important;
+            //     margin-top: .125rem;
 
-                background-image: url("../images/close.svg") !important;
-                background-repeat: no-repeat !important;
-                background-position-x: -4px !important;
-                background-position-y: -4px !important;
-                background-size: 18px !important;
+            //     background-image: url("../images/close.svg") !important;
+            //     background-repeat: no-repeat !important;
+            //     background-position-x: -4px !important;
+            //     background-position-y: -4px !important;
+            //     background-size: 18px !important;
 
-                opacity: 1 !important;
+            //     opacity: 1 !important;
+            //     transition: opacity 0.2s ease !important;
+
+            //     &:hover {
+            //         opacity: 0.8 !important
+            //     }
+            // }
+
+            .search-choice-close-better { // Simple text-based close button
+                font-size: 18px !important;
+                margin-left: 0.5rem !important;
+                color: $primary-500 !important;
+                cursor: pointer !important;
+                opacity: 0.9 !important;
                 transition: opacity 0.2s ease !important;
+                font-family: monospace;
+                line-height: 10px;
 
                 &:hover {
-                    opacity: 0.8 !important
+                    opacity: 0.6 !important;
                 }
             }
         }
