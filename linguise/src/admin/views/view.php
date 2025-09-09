@@ -6,9 +6,9 @@ use Linguise\WordPress\Admin\Helper as AdminHelper;
 use Linguise\WordPress\Helper as MainHelper;
 
 // Admin helper
-include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'Helper.php');
+require_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'Helper.php');
 // Main helper
-include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR  . 'Helper.php');
+require_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR  . 'Helper.php');
 
 $translation_strings_root = [
     'tabs' => [
@@ -416,15 +416,19 @@ $config_array = array('vars' => array('configs' => $config));
 <!-- start of linguise config script -->
 <script id="config-script" type="text/javascript">
     var linguise_configs = <?php echo json_encode($config_array); ?>;
+    window.linguise_configs = linguise_configs;
 </script>
 <script type="text/javascript">
     var linguise_site_url = "<?php echo esc_attr(linguiseGetSite()); ?>";
+    window.linguise_site_url = linguise_site_url;
 </script>
 <!-- end of linguise config script -->
 
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    window.Tawk_API = Tawk_API;
+    window.Tawk_LoadStart = Tawk_LoadStart;
     (function(){
         var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
         s1.async=true;

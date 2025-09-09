@@ -1298,7 +1298,7 @@ class FragmentHandler
             $replaced_json = $json_data->getJson();
 
             if (function_exists('apply_filters')) {
-                $replaced_json = apply_filters('linguise_after_apply_translated_fragments_override', $fragment_name, $replaced_json);
+                $replaced_json = apply_filters('linguise_after_apply_translated_fragments_override', $replaced_json, $fragment_name);
             }
 
             if ($should_encode) {
@@ -1403,7 +1403,7 @@ class FragmentHandler
                 $replaced_json = self::applyTranslatedFragmentsForAuto(json_decode('{' . $html_matches[3] . '}', true), $fragment_list['fragments']);
 
                 if (function_exists('apply_filters')) {
-                    $replaced_json = apply_filters('linguise_after_apply_translated_fragments_auto', $fragment_name, $replaced_json);
+                    $replaced_json = apply_filters('linguise_after_apply_translated_fragments_auto', $replaced_json, $fragment_name);
                 }
 
                 if ($replaced_json === false) {

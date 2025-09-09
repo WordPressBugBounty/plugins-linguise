@@ -1,4 +1,5 @@
 <?php
+
 defined('ABSPATH') || die('');
 
 $options = linguiseGetOptions();
@@ -86,22 +87,58 @@ $translation_strings = [
 ];
 
 $log_path = LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR;
-$debug_file = $log_path . 'debug.php';
-$errors_file = $log_path . 'errors.php';
 
-$last_errors = null;
-if (file_exists($errors_file)) {
-    $last_errors = file_get_contents($errors_file);
-    $log_lines = explode("\n", $last_errors);
+if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
+    /**
+     * @disregard P1011
+     */
+    $simulated_debug = defined('LINGUISE_TESTING_DEBUG') ? LINGUISE_TESTING_DEBUG : false;
+    /**
+     * @disregard P1011
+     */
+    $simulated_errors = defined('LINGUISE_TESTING_ERRORS') ? LINGUISE_TESTING_ERRORS : '';
+
+    $has_debug_file = !empty($simulated_debug);
+
+    $log_lines = explode("\n", trim($simulated_errors));
     if (count($log_lines) >= 1) {
-        array_shift($log_lines);
+        array_shift($log_lines); // Remove the first line which is a header
+    } else {
+        $log_lines = [];
     }
-    $last_errors = implode("\n", $log_lines);
+    if (empty($log_lines)) {
+        $last_errors = null;
+    } else {
+        $last_errors = implode("\n", $log_lines);
+    }
+} else {
+    $debug_file = $log_path . 'debug.php';
+    $errors_file = $log_path . 'errors.php';
+
+    $has_debug_file = file_exists($debug_file);
+
+    $last_errors = null;
+    if (file_exists($errors_file)) {
+        $last_errors = file_get_contents($errors_file);
+        $log_lines = explode("\n", $last_errors);
+        if (count($log_lines) >= 1) {
+            array_shift($log_lines);
+        }
+        $last_errors = implode("\n", $log_lines);
+    }
 }
 
-$integrations = \Linguise\WordPress\ThirdPartyLoader::getInstance();
-$loaded_integrations = $integrations->getLoadedIntegrationsNames();
-$active_integrations = $integrations->getActiveIntegrations();
+/**
+ * @disregard P1011
+ */
+if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
+    $loaded_integrations = [];
+    $active_integrations = [];
+} else {
+    $integrations = \Linguise\WordPress\ThirdPartyLoader::getInstance();
+    $loaded_integrations = $integrations->getLoadedIntegrationsNames();
+    $active_integrations = $integrations->getActiveIntegrations();
+}
 
 ?>
 
@@ -274,7 +311,7 @@ $active_integrations = $integrations->getActiveIntegrations();
                         </span>
                     </span>
                 </label>
-                <?php if (file_exists($debug_file)) { ?>
+                <?php if ($has_debug_file) { ?>
                     <a href="<?php echo esc_url(admin_url('admin-ajax.php')); ?>?action=linguise_download_debug" class="linguise-link ml-2" target="_blank">
                         <?php echo esc_html($translation_strings['debug']['download']); ?>
                     </a>
@@ -358,11 +395,21 @@ $active_integrations = $integrations->getActiveIntegrations();
         (() => {
             const hideUnhide = () => {
                 const checkboxDynTranslation = document.querySelector('input[name="linguise_options[dynamic_translations]"]');
-                const dynamicWarning = jQuery('#linguise-dynamic-warning');
+                const dynamicWarning = document.getElementById('linguise-dynamic-warning');
 
                 checkboxDynTranslation.addEventListener('change', () => {
-                    dynamicWarning.fadeIn(1000);
-                });
+                    // do fade in effect
+                    dynamicWarning.style.display = 'block';
+                    dynamicWarning.style.opacity = 0;
+                    let opacity = 0;
+                    const fadeInInterval = setInterval(() => {
+                        opacity += 0.1;
+                        dynamicWarning.style.opacity = opacity;
+                        if (opacity >= 1) {
+                            clearInterval(fadeInInterval);
+                        }
+                    }, 100);
+                })
             }
 
             if (document.readyState !== 'loading') {

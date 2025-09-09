@@ -207,12 +207,12 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
      * Restore the original block appearance structure that was accidentally
      * changed into an array
      *
-     * @param string $fragment_name The name of the fragment being translated.
      * @param string $replaced_json The fragment being translated.
+     * @param string $fragment_name The name of the fragment being translated.
      *
      * @return array The original block appearance structure.
      */
-    public function restoreOriginalConfigBlockCheckout($fragment_name, $replaced_json)
+    public function restoreOriginalConfigBlockCheckout($replaced_json, $fragment_name)
     {
         $replaced_json = json_decode($replaced_json);
         if ($fragment_name === 'wc-settings-encoded') {

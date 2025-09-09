@@ -17,11 +17,19 @@ class Helper
      */
     public static function getLastErrors()
     {
-        $errorsFile = LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR. 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR . 'errors.php';
-        if (file_exists($errorsFile)) {
-            $errors = file_get_contents($errorsFile);
+        if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
+            // If we are testing, we use custom errors data
+            /**
+             * @disregard
+             */
+            $errors = defined('LINGUISE_TESTING_ERRORS') ? LINGUISE_TESTING_ERRORS : '';
         } else {
-            $errors = '';
+            $errorsFile = LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR. 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR . 'errors.php';
+            if (file_exists($errorsFile)) {
+                $errors = file_get_contents($errorsFile);
+            } else {
+                $errors = '';
+            }
         }
 
         $errorsList = [];
@@ -142,6 +150,9 @@ class Helper
      */
     public static function getWPLangNativeName($lang_code)
     {
+        if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
+            return 'Testing (' .  $lang_code . ')'; // In testing mode, we return the code as is
+        }
         require_once ABSPATH . 'wp-admin/includes/translation-install.php';
         $translations = wp_get_available_translations();
         if (isset($translations[$lang_code])) {

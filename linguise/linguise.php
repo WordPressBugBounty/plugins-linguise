@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.68
+ * Version:2.1.69
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -14,7 +14,9 @@
 
 use Linguise\Vendor\Linguise\Script\Core\Configuration;
 use Linguise\Vendor\Linguise\Script\Core\Database;
+use Linguise\Vendor\Linguise\Script\Core\Request;
 use Linguise\WordPress\Helper as WPHelper;
+use Linguise\WordPress\LinguiseSwitcher;
 
 defined('ABSPATH') || die('');
 
@@ -674,6 +676,21 @@ add_action('plugins_loaded', 'linguiseFirstHook', 1);
 add_action('plugins_loaded', 'linguiseHookLanguage', 2);
 add_action('init', function () {
     load_plugin_textdomain('linguise', false, dirname(plugin_basename(__FILE__)) . '/languages');
+
+    if (!is_admin() && !wp_doing_ajax()) {
+        linguiseInitializeConfiguration();
+    
+        $tl_host = Configuration::getInstance()->get('host');
+        $tl_port = (int)Configuration::getInstance()->get('port');
+        $no_port_needed = $tl_port === 80 || $tl_port === 443;
+        $tl_addr = 'http' . ($tl_port === 443 ? 's' : '') . '://' . $tl_host . ($no_port_needed ? '' : ':' . $tl_port);
+    
+        $options = linguiseGetOptions();
+        $request = Request::getInstance();
+        $base_url = $request->getBaseUrl();
+        $switcher = new LinguiseSwitcher($options, $base_url, $tl_addr);
+        $switcher->start(); // initialize hook and more
+    }
 });
 
 // Redirection, cookies, and more.
