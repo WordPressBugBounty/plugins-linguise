@@ -31,6 +31,30 @@ class AmeliaBookingIntegration extends LinguiseBaseIntegrations
             'match' => 'var wpAmeliaLabels = (.*?);',
             'replacement' => 'var wpAmeliaLabels = $$JSON_DATA$$;',
         ],
+        [
+            'name' => 'amelia-settings',
+            'match' => 'var wpAmeliaSettings = (.*?);',
+            'replacement' => 'var wpAmeliaSettings = $$JSON_DATA$$;',
+            'strict' => true, // Only match if the object is allowed
+        ],
+    ];
+
+    /**
+     * A collection of fragment keys that we want to translate
+     *
+     * @var array
+     */
+    protected static $fragment_keys = [
+        [
+            'key' => '^customizedData\.sbsNew\.(?!colors)\w+\.(?:options|translations|order)\.\w+\.(?:name|default)',
+            'mode' => 'regex_full',
+            'kind' => 'allow',
+        ],
+        [
+            'key' => '^weekSchedule\.\d+\.day',
+            'mode' => 'regex_full',
+            'kind' => 'allow',
+        ],
     ];
 
     /**
