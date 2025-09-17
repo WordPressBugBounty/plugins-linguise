@@ -86,6 +86,14 @@ class Configuration
 
         // Insert back WordPress translation into Scripts
         self::wpFragmentsScriptInsertion();
+
+        /**
+         * Hotfix for some of urls with non latin char become invalid (HTML entity–encoded Unicode characters)
+         * And causing some of SEO tool complaining, Semrush mark hreflang as broken.
+         * TODO: can be removed if core translate the URL properly
+         */
+        // Normalize canonical link href value
+        self::normalizeCanonical();
     }
 
     /**
@@ -99,6 +107,61 @@ class Configuration
         $content  = $response->getContent();
         $content = str_replace('<div id="wpadminbar" ', '<div id="wpadminbar" translate="no" ', $content);
         $response->setContent($content);
+    }
+
+    /**
+     * Decoed href value of hreflang
+     *
+     * @return void
+     */
+    protected static function normalizeCanonical()
+    {
+        $response = Response::getInstance();
+        $content = $response->getContent();
+
+        $content = self::normalizeCanonicalLink($content);
+
+        $response->setContent($content);
+    }
+
+    /**
+     * Normalize canonical link href values by decoding HTML entities.
+     * Converts things like:
+     *   https://example.com/ar/&#x635;&#x641;&#x62D;&#x629;/
+     * into:
+     *   https://example.com/ar/صفحة/
+     *
+     * @param string $html The HTML content
+     *
+     * @return string The modified HTML content
+     */
+    protected static function normalizeCanonicalLink(string $html): string
+    {
+        return preg_replace_callback(
+            '/(<link\s+rel="canonical"[^>]*?href=")([^"]+)(")/i',
+            function ($matches) {
+                // Decode HTML entities (&#xNNNN; or &amp;)
+                $decoded = html_entity_decode($matches[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+                // Optional: percent-encode path segments for safety
+                $parts = parse_url($decoded);
+                if (isset($parts['path'])) {
+                    $segments = array_map('rawurlencode', explode('/', trim($parts['path'], '/')));
+                    $parts['path'] = '/' . implode('/', $segments) . '/';
+                }
+
+                // Rebuild URL
+                $rebuilt =
+                    (isset($parts['scheme']) ? $parts['scheme'] . '://' : '') .
+                    ($parts['host'] ?? '') .
+                    ($parts['path'] ?? '') .
+                    (isset($parts['query']) ? '?' . $parts['query'] : '') .
+                    (isset($parts['fragment']) ? '#' . $parts['fragment'] : '');
+
+                return $matches[1] . $rebuilt . $matches[3];
+            },
+            $html
+        );
     }
 
     /**

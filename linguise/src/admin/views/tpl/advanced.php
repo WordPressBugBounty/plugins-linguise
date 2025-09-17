@@ -90,10 +90,14 @@ $log_path = LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SE
 
 if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
     /**
+     * Ignore linting stuff
+     *
      * @disregard P1011
      */
     $simulated_debug = defined('LINGUISE_TESTING_DEBUG') ? LINGUISE_TESTING_DEBUG : false;
     /**
+     * Ignore linting stuff
+     *
      * @disregard P1011
      */
     $simulated_errors = defined('LINGUISE_TESTING_ERRORS') ? LINGUISE_TESTING_ERRORS : '';
@@ -129,6 +133,8 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
 }
 
 /**
+ * Ignore linting stuff
+ *
  * @disregard P1011
  */
 if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {

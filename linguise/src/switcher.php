@@ -270,7 +270,17 @@ class LinguiseSwitcher
                 }
 
                 if (!is_wp_error($url_translation) && !empty($url_translation)) {
-                    $url = $scheme . '://' . $host . $this->config['base'] . htmlentities($url_translation->translation, ENT_COMPAT) . $this->config['trailing_slashes'] . $query;
+                    /**
+                     * Hotfix for some of urls with non latin char become invalid (HTML entity–encoded Unicode characters)
+                     * And causing some of SEO tool complaining, Semrush mark hreflang as broken.
+                     * TODO: can be removed if core translate the URL properly
+                     */
+                    $encoded_translation = implode(
+                        '/',
+                        array_map('rawurlencode', explode('/', trim($url_translation->translation, '/')))
+                    );
+
+                    $url = $scheme . '://' . $host . $this->config['base'] . '/' . $encoded_translation . $this->config['trailing_slashes'] . $query;
                 } else {
                     $url = $scheme . '://' . $host . $this->config['base'] . (in_array($language_code, array($this->config['default_language'], 'x-default')) ? '' : '/' . $language_code) . $path . $this->config['trailing_slashes'] . $query;
                 }

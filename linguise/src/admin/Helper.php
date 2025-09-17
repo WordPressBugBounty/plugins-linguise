@@ -18,8 +18,10 @@ class Helper
     public static function getLastErrors()
     {
         if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
-            // If we are testing, we use custom errors data
             /**
+             * If we are testing, we use custom errors data
+             * Also ignore type check error
+             *
              * @disregard
              */
             $errors = defined('LINGUISE_TESTING_ERRORS') ? LINGUISE_TESTING_ERRORS : '';
