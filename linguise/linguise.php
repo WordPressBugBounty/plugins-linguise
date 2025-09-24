@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.71
+ * Version:2.1.72
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -386,6 +386,9 @@ add_filter('insert_custom_user_meta', function ($custom_meta, $user, $update) {
 
 // Load all the super-important stuff first
 require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'HTMLHelper.php'); // Main HTML Helper, required by fragment handler
+include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'FragmentBase.php'); // Base class for fragment handlers
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'FragmentHandler.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'AttributeHandler.php');
 include_once(__DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'rest-ajax.php');

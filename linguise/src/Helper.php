@@ -4,7 +4,6 @@ namespace Linguise\WordPress;
 
 defined('ABSPATH') || die('');
 
-
 /**
  * Class Helper
  */
@@ -340,5 +339,44 @@ class Helper
         }
 
         return 'rgba(' . $color_p['r'] . ', ' . $color_p['g'] . ', ' . $color_p['b'] . ', ' . $alpha . ')';
+    }
+
+    /**
+     * Check if the array is an actual object or not.
+     *
+     * @param array|object $arrOrObject The array or object to be checked
+     *
+     * @return boolean - True if it's an actual object, false if it's an array
+     */
+    public static function isActualObject($arrOrObject)
+    {
+        if (is_object($arrOrObject)) {
+            return true;
+        }
+
+        if (!is_array($arrOrObject)) {
+            // preliminary check
+            return false;
+        }
+
+        // https://stackoverflow.com/a/72949244 (PHP 7 compatible)
+        if (function_exists('array_is_list')) {
+            return array_is_list($arrOrObject) === false; // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.array_is_listFound
+        }
+
+        $keys = array_keys($arrOrObject);
+        return implode('', $keys) !== implode(range(0, count($keys) - 1));
+    }
+
+    /**
+     * Check if the string has space or not.
+     *
+     * @param string $str The string to be checked
+     *
+     * @return boolean - True if it has space, false if it doesn't
+     */
+    public static function hasSpace($str)
+    {
+        return preg_match('/\s/', $str) > 0;
     }
 }

@@ -2,8 +2,9 @@
 
 namespace Linguise\WordPress;
 
-use Linguise\Vendor\JsonPath\JsonObject;
 use Linguise\WordPress\FragmentHandler;
+use Linguise\WordPress\HTMLHelper;
+use Linguise\Vendor\JsonPath\JsonObject;
 use Linguise\Vendor\Linguise\Script\Core\Debug;
 
 defined('ABSPATH') || die('');
@@ -155,7 +156,7 @@ class AttributeHandler extends FragmentHandler
      */
     public static function findWPFragments(&$html_data)
     {
-        $html_dom = self::loadHTML($html_data);
+        $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
             return [];
         }
@@ -178,7 +179,7 @@ class AttributeHandler extends FragmentHandler
                 }
 
                 // Unroll the entity
-                $key_data = html_entity_decode(self::unprotectEntity($key_data), ENT_QUOTES, 'UTF-8');
+                $key_data = html_entity_decode(HTMLHelper::unprotectEntity($key_data), ENT_QUOTES, 'UTF-8');
 
                 // Is the data URL encoded?
                 $should_encode = isset($matcher['encode']) && $matcher['encode'];
@@ -235,7 +236,7 @@ class AttributeHandler extends FragmentHandler
         }
 
         if (!empty($all_fragments)) {
-            $html_data = self::saveHTML($html_dom);
+            $html_data = HTMLHelper::saveHTML($html_dom);
         }
 
         Debug::log('AttributeHandler -> Collected: ' . json_encode($all_fragments, JSON_PRETTY_PRINT));
@@ -282,7 +283,7 @@ class AttributeHandler extends FragmentHandler
             return $html_data;
         }
 
-        $html_dom = self::loadHTML($html_data);
+        $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
             return $html_data;
         }
@@ -320,7 +321,7 @@ class AttributeHandler extends FragmentHandler
                 }
 
                 // Since we have protection enabled around this!
-                $match_data = html_entity_decode(self::unprotectEntity($match_data), ENT_QUOTES, 'UTF-8');
+                $match_data = html_entity_decode(HTMLHelper::unprotectEntity($match_data), ENT_QUOTES, 'UTF-8');
 
                 $should_encode = isset($matched['encode']) && $matched['encode'];
                 if ($should_encode) {
@@ -346,7 +347,7 @@ class AttributeHandler extends FragmentHandler
                         $replaced_text = rawurlencode($replaced_text);
                     }
 
-                    $protected_json = self::protectEntity($replaced_text);
+                    $protected_json = HTMLHelper::protectEntity($replaced_text);
                 } else {
                     // JSON mode, we need to decode the JSON data
                     $json_decoded = json_decode($match_data, true);
@@ -356,10 +357,11 @@ class AttributeHandler extends FragmentHandler
 
                     $json_data = new JsonObject($json_decoded);
                     foreach ($fragment_list['fragments'] as $fragment) {
+                        $dec_key = self::unwrapKey($fragment['key']);
                         try {
-                            $json_data->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
+                            $json_data->set('$.' . $dec_key, $fragment['value']);
                         } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                            Debug::log('Failed to set key in attributes: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+                            Debug::log('Failed to set key in attributes: ' . $dec_key . ' -> ' . $e->getMessage());
                         }
                     }
 
@@ -369,7 +371,7 @@ class AttributeHandler extends FragmentHandler
                     }
 
                     // Protect the entity back
-                    $protected_json = self::protectEntity(htmlspecialchars($replaced_json, ENT_QUOTES, 'UTF-8', false));
+                    $protected_json = HTMLHelper::protectEntity(htmlspecialchars($replaced_json, ENT_QUOTES, 'UTF-8', false));
                 }
 
                 $attr_html->setAttribute($matched['key'], $protected_json);
@@ -377,7 +379,7 @@ class AttributeHandler extends FragmentHandler
             }
         }
 
-        $html_data = self::saveHTML($html_dom);
+        $html_data = HTMLHelper::saveHTML($html_dom);
         foreach ($queued_deletions as $deletion) {
             foreach ($deletion as $fragment) {
                 $decoded_match = html_entity_decode($fragment['match'], ENT_QUOTES | ENT_HTML5, 'UTF-8');

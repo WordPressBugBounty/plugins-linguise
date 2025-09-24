@@ -2,54 +2,18 @@
 
 namespace Linguise\WordPress;
 
+use Linguise\WordPress\FragmentBase;
+use Linguise\WordPress\Helper;
+use Linguise\WordPress\HTMLHelper;
 use Linguise\Vendor\JsonPath\JsonObject;
 use Linguise\Vendor\Linguise\Script\Core\Debug;
 
 defined('ABSPATH') || die('');
 
 /**
- * Check if the array is an actual object or not.
- *
- * @param array|object $arr_or_object The array or object to be checked
- *
- * @return boolean - True if it's an actual object, false if it's an array
- */
-function is_actual_object($arr_or_object): bool
-{
-    if (is_object($arr_or_object)) {
-        return true;
-    }
-
-    if (!is_array($arr_or_object)) {
-        // preliminary check
-        return false;
-    }
-
-    // https://stackoverflow.com/a/72949244 (PHP 7 compatible)
-    if (function_exists('array_is_list')) {
-        return array_is_list($arr_or_object) === false; // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.array_is_listFound
-    }
-
-    $keys = array_keys($arr_or_object);
-    return implode('', $keys) !== implode(range(0, count($keys) - 1));
-}
-
-/**
- * Check if the string has space or not.
- *
- * @param string $str The string to be checked
- *
- * @return boolean - True if it has space, false if it doesn't
- */
-function has_space($str)
-{
-    return preg_match('/\s/', $str) > 0;
-}
-
-/**
  * Class FragmentHandler
  */
-class FragmentHandler
+class FragmentHandler extends FragmentBase
 {
     /**
      * Regex/matcher for our custom HTML fragment
@@ -65,411 +29,6 @@ class FragmentHandler
      * @var string
      */
     protected static $frag_html_match_self_close = '/<(img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text|media-img|media-imgset)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?\s*\/?>/si';
-
-    /**
-     * Marker used to protect the HTML entities
-     *
-     * @var array
-     */
-    protected static $marker_entity = [
-        'common' => 'linguise-internal-entity',
-        'named' => 'linguise-internal-entity1',
-        'numeric' => 'linguise-internal-entity2',
-    ];
-
-    /**
-     * Default filters for the fragments
-     *
-     * @var array
-     */
-    protected static $default_filters = [
-        [
-            'key' => 'nonce',
-            'mode' => 'wildcard',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'i18n_.+',
-            'mode' => 'regex',
-            'kind' => 'allow',
-            'cast' => 'html-main',
-        ],
-        [
-            'key' => 'currency\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'wc.*?_currency',
-            'mode' => 'regex',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'dateFormat',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'baseLocation.country',
-            'mode' => 'path',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'baseLocation.state',
-            'mode' => 'path',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'admin.wccomHelper.storeCountry',
-            'mode' => 'path',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => '.*-version',
-            'mode' => 'regex',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'orderStatuses\..*',
-            'mode' => 'regex_full',
-            'kind' => 'allow',
-        ],
-        [
-            'key' => 'wc.*Url',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => '^defaultFields\..*\.(autocapitalize|autocomplete)',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'defaultAddressFormat',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'dateFormat',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => '^checkoutData\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'api_key',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => '^countryData\..*\.format',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => '.*?(hash_key|fragment_name|storage_key)',
-            'mode' => 'regex',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'wc_ajax_url',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        /**
-         * Plugin : woocommerce-gateway-stripe
-         */
-        [
-            'key' => 'paymentMethodsConfig.*?(card|us_bank_account|alipay|klarna|afterpay_clearpay|link|wechat_pay|cashapp)\.countries',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'accountCountry',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'appearance\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'blocksAppearance\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'paymentMethodData.*?stripe\.plugin_url',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'currency',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-    ];
-
-    /**
-     * Check with the Configuration for the allow list and deny list.
-     *
-     * @param string $key      The key to be checked
-     * @param string $full_key The full JSON path key to be checked
-     *
-     * @return boolean|null - True if it's allowed, false if it's not
-     */
-    public static function isKeyAllowed($key, $full_key)
-    {
-        // the allow/deny list are formatted array like:
-        // [
-        //    [
-        //        'key' => 'woocommerce',
-        //        'mode' => 'regex' | 'exact | 'path' | 'wildcard',
-        //        'kind' => 'allow' | 'deny',
-        //    ]
-        // ]
-
-        $merged_defaults = self::$default_filters;
-        if (self::isCurrentTheme('Woodmart')) {
-            $regex_key_disallowed = [
-                'add_to_cart_action.*',
-                'age_verify.*',
-                'ajax_(?!url)(\w+)',
-                'carousel_breakpoints\..*',
-                'comment_images_upload_mimes\..*',
-                'tooltip_\w+_selector',
-            ];
-
-            foreach ($regex_key_disallowed as $regex_key) {
-                $merged_defaults[] = [
-                    'key' => $regex_key,
-                    'mode' => 'regex_full',
-                    'kind' => 'deny',
-                ];
-            }
-
-            $exact_key_disallowed = [
-                'added_popup',
-                'base_hover_mobile_click',
-                'cart_redirect_after_add',
-                'categories_toggle',
-                'collapse_footer_widgets',
-                'compare_by_category',
-                'compare_save_button_state',
-                'countdown_timezone',
-                'whb_header_clone',
-                'vimeo_library_url',
-                'theme_dir',
-                'wishlist_page_nonce',
-                'photoswipe_template',
-            ];
-
-            foreach ($exact_key_disallowed as $exact_key) {
-                $merged_defaults[] = [
-                    'key' => $exact_key,
-                    'mode' => 'path',
-                    'kind' => 'deny',
-                ];
-            }
-        }
-
-        // Run through filters, provide our current default filters
-        // User can change it by adding a filter and modify the array.
-        if (function_exists('apply_filters')) {
-            $wp_frag_list = apply_filters('linguise_fragment_filters', $merged_defaults);
-        } else {
-            $wp_frag_list = $merged_defaults;
-        }
-
-        foreach ($wp_frag_list as $frag_item) {
-            $allow = $frag_item['kind'] === 'allow';
-            $cast_data = isset($frag_item['cast']) ? $frag_item['cast'] : null;
-            if ($frag_item['mode'] === 'path') {
-                // check if full key is the same
-                if ($frag_item['key'] === $full_key) {
-                    // Return cast or bool
-                    return $cast_data ? $cast_data : $allow;
-                }
-            } elseif ($frag_item['mode'] === 'exact') {
-                // check if key is the same
-                if ($frag_item['key'] === $key) {
-                    return $cast_data ? $cast_data : $allow;
-                }
-            } elseif ($frag_item['mode'] === 'regex' || $frag_item['mode'] === 'regex_full') {
-                // check if regex matches
-                $key_match = $frag_item['mode'] === 'regex_full' ? $full_key : $key;
-                $match_re = '/' . $frag_item['key'] . '/';
-                if (preg_match($match_re, $key_match)) {
-                    return $cast_data ? $cast_data : $allow;
-                }
-            } elseif ($frag_item['mode'] === 'wildcard') {
-                // check if wildcard matches
-                $match_re = '/^.*?' . $frag_item['key'] . '.*?$/';
-                if (preg_match($match_re, $key)) {
-                    return $cast_data ? $cast_data : $allow;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if the string is a translatable string or not.
-     *
-     * @param string $value The string to be checked
-     *
-     * @return boolean - True if it's a translatable string, false if it's not
-     */
-    private static function isTranslatableString($value)
-    {
-        $value = trim($value);
-
-        if (empty($value) || !is_string($value)) {
-            return false;
-        }
-
-        // Check if it's a JSON, if yes, do not translate
-        $json_parse = json_decode($value);
-        if (!is_null($json_parse)) {
-            return false;
-        }
-
-        // Has space? Most likely a translateable string
-        if (has_space($value)) {
-            return true;
-        }
-
-        // Check if email
-        if (!empty(filter_var($value, FILTER_VALIDATE_EMAIL))) {
-            return false;
-        }
-
-        // Check if string is UUID
-        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $value)) {
-            return false;
-        }
-
-        // Check if first word is lowercase (bad idea?)
-        // Or, check if has a number/symbols
-        if (ctype_lower($value[0]) || preg_match('/[0-9\W]/', $value)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if the string is a link or not.
-     *
-     * @param string $value The string to be checked
-     *
-     * @return boolean - True if it's a link, false if it's not
-     */
-    private static function isStringLink($value)
-    {
-        // Has http:// or https://
-        // Has %%endpoint%%
-        // Starts with / and has no space
-        if (preg_match('/https?:\/\//', $value)) {
-            // Validate the link
-            if (filter_var($value, FILTER_VALIDATE_URL)) {
-                return true;
-            }
-
-            return false;
-        }
-
-        if (substr($value, 0, 1) === '/' && !has_space($value)) {
-            $as_url = parse_url($value);
-            if (empty($as_url)) {
-                return false;
-            }
-
-            // Check if it only have "path" and not other keys
-            $array_keys = array_keys($as_url);
-            if (count($array_keys) === 1 && $array_keys[0] === 'path') {
-                return true;
-            }
-
-            if (preg_match('/%%.*%%/', $value)) {
-                // Assume WC-AJAX
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if the string is a image link or not.
-     *
-     * @param string $value The string to be checked
-     *
-     * @return boolean - True if it's a image link, false if it's not
-     */
-    private static function isImageLink($value)
-    {
-        // There is so much more image extension
-        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff', 'tif', 'ico', 'avif', 'heic', 'heif'];
-        $regex_matcher = '/\.(?:' . implode('|', $extensions) . ')$/i';
-        if (preg_match($regex_matcher, $value)) {
-            // We don't need to validate the link since this is called inside isStringLink
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Check if the string is a HTML element or not.
-     *
-     * @param string $value The string to be checked
-     *
-     * @return string|false - True if it's a HTML element, false if it's not
-     */
-    private static function isHTMLElement($value)
-    {
-        if (empty($value)) {
-            return false;
-        }
-
-        // use simplexml, suppress the warning
-        if (extension_loaded('xml') && function_exists('simplexml_load_string')) {
-            $doc = @simplexml_load_string($value); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
-            if ($doc !== false) {
-                return 'html';
-            }
-        }
-
-        // Use strip_tags method
-        if (strip_tags($value) !== $value) {
-            return 'html-main';
-        }
-
-        return false;
-    }
-
-    /**
-     * Check and wrap key with ["$key"] if it use symbols
-     *
-     * @param string $key The key to be checked
-     *
-     * @return string
-     */
-    private static function wrapKey($key)
-    {
-        // only include symbols
-        // alphanumeric is not included
-        if (preg_match('/[^\w]/', $key)) {
-            return "['" . $key . "']";
-        }
-
-        return $key;
-    }
 
     /**
      * Collect the fragment from the JSON data.
@@ -497,7 +56,7 @@ class FragmentHandler
             $use_key = $current_key . $use_key;
         }
 
-        if (is_actual_object($value)) {
+        if (Helper::isActualObject($value)) {
             $collected_fragments = self::collectFragmentFromJson($value, $strict, $collected_fragments, $use_key);
         } elseif (is_array($value)) {
             for ($arr_i = 0; $arr_i < count($value); $arr_i++) { // phpcs:ignore Generic.CodeAnalysis.ForLoopWithTestFunctionCall.NotAllowed
@@ -565,353 +124,6 @@ class FragmentHandler
             $collected_fragments = self::collectFragment($key, $value, $collected_fragments, $current_key, $strict);
         }
         return $collected_fragments;
-    }
-
-    /**
-     * Checks if the given theme name is the current theme or the parent of the current theme.
-     *
-     * @param string         $theme_name   The name of the theme to check.
-     * @param \WP_Theme|null $parent_theme Optional. The parent theme to check. Default is null.
-     *
-     * @return boolean True if the given theme name is the current theme or its parent, false otherwise.
-     */
-    private static function isCurrentTheme($theme_name, $parent_theme = \null)
-    {
-        if (!function_exists('wp_get_theme')) {
-            return false;
-        }
-
-        $theme = $parent_theme ?: wp_get_theme();
-        if (empty($theme)) {
-            return false;
-        }
-
-        $is_theme = $theme->name === $theme_name;
-        if ($is_theme) {
-            return true;
-        }
-
-        $parent = $theme->parent();
-        if ($parent !== false) {
-            return self::isCurrentTheme($theme_name, $parent);
-        }
-        return false;
-    }
-
-    /**
-     * Protect the HTML entities in the source code.
-     *
-     * Adapted from: https://github.com/ivopetkov/html5-dom-document-php/blob/master/src/HTML5DOMDocument.php
-     *
-     * @param string $source The source code to be protected
-     *
-     * @return string The protected source code
-     */
-    protected static function protectEntity($source)
-    {
-        // Replace the entity with our own
-        $source = preg_replace('/&([a-zA-Z]*);/', self::$marker_entity['named'] . '-$1-end', $source);
-        $source = preg_replace('/&#([0-9]*);/', self::$marker_entity['numeric'] . '-$1-end', $source);
-
-        return $source;
-    }
-
-    /**
-     * Unprotect the HTML entities in the source code.
-     *
-     * @param string $html The HTML code to be unprotected
-     *
-     * @return string The unprotected HTML code
-     */
-    protected static function unprotectEntity($html)
-    {
-        if (strpos($html, self::$marker_entity['common']) !== false) {
-            $html = preg_replace('/' . self::$marker_entity['named'] . '-(.*?)-end/', '&$1;', $html);
-            $html = preg_replace('/' . self::$marker_entity['numeric'] . '-(.*?)-end/', '&#$1;', $html);
-        }
-
-        return $html;
-    }
-
-    /**
-     * Protect the HTML string before processing with DOMDocument.
-     *
-     * It does:
-     * - Add CDATA around script tags content
-     * - Preserve html entities
-     *
-     * Adapted from: https://github.com/ivopetkov/html5-dom-document-php/blob/master/src/HTML5DOMDocument.php
-     *
-     * @param string $source The HTML source code to be protected
-     *
-     * @return string The protected HTML source code
-     */
-    private static function protectHTML($source)
-    {
-        // Add CDATA around script tags content
-        $matches = null;
-        preg_match_all('/<script(.*?)>/', $source, $matches);
-        if (isset($matches[0])) {
-            $matches[0] = array_unique($matches[0]);
-            foreach ($matches[0] as $match) {
-                if (substr($match, -2, 1) !== '/') { // check if ends with />
-                    $source = str_replace($match, $match . '<![CDATA[-linguise-dom-internal-cdata', $source); // Add CDATA after the open tag
-                }
-            }
-        }
-
-        $source = str_replace('</script>', '-linguise-dom-internal-cdata]]></script>', $source); // Add CDATA before the end tag
-        $source = str_replace('<![CDATA[-linguise-dom-internal-cdata-linguise-dom-internal-cdata]]>', '', $source); // Clean empty script tags
-        $matches = null;
-        preg_match_all('/\<!\[CDATA\[-linguise-dom-internal-cdata.*?-linguise-dom-internal-cdata\]\]>/s', $source, $matches);
-        if (isset($matches[0])) {
-            $matches[0] = array_unique($matches[0]);
-            foreach ($matches[0] as $match) {
-                if (strpos($match, '</') !== false) { // check if contains </
-                    $source = str_replace($match, str_replace('</', '<-linguise-dom-internal-cdata-endtagfix/', $match), $source);
-                }
-            }
-        }
-
-        // Preserve html entities
-        $source = self::protectEntity($source);
-
-        return $source;
-    }
-
-    /**
-     * Load the HTML data into a DOMDocument object.
-     *
-     * @param string $html_data The HTML data to be loaded
-     *
-     * @return \DOMDocument|null The loaded HTML DOM object
-     */
-    protected static function loadHTML($html_data)
-    {
-        // Check if DOMDocument is available or xml extension is loaded
-        if (!class_exists('DOMDocument') && !extension_loaded('xml')) {
-            return null;
-        }
-
-        // Load HTML
-        $html_dom = new \DOMDocument();
-        @$html_dom->loadHTML(self::protectHTML($html_data), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged
-
-        /**
-        * Avoid mangling the CSS and JS code with encoded HTML entities
-        *
-        * See: https://www.php.net/manual/en/domdocument.savehtml.php#119813
-        *
-        * While testing, we found this issue with css inner text got weirdly mangled
-        * following the issue above, I manage to correct this by adding proper content-type equiv
-        * which is really weird honestly but it manages to fix the issue.
-        */
-        $has_utf8 = false;
-        $meta_attrs = $html_dom->getElementsByTagName('meta');
-        foreach ($meta_attrs as $meta) {
-            if ($meta->hasAttribute('http-equiv') && strtolower($meta->getAttribute('http-equiv')) === 'content-type') {
-                // force UTF-8s
-                $meta->setAttribute('content', 'text/html; charset=UTF-8');
-                $has_utf8 = true;
-                break;
-            }
-        }
-
-        if (!$has_utf8) {
-            // We didn't found any meta tag with content-type equiv, add our own
-            $meta = $html_dom->createElement('meta');
-            $meta->setAttribute('http-equiv', 'Content-Type');
-            $meta->setAttribute('content', 'text/html; charset=UTF-8');
-            $head_doc = $html_dom->getElementsByTagName('head');
-            if ($head_doc->length > 0) {
-                // Add to head tag on the child as the first node
-                $head = $head_doc->item(0);
-                @$head->insertBefore($meta, $head->firstChild); // phpcs:ignore Generic.PHP.NoSilencedErrors.Discouraged -- ignore any errors for now
-            }
-        }
-
-        return $html_dom;
-    }
-
-    /**
-     * Save the HTML data into a string.
-     *
-     * @param \DOMDocument $dom The DOMDocument object to be saved
-     *
-     * @return string The saved HTML data
-     */
-    protected static function saveHTML($dom)
-    {
-        // Save HTML
-        $html_data = $dom->saveHTML();
-        if ($html_data === false) {
-            return '';
-        }
-
-        // Unprotect HTML entities
-        $html_data = self::unprotectEntity($html_data);
-
-        // Unprotect HTML
-        $code_to_be_removed = [
-            'linguise-dom-internal-content',
-            '<![CDATA[-linguise-dom-internal-cdata',
-            '-linguise-dom-internal-cdata]]>',
-            '-linguise-dom-internal-cdata-endtagfix'
-        ];
-        foreach ($code_to_be_removed as $code) {
-            $html_data = str_replace($code, '', $html_data);
-        }
-
-        // Unmangle stuff like &amp;#xE5;
-        $html_data = preg_replace('/&amp;#x([0-9A-Fa-f]+);/', '&#x$1;', $html_data);
-
-        return $html_data;
-    }
-
-    /**
-     * Unclobber the CDATA internal
-     *
-     * NOTE: Only use this when processing a script content internal data not the whole HTML data.
-     *
-     * This is used to protect the CDATA internal data from being mangled by the DOMDocument.
-     *
-     * @param string $html_data The HTML data to be unclobbered
-     *
-     * @return string The unclobbered HTML data
-     */
-    protected static function unclobberCdataInternal($html_data)
-    {
-        // Unclobber the CDATA internal
-        $html_data = str_replace('<![CDATA[-linguise-dom-internal-cdata', '', $html_data);
-        $html_data = str_replace('-linguise-dom-internal-cdata]]>', '', $html_data);
-        $html_data = str_replace('<-linguise-dom-internal-cdata-endtagfix/', '</', $html_data);
-
-        return $html_data;
-    }
-
-    /**
-     * Clobber back the CDATA internal
-     *
-     * NOTE: Only use this when processing a script content internal data not the whole HTML data.
-     *
-     * This is used to protect the CDATA internal data from being mangled by the DOMDocument.
-     *
-     * @param string $html_data The HTML data to be clobbered
-     *
-     * @return string The clobbered HTML data
-     */
-    protected static function clobberCdataInternal($html_data)
-    {
-        // Append prefix and suffix
-        return '<![CDATA[-linguise-dom-internal-cdata' . $html_data . '-linguise-dom-internal-cdata]]>';
-    }
-
-    /**
-     * Get override JSON fragment matching
-     *
-     * The way the override works is by matching the script content with the regex, the schema of each item is:
-     * - name: The name of the plugin, e.g. 'mailoptin', must be unique
-     * - match: The regex to match the script content
-     * - replacement: The replacement string, use $$JSON_DATA$$ as the placeholder for the JSON data
-     * - position: The position of the JSON data, default to 1 (optional)
-     * - encode: If the JSON data is URL encoded or not, default to false (optional)
-     * - id: The id of the script, if it's not the same, then it will be skipped (optional)
-     * - mode: The mode of the script, default to 'script' (available are: `script` and `app_json`)
-     *
-     * @param string $html_data The HTML data input
-     *
-     * @return array The array of JSON to match with fragment
-     */
-    private static function getJSONOverrideMatcher($html_data)
-    {
-        $current_list = [];
-
-        if (is_plugin_active('mailoptin/mailoptin.php')) {
-            $current_list[] = [
-                'name' => 'mailoptin',
-                'match' => '<script type="text\/javascript">var (.*)_lightbox = (.*);<\/script>',
-                'replacement' => '<script text="text/javascript">var $1_lightbox = $$JSON_DATA$$;</script>',
-                'position' => 2,
-            ];
-        }
-
-        if (is_plugin_active('ninja-forms/ninja-forms.php')) {
-            $current_list[] = [
-                'name' => 'ninjaforms_fields',
-                'match' => 'form.fields=(.*?);nfForms',
-                'replacement' => 'form.fields=$1;nfForms',
-            ];
-            $current_list[] = [
-                'name' => 'ninjaforms_i18n',
-                'match' => 'nfi18n = (.*?);',
-                'replacement' => 'nfi18n = $$JSON_DATA$$;',
-            ];
-            $current_list[] = [
-                'name' => 'ninjaforms_settings',
-                'match' => 'form.settings=(.*?);form',
-                'replacement' => 'form.settings=$$JSON_DATA$$;form',
-            ];
-        }
-
-        if (is_plugin_active('wpforms-lite/wpforms.php')) {
-            $current_list[] = [
-                'name' => 'wpforms-lite',
-                'match' => 'wpforms_settings = (.*?)(\n)(\/\* ]]> \*\/)',
-                'replacement' => 'wpforms_settings = $$JSON_DATA$$$2$3',
-            ];
-        }
-
-        if (is_plugin_active('popup-maker/popup-maker.php')) {
-            $current_list[] = [
-                'name' => 'popup-maker',
-                'match' => 'var pumAdminBarText = (.*?);',
-                'replacement' => 'var pumAdminBarText = $$JSON_DATA$$;',
-            ];
-        }
-
-        if (is_plugin_active('mailpoet/mailpoet.php')) {
-            $current_list[] = [
-                'name' => 'mailpoet',
-                'match' => 'var MailPoetForm = (.*?);',
-                'replacement' => 'var MailPoetForm = $$JSON_DATA$$;',
-            ];
-        }
-
-        if (self::isCurrentTheme('Woodmart')) {
-            $current_list[] = [
-                'name' => 'woodmart-theme',
-                'match' => 'var woodmart_settings = (.*?);',
-                'replacement' => 'var woodmart_settings = $$JSON_DATA$$;',
-            ];
-        }
-
-        $current_list[] = [
-            'name' => 'wc-settings-encoded',
-            'match' => 'var wcSettings = wcSettings \|\| JSON\.parse\( decodeURIComponent\( \'(.*?)\' \) \);',
-            'replacement' => 'var wcSettings = wcSettings || JSON.parse( decodeURIComponent( \'$$JSON_DATA$$\' ) );',
-            'encode' => true,
-        ];
-
-        if (defined('CFCORE_VER')) {
-            $current_list[] = [
-                'name' => 'calderaforms',
-                'match' => 'CF_VALIDATOR_STRINGS = (.*?);',
-                'replacement' => 'CF_VALIDATOR_STRINGS = $$JSON_DATA$$;',
-            ];
-        }
-
-        $current_list[] = [
-            'name' => 'surecart-store-data',
-            'key' => 'sc-store-data',
-            'mode' => 'app_json',
-        ];
-
-        // Merge with apply_filters
-        if (function_exists('apply_filters')) {
-            $current_list = apply_filters('linguise_fragment_override', $current_list, $html_data);
-        }
-
-        return $current_list;
     }
 
     /**
@@ -1060,7 +272,7 @@ class FragmentHandler
         $override_list = self::getJSONOverrideMatcher($html_data);
 
         foreach ($override_list as $override_item) {
-            $script_content = self::unclobberCdataInternal($script_content);
+            $script_content = HTMLHelper::unclobberCdataInternal($script_content);
             if (isset($override_item['mode']) && $override_item['mode'] === 'app_json') {
                 // If mode is app_json and key is the same
                 if (isset($override_item['key']) &&  $override_item['key'] === $script_id) {
@@ -1129,7 +341,7 @@ class FragmentHandler
      */
     public static function findWPFragments(&$html_data)
     {
-        $html_dom = self::loadHTML($html_data);
+        $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
             return [];
         }
@@ -1153,7 +365,7 @@ class FragmentHandler
 
             $frag_id = $attr_match[1];
 
-            $script_content = self::unclobberCdataInternal($script->textContent);
+            $script_content = HTMLHelper::unclobberCdataInternal($script->textContent);
 
             $match_res = preg_match('/var ' . str_replace('-', '_', $frag_id) . '_params = (.*);/', $script_content, $json_matches);
             if ($match_res === false || $match_res === 0) {
@@ -1201,24 +413,6 @@ class FragmentHandler
     }
 
     /**
-     * Unpack/decode the key name from the JSON data.
-     *
-     * This is needed because the key name would be encoded sometimes.
-     *
-     * @param string $key The key to be decoded
-     *
-     * @return string
-     */
-    protected static function decodeKeyName($key)
-    {
-        $key = html_entity_decode($key, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        // Would sometimes fails??
-        $key = str_replace('&apos;', "'", $key);
-        $key = str_replace('&quot;', '"', $key);
-        return $key;
-    }
-
-    /**
      * Apply the translated fragments for the override.
      *
      * @param string $html_data      The HTML data to be injected
@@ -1259,10 +453,11 @@ class FragmentHandler
             $match_data = $html_matches[1];
             $json_data = new JsonObject(json_decode('{' . $match_data . '}', true));
             foreach ($fragment_info['fragments'] as $fragment) {
+                $decoded_key = self::unwrapKey($fragment['key']);
                 try {
-                    $json_data->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
+                    $json_data->set('$.' . $decoded_key, $fragment['value']);
                 } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                    Debug::log('Failed to set key in override: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+                    Debug::log('Failed to set key in override: ' . $decoded_key . ' -> ' . $e->getMessage());
                 }
             }
 
@@ -1288,10 +483,11 @@ class FragmentHandler
 
             $json_data = new JsonObject(json_decode($before_match, true));
             foreach ($fragment_info['fragments'] as $fragment) {
+                $decoded_key = self::unwrapKey($fragment['key']);
                 try {
-                    $json_data->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
+                    $json_data->set('$.' . $decoded_key, $fragment['value']);
                 } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                    Debug::log('Failed to set key in override: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+                    Debug::log('Failed to set key in override: ' . $decoded_key . ' -> ' . $e->getMessage());
                 }
             }
 
@@ -1334,10 +530,11 @@ class FragmentHandler
 
         foreach ($fragments as $fragment) {
             // remove the html fragment from the translated page
+            $decoded_key = self::unwrapKey($fragment['key']);
             try {
-                $json_path->set('$.' . self::decodeKeyName($fragment['key']), $fragment['value']);
+                $json_path->set('$.' . $decoded_key, $fragment['value']);
             } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                Debug::log('Failed to set key in auto: ' . self::decodeKeyName($fragment['key']) . ' -> ' . $e->getMessage());
+                Debug::log('Failed to set key in auto: ' . $decoded_key . ' -> ' . $e->getMessage());
             }
         }
 
