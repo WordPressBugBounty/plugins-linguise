@@ -187,12 +187,12 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
      * Restore the original block appearance structure that was accidentally
      * changed into an array
      *
-     * @param string $fragment_name The name of the fragment being translated.
      * @param array  $replaced_json The fragment being translated.
+     * @param string $fragment_name The name of the fragment being translated.
      *
      * @return array The original block appearance structure.
      */
-    public function restoreOriginalConfigClassicCheckout($fragment_name, $replaced_json)
+    public function restoreOriginalConfigClassicCheckout($replaced_json, $fragment_name)
     {
         if ($fragment_name === 'wc-stripe-upe-classic') {
             if (array_key_exists('blocksAppearance', $replaced_json)) {
@@ -216,8 +216,9 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
     {
         $replaced_json = json_decode($replaced_json);
         if ($fragment_name === 'wc-settings-encoded') {
-            if (isset($replaced_json->paymentMethodData->stripe->blocksAppearance)) {
-                $rules = $replaced_json->paymentMethodData->stripe->blocksAppearance->rules;
+            $blocksAppearance = $replaced_json->paymentMethodData->stripe->blocksAppearance ?? null;
+            if ($blocksAppearance && is_array($blocksAppearance->rules ?? null)) {
+                $rules = $blocksAppearance->rules;
                 $replaced_json->paymentMethodData->stripe->blocksAppearance->rules = $this->arrayToObject($rules);
             }
         }
