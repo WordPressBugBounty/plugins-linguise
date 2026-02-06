@@ -353,7 +353,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         foreach ($matches as $match) {
             $contexts[] = [
                 'context' => $match[0],
-                'data' => json_decode('{' . $match[1] . '}'),
+                'data' => json_decode('{' . $match[1] . '}', true),
             ];
         }
 
@@ -367,7 +367,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         for ($index = 0; $index < $contexts_length; $index++) {
             $context = $contexts[$index];
             if (empty($context['data'])) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
             $fragments = FragmentHandler::collectFragmentFromJson($context['data']);
 
@@ -417,14 +417,14 @@ class SurecartIntegration extends LinguiseBaseIntegrations
             // key-preifx is formatted "index-${index}"
             $index = (int)str_replace('index-', '', $key_prefix);
             // Find the context
-            $context = $contexts[$index];
-            if (empty($context)) {
+            if (!isset($contexts[$index]) || empty($contexts[$index])) {
                 continue;
             }
+            $context = $contexts[$index];
 
             $tl_json_frag_list = $tl_json_frag['fragments'];
             if (empty($tl_json_frag_list)) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($context['data'], $tl_json_frag_list);
@@ -461,7 +461,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         if (is_string($repl_block_content) && !empty($repl_block_content)) {
             return $repl_block_content;
         }
-        return $block_content;
+        return $block_content; // @codeCoverageIgnore
     }
 
     /**

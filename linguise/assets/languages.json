@@ -76,6 +76,12 @@
     "rtl": false,
     "wp_code": "bg_BG"
   },
+  "my": {
+    "name": "Burmese",
+    "original_name": "မြန်မာဘာသာ",
+    "code": "my",
+    "rtl": false
+  },
   "ca": {
     "name": "Catalan",
     "original_name": "Català",
@@ -245,6 +251,12 @@
     "name": "Khmer",
     "original_name": "ភាសាខ្មែរ",
     "code": "km",
+    "rtl": false
+  },
+  "rw": {
+    "name": "Kinyarwanda",
+    "original_name": "Kinyarwanda",
+    "code": "rw",
     "rtl": false
   },
   "ko": {

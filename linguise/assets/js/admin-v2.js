@@ -247,12 +247,9 @@ jQuery(document).ready(($) => {
         languages[globalConfig.current_language] = getLanguageName(globalConfig.current_language);
 
         $('#ms_translate_into_chosen .search-choice').each((_, elem) => {
-            const names = $(elem).find('span').text().trim();
-            // strip out the language code
-            // names formatted like this: "English (en)"
-            const code = names.match(languageCodeRegex);
-            languages[code[1]] = getLanguageName(code[1]);
-            sortedLists.push(code[1]);
+            const code = $(elem).data('code');
+            languages[code] = getLanguageName(code);
+            sortedLists.push(code);
         });
 
         globalConfig.enabled_languages = sortedLists;

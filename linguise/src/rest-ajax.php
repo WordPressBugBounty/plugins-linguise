@@ -25,7 +25,7 @@ use Linguise\WordPress\Helper as WPHelper;
 function linguise_intercept_ajax_request($response, $handler, $request)
 {
     if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
-        define('LINGUISE_SCRIPT_TRANSLATION', 1);
+        define('LINGUISE_SCRIPT_TRANSLATION', 1); // @codeCoverageIgnore
     }
 
     include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -34,6 +34,7 @@ function linguise_intercept_ajax_request($response, $handler, $request)
 
     $options = linguiseGetOptions();
 
+    // @codeCoverageIgnoreStart
     if (!empty(Configuration::getInstance()->get('debug')) && Configuration::getInstance()->get('debug')) {
         if (is_int(Configuration::getInstance()->get('debug'))) {
             $verbosity = Configuration::getInstance()->get('debug');
@@ -42,6 +43,7 @@ function linguise_intercept_ajax_request($response, $handler, $request)
         }
         Debug::enable($verbosity, Configuration::getInstance()->get('debug_ip'));
     }
+    // @codeCoverageIgnoreEnd
 
     $route = $request->get_route();
 
@@ -119,7 +121,12 @@ function linguise_intercept_ajax_request($response, $handler, $request)
 
     $ch = curl_init();
     list($translated_content, $response_code) = Translation::getInstance()->_translate($ch, $boundary);
-    curl_close($ch);
+    if (PHP_VERSION_ID < 80000) {
+        // @codeCoverageIgnoreStart
+        // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.curl_closeDeprecated,Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+        curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        // @codeCoverageIgnoreEnd
+    }
 
     if (!$translated_content || $response_code !== 200) {
         // We failed to translate
@@ -137,7 +144,12 @@ function linguise_intercept_ajax_request($response, $handler, $request)
     // if we don't replace it.
     $req_reflect = new \ReflectionClass($req_object);
     $reflect_lang = $req_reflect->getProperty('language');
-    $reflect_lang->setAccessible(true);
+    if (PHP_VERSION_ID < 80100) {
+        // @codeCoverageIgnoreStart
+        // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+        $reflect_lang->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+        // @codeCoverageIgnoreEnd
+    }
     // Get the old value first
     $req_language = $req_object->getLanguage();
     // Set the new value from the referer data
@@ -156,9 +168,11 @@ function linguise_intercept_ajax_request($response, $handler, $request)
     }
 
     register_shutdown_function(function () use ($db_updated) {
+         // @codeCoverageIgnoreStart
         if ($db_updated) {
             Database::getInstance()->close();
         }
+         // @codeCoverageIgnoreEnd
     });
 
     // Revert the language back
@@ -185,12 +199,12 @@ function linguise_intercept_ajax_request($response, $handler, $request)
 
     $tl_json_frag = $translated_fragments['wp-ajax-json'][$woo_prefix];
     if (empty($tl_json_frag)) {
-        return $response;
+        return $response; // @codeCoverageIgnore
     }
 
     $tl_json_frag_list = $tl_json_frag['fragments'];
     if (empty($tl_json_frag_list)) {
-        return $response;
+        return $response; // @codeCoverageIgnore
     }
 
     $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($raw_data, $tl_json_frag_list);

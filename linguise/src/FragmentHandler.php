@@ -5,10 +5,13 @@ namespace Linguise\WordPress;
 use Linguise\WordPress\FragmentBase;
 use Linguise\WordPress\Helper;
 use Linguise\WordPress\HTMLHelper;
-use Linguise\Vendor\JsonPath\JsonObject;
 use Linguise\Vendor\Linguise\Script\Core\Debug;
 
 defined('ABSPATH') || die('');
+
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'FragmentOverrideHandler.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'FragmentAutoHandler.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'FragmentI18nHandler.php';
 
 /**
  * Class FragmentHandler
@@ -20,7 +23,7 @@ class FragmentHandler extends FragmentBase
      *
      * @var string
      */
-    protected static $frag_html_match = '/<(div|a|linguise-main|img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text|media-img|media-imgset)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?>(.*?)<\/\1>/si';
+    protected static $frag_html_match = '/<(div|a|linguise-main|img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="((?:link|html|html-main|text|media-img|media-imgset)(?:-skip)?)" data-fragment-mode="(auto|override|skip|i18n|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?>(.*?)<\/\1>/si';
     /**
      * Regex/matcher for our custom HTML fragment
      *
@@ -28,7 +31,7 @@ class FragmentHandler extends FragmentBase
      *
      * @var string
      */
-    protected static $frag_html_match_self_close = '/<(img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="(link|html|html-main|text|media-img|media-imgset)" data-fragment-mode="(auto|override|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?\s*\/?>/si';
+    protected static $frag_html_match_self_close = '/<(img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="((?:link|html|html-main|text|media-img|media-imgset)(?:-skip)?)" data-fragment-mode="(auto|override|skip|i18n|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?\s*\/?>/si';
 
     /**
      * Collect the fragment from the JSON data.
@@ -90,11 +93,14 @@ class FragmentHandler extends FragmentBase
                 $format = $allowed_filters;
             }
             if ($tl_string || $tl_link || is_string($tl_dom) || $allowed_filters) {
-                $collected_fragments[] = [
-                    'key' => $use_key,
-                    'value' => $value,
-                    'format' => $format,
-                ];
+                // Extra check
+                if (is_string($value) && !empty($value)) {
+                    $collected_fragments[] = [
+                        'key' => $use_key,
+                        'value' => $value,
+                        'format' => $format,
+                    ];
+                }
             }
         }
 
@@ -120,10 +126,48 @@ class FragmentHandler extends FragmentBase
         if ($current_key === null) {
             $current_key = '';
         }
+        if (empty($json_data) || !is_array($json_data)) {
+            return $collected_fragments;
+        }
         foreach ($json_data as $key => $value) {
             $collected_fragments = self::collectFragment($key, $value, $collected_fragments, $current_key, $strict);
         }
         return $collected_fragments;
+    }
+
+    /**
+     * Protect sprintf templates in the text by wrapping them in a span tag
+     *
+     * @param string $text The text to be protected
+     *
+     * @return string The protected text
+     */
+    private static function protectSprintfTemplates($text)
+    {
+        $pattern = '/(%(?:\d+\$)?[+-]?(?:\d+)?(?:\.\d+)?[bcdeEfFgGosuxX])/';
+        $replacement = '<span-ling translate="no">$1</span-ling>';
+        $result = preg_replace($pattern, $replacement, $text);
+        if (!empty($result)) {
+            return $result;
+        }
+        return $text; // @codeCoverageIgnore
+    }
+
+    /**
+     * Restore sprintf templates in the text by unwrapping them from the span tag
+     *
+     * @param string $text The text to be restored
+     *
+     * @return string The restored text
+     */
+    private static function restoreSprintfTemplates($text)
+    {
+        $pattern = '/<span-ling translate="no">(%(?:\d+\$)?[+-]?(?:\d+)?(?:\.\d+)?[bcdeEfFgGosuxX])<\/span-ling>/';
+        $result = preg_replace($pattern, '$1', $text);
+        if (!empty($result)) {
+            return $result;
+        }
+        return $text; // @codeCoverageIgnore
     }
 
     /**
@@ -155,10 +199,18 @@ class FragmentHandler extends FragmentBase
             if ($fragment['format'] === 'media-img' || $fragment['format'] === 'media-imgset') {
                 $tag = 'img';
             }
+            $frag_format = $fragment['format'];
+            if (isset($fragment['skip']) && $fragment['skip']) {
+                $frag_format .= '-skip';
+            }
+
             $html .= '<' . $tag . ' class="linguise-fragment" data-fragment-name="' . $fragment_name . '" data-fragment-param="' . $fragment_param . '" data-fragment-key="';
-            $html .= $fragment['key'] . '" data-fragment-format="' . $fragment['format'] . '" data-fragment-mode="' . $json_fragments['mode'] . '"';
+            $html .= $fragment['key'] . '" data-fragment-format="' . $frag_format . '" data-fragment-mode="' . $json_fragments['mode'] . '"';
             if ($json_fragments['mode'] === 'attribute' && isset($json_fragments['attribute'])) {
                 $html .= ' data-fragment-extra-id="' . $json_fragments['attribute'] . '"';
+            }
+            if ($json_fragments['mode'] === 'i18n' && isset($fragment['index'])) {
+                $html .= ' data-fragment-extra-id="' . $fragment['index'] . '"';
             }
             if ($fragment['format'] === 'link') {
                 $html .= ' href="' . $fragment['value'] . '">';
@@ -166,12 +218,12 @@ class FragmentHandler extends FragmentBase
                 $tag_select = $fragment['format'] === 'media-imgset' ? 'srcset' : 'src';
                 $html .= ' ' . $tag_select . '="' . $fragment['value'] . '">';
             } else {
-                $html .= '>' . $frag_value;
+                $html .= '>' . self::protectSprintfTemplates($frag_value);
             }
             $html .= '</' . $tag . '>' . "\n";
         }
 
-        return trim($html);
+        return trim($html) . "\n";
     }
 
     /**
@@ -197,6 +249,12 @@ class FragmentHandler extends FragmentBase
 
             $fragment_value = isset($match[9]) ? $match[9] : '';
 
+            $is_skipped = false;
+            if (substr($fragment_format, -5) === '-skip') {
+                $is_skipped = true;
+                $fragment_format = substr($fragment_format, 0, -5);
+            }
+
             if ($fragment_format === 'link' || $fragment_format === 'media-img' || $fragment_format === 'media-imgset') {
                 $fragment_value = $match[8];
             }
@@ -214,6 +272,8 @@ class FragmentHandler extends FragmentBase
             if (!empty($result_strip)) {
                 $fragment_value = $result_strip;
             }
+
+            $fragment_value = self::restoreSprintfTemplates($fragment_value);
 
             if (!isset($fragments[$fragment_name])) {
                 $fragments[$fragment_name] = [];
@@ -238,12 +298,19 @@ class FragmentHandler extends FragmentBase
                 $fragment_value = html_entity_decode($fragment_value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             }
 
+            $fragment_index = null;
+            if ($fragment_mode === 'i18n' && isset($match[7]) && is_numeric($match[7])) {
+                $fragment_index = (int)$match[7];
+            }
+
             // make it into list for each fragment name
             $fragments[$fragment_name][$fragment_param]['fragments'][] = [
                 'key' => $fragment_key,
                 'value' => $fragment_value,
                 'format' => $fragment_format,
                 'match' => $match[0],
+                'index' => $fragment_index,
+                'skip' => $is_skipped, // If `skip` is true, then don't replace this fragment (but remove it)
             ];
         }
 
@@ -266,69 +333,19 @@ class FragmentHandler extends FragmentBase
      */
     private static function tryMatchWithOverride($script, $html_data)
     {
-        $script_content = $script->textContent;
-        $script_id = $script->getAttribute('id');
+        return FragmentOverrideHandler::tryMatchWithOverride($script, $html_data);
+    }
 
-        $override_list = self::getJSONOverrideMatcher($html_data);
-
-        foreach ($override_list as $override_item) {
-            $script_content = HTMLHelper::unclobberCdataInternal($script_content);
-            if (isset($override_item['mode']) && $override_item['mode'] === 'app_json') {
-                // If mode is app_json and key is the same
-                if (isset($override_item['key']) &&  $override_item['key'] === $script_id) {
-                    $json_data = json_decode($script_content, true);
-                    $collected_temp = self::collectFragmentFromJson($json_data);
-                    if (!empty($collected_temp)) {
-                        return [
-                            'name' => $override_item['name'],
-                            'fragments' => $collected_temp,
-                        ];
-                    }
-                }
-
-                continue;
-            }
-
-            if (isset($override_item['key']) && $override_item['key'] !== $script_id) {
-                // If the key is set and it's not the same, then we skip
-                continue;
-            }
-
-            $match_res = preg_match('/' . $override_item['match'] . '/s', $script_content, $match);
-            if ($match_res === false || $match_res === 0) {
-                continue;
-            }
-
-            // since it matches, get the JSON value.
-            $match_index = 1;
-            if (isset($override_item['position'])) {
-                $match_index = $override_item['position'];
-            }
-
-            $matched = $match[$match_index];
-            
-            if (isset($override_item['encode']) && $override_item['encode']) {
-                // decode the matched string
-                $matched = urldecode($matched);
-            }
-
-            $json_data = json_decode($matched, true);
-
-            // collect the fragment
-            $is_strict = false;
-            if (isset($override_item['strict']) && $override_item['strict']) {
-                $is_strict = true;
-            }
-            $collected_temp = self::collectFragmentFromJson($json_data, $is_strict);
-            if (!empty($collected_temp)) {
-                return [
-                    'name' => $override_item['name'],
-                    'fragments' => $collected_temp,
-                ];
-            }
-        }
-
-        return null;
+    /**
+     * Parse the translation block from the script tag.
+     *
+     * @param \DOMNode|\DOMElement $script The script to be matched
+     *
+     * @return array|null
+     */
+    public static function tryMatchTranslationBlock($script)
+    {
+        return FragmentI18nHandler::tryMatchTranslationBlock($script);
     }
 
     /**
@@ -343,7 +360,7 @@ class FragmentHandler extends FragmentBase
     {
         $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
-            return [];
+            return []; // @codeCoverageIgnore
         }
 
         $scripts = $html_dom->getElementsByTagName('script');
@@ -355,10 +372,27 @@ class FragmentHandler extends FragmentBase
             if ($match_res === false || $match_res === 0) {
                 $overridden_temp = self::tryMatchWithOverride($script, $html_data);
                 if (is_array($overridden_temp)) {
-                    $all_fragments[$overridden_temp['name']][$overridden_temp['name']] = [
-                        'mode' => 'override',
-                        'fragments' => $overridden_temp['fragments'],
-                    ];
+                    foreach ($overridden_temp as $overridden_temp_item) {
+                        $all_fragments[$overridden_temp_item['name']][$overridden_temp_item['name']] = [
+                            'mode' => 'override',
+                            'fragments' => $overridden_temp_item['fragments'],
+                        ];
+                    }
+
+                    continue;
+                }
+
+                // Try matching -js-translations
+                $trans_match_res = preg_match('/^(.*)-js-translations$/', $attr_id, $trans_attr_match);
+                if ($trans_match_res !== false && $trans_match_res !== 0) {
+                    $translation_block = self::tryMatchTranslationBlock($script);
+                    $param_name = $trans_attr_match[1];
+                    if (is_array($translation_block)) {
+                        $all_fragments[$param_name][$translation_block['name']] = [
+                            'mode' => 'i18n',
+                            'fragments' => $translation_block['fragments'],
+                        ];
+                    }
                 }
                 continue;
             }
@@ -373,10 +407,12 @@ class FragmentHandler extends FragmentBase
                 if ($unmatched_res === false || $unmatched_res === 0) {
                     $overridden_temp = self::tryMatchWithOverride($script, $html_data);
                     if (is_array($overridden_temp)) {
-                        $all_fragments[$frag_id][$overridden_temp['name']] = [
-                            'mode' => 'override',
-                            'fragments' => $overridden_temp['fragments'],
-                        ];
+                        foreach ($overridden_temp as $overridden_temp_item) {
+                            $all_fragments[$frag_id][$overridden_temp_item['name']] = [
+                                'mode' => 'override',
+                                'fragments' => $overridden_temp_item['fragments'],
+                            ];
+                        }
                     }
                     continue;
                 }
@@ -407,6 +443,13 @@ class FragmentHandler extends FragmentBase
             }
         }
 
+        // Run filters
+        $filtered_fragments = $all_fragments;
+        $filtered_fragments = apply_filters('linguise_after_fragment_collection', $filtered_fragments, $html_data, $html_dom);
+        if (is_array($filtered_fragments)) {
+            $all_fragments = $filtered_fragments;
+        }
+
         Debug::log('FragmentHandler -> Collected: ' . json_encode($all_fragments, JSON_PRETTY_PRINT));
 
         return $all_fragments;
@@ -424,92 +467,7 @@ class FragmentHandler extends FragmentBase
      */
     public static function applyTranslatedFragmentsForOverride($html_data, $fragment_name, $fragment_param, $fragment_info)
     {
-        $fragment_matcher = self::getJSONOverrideMatcher($html_data);
-
-        // Find the one that match $fragment_name
-        $matched_fragment = null;
-        foreach ($fragment_matcher as $fragment_match) {
-            if ($fragment_match['name'] === $fragment_name) {
-                $matched_fragment = $fragment_match;
-                break;
-            }
-        }
-
-        if (is_null($matched_fragment)) {
-            return $html_data;
-        }
-
-        if (isset($matched_fragment['mode']) && $matched_fragment['mode'] === 'app_json') {
-            if (!isset($matched_fragment['key'])) {
-                return $html_data;
-            }
-
-            $match_res = preg_match('/<script.*? id=["\']' . $matched_fragment['key'] . '["\'].+?>{(.*)}<\/script>/s', $html_data, $html_matches);
-
-            if ($match_res === false || $match_res === 0) {
-                return $html_data;
-            }
-
-            $match_data = $html_matches[1];
-            $json_data = new JsonObject(json_decode('{' . $match_data . '}', true));
-            foreach ($fragment_info['fragments'] as $fragment) {
-                $decoded_key = self::unwrapKey($fragment['key']);
-                try {
-                    $json_data->set('$.' . $decoded_key, $fragment['value']);
-                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                    Debug::log('Failed to set key in override: ' . $decoded_key . ' -> ' . $e->getMessage());
-                }
-            }
-
-            $replaced_json = $json_data->getJson();
-
-            $html_data = str_replace('{' . $match_data . '}', $replaced_json, $html_data);
-        } else {
-            $match_res = preg_match('/' . $matched_fragment['match'] . '/s', $html_data, $html_matches);
-            if ($match_res === false || $match_res === 0) {
-                return $html_data;
-            }
-
-            $index_match = 1;
-            if (isset($matched_fragment['position'])) {
-                $index_match = $matched_fragment['position'];
-            }
-
-            $before_match = $html_matches[$index_match];
-            $should_encode = isset($matched_fragment['encode']) && $matched_fragment['encode'];
-            if ($should_encode) {
-                $before_match = urldecode($before_match);
-            }
-
-            $json_data = new JsonObject(json_decode($before_match, true));
-            foreach ($fragment_info['fragments'] as $fragment) {
-                $decoded_key = self::unwrapKey($fragment['key']);
-                try {
-                    $json_data->set('$.' . $decoded_key, $fragment['value']);
-                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                    Debug::log('Failed to set key in override: ' . $decoded_key . ' -> ' . $e->getMessage());
-                }
-            }
-
-            $replaced_json = $json_data->getJson();
-
-            if (function_exists('apply_filters')) {
-                $replaced_json = apply_filters('linguise_after_apply_translated_fragments_override', $replaced_json, $fragment_name);
-            }
-
-            if ($should_encode) {
-                $replaced_json = rawurlencode($replaced_json);
-            }
-            $subst_ptrn = $matched_fragment['replacement'];
-            $subst_ptrn = str_replace('$$JSON_DATA$$', $replaced_json, $subst_ptrn);
-
-            $replacement = preg_replace('/' . $matched_fragment['match'] . '/', $subst_ptrn, $html_data, 1, $count);
-            if ($count) {
-                $html_data = $replacement;
-            }
-        }
-
-        return $html_data;
+        return FragmentOverrideHandler::applyTranslatedFragmentsForOverride($html_data, $fragment_name, $fragment_param, $fragment_info);
     }
 
     /**
@@ -522,42 +480,22 @@ class FragmentHandler extends FragmentBase
      */
     public static function applyTranslatedFragmentsForAuto($json_data, $fragments)
     {
-        $json_path = new JsonObject($json_data);
-        // Warn if $json_data is empty
-        if (empty($json_path->getValue())) {
-            return false;
-        }
-
-        foreach ($fragments as $fragment) {
-            // remove the html fragment from the translated page
-            $decoded_key = self::unwrapKey($fragment['key']);
-            try {
-                $json_path->set('$.' . $decoded_key, $fragment['value']);
-            } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                Debug::log('Failed to set key in auto: ' . $decoded_key . ' -> ' . $e->getMessage());
-            }
-        }
-
-        $replaced_json = $json_path->getValue();
-        return $replaced_json;
+        return FragmentAutoHandler::applyTranslatedFragmentsForAuto($json_data, $fragments);
     }
 
     /**
-     * Clean up the fragments from the HTML data.
+     * Apply the translated fragments for the i18n mode.
      *
-     * @param string $html_data The HTML data to be cleaned up
-     * @param array  $fragments The array of fragments to be cleaned up, from intoJSONFragments
+     * @param string $html_data  The HTML data to be injected
+     * @param string $param_name The name of the fragment, e.g. 'woocommerce'
+     * @param string $param_key  The param of the fragment, e.g. 'messages'
+     * @param array  $fragments  The array of fragments to be injected, from intoJSON
      *
      * @return string
      */
-    protected static function cleanupFragments($html_data, $fragments)
+    public static function applyTranslatedFragmentsForI18n($html_data, $param_name, $param_key, $fragments)
     {
-        foreach ($fragments as $fragment) {
-            // remove the html fragment from the translated page
-            $html_data = str_replace($fragment['match'], '', $html_data);
-        }
-
-        return $html_data;
+        return FragmentI18nHandler::applyTranslatedFragmentsForI18n($html_data, $param_name, $param_key, $fragments);
     }
 
     /**
@@ -576,12 +514,24 @@ class FragmentHandler extends FragmentBase
             foreach ($fragment_jsons as $fragment_param => $fragment_list) {
                 $mode = $fragment_list['mode'];
 
-                if (!in_array($mode, ['auto', 'override'])) {
+                if (!in_array($mode, ['auto', 'override', 'skip', 'i18n'])) {
+                    continue;
+                }
+
+                if ($mode === 'skip') {
+                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
 
                 if ($mode === 'override') {
                     $html_data = self::applyTranslatedFragmentsForOverride($html_data, $fragment_param, $fragment_name, $fragment_list);
+                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
+                    continue;
+                }
+
+                if ($mode === 'i18n') {
+                    // i18n mode for translation blocks
+                    $html_data = self::applyTranslatedFragmentsForI18n($html_data, $fragment_name, $fragment_param, $fragment_list['fragments']);
                     $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
@@ -599,12 +549,10 @@ class FragmentHandler extends FragmentBase
 
                 $replaced_json = self::applyTranslatedFragmentsForAuto(json_decode('{' . $html_matches[3] . '}', true), $fragment_list['fragments']);
 
-                if (function_exists('apply_filters')) {
-                    $replaced_json = apply_filters('linguise_after_apply_translated_fragments_auto', $replaced_json, $fragment_name);
-                }
+                $replaced_json = apply_filters('linguise_after_apply_translated_fragments_auto', $replaced_json, $fragment_name);
 
                 if ($replaced_json === false) {
-                    throw new \LogicException('FragmentHandler -> Injection -> ' . $fragment_name . '/' . $fragment_param . ' -> JSON data is empty!');
+                    throw new \LogicException('FragmentHandler -> Injection -> ' . $fragment_name . '/' . $fragment_param . ' -> JSON data is empty!'); // @codeCoverageIgnore
                 }
 
                 $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
@@ -617,7 +565,7 @@ class FragmentHandler extends FragmentBase
             }
         }
 
-        $mod_html_data = apply_filters('linguise_after_fragment_translation', $html_data);
+        $mod_html_data = apply_filters('linguise_after_fragment_translation', $html_data, $fragments);
         if (!empty($mod_html_data)) {
             $html_data = $mod_html_data;
         }

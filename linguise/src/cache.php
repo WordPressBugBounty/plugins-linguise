@@ -10,9 +10,14 @@ add_action('wp_ajax_linguise_clear_cache', function () {
     check_admin_referer('_linguise_nonce_');
     // check user capabilities
     if (!current_user_can('manage_options')) {
-        header('Content-Type: application/json; charset=UTF-8;');
-        echo json_encode(['success' => false]);
-        die();
+        if (!defined('LINGUISE_WP_PLUGIN_TEST_MODE')) {
+            header('Content-Type: application/json; charset=UTF-8;');
+        }
+        echo wp_json_encode(['success' => false]);
+        if (defined('LINGUISE_WP_PLUGIN_TEST_MODE')) {
+            return;
+        }
+        die(); // @codeCoverageIgnore
     }
 
     ini_set('display_errors', false);

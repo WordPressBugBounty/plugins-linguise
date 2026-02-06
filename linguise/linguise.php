@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.1.73
+ * Version:2.2.21
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -462,6 +462,7 @@ add_action('admin_notices', function () {
     foreach ($translate_plugins as $path => $plugin_name) {
         if (is_plugin_active($path)) {
             echo '<div class="error">';
+            /* translators: %s: Name of the conflicting translation plugin */
             echo '<p>' . sprintf(esc_html__('We\'ve detected that %s translation plugin is installed. Please disable it before using Linguise to avoid conflict with translated URLs mainly', 'linguise'), '<strong>' . esc_html($plugin_name) . '</strong>') . '</p>';
             echo '</div>';
         }
@@ -476,6 +477,7 @@ add_action('admin_notices', function () {
     if (file_exists($htaccess_file)) {
         if (strpos(file_get_contents($htaccess_file), 'BEGIN GTranslate config') !== false) {
             echo '<div class="error">';
+            /* translators: %1$s: GTranslate %2$s: GTranslate */
             echo '<p>' . sprintf(esc_html__("It looks like you have %1\$s extension that hasn't been properly uninstalled and prevents Linguise from working properly, please contact our support team or remove %2\$s code from your .htaccess file.", 'linguise'), '<strong>GTranslate</strong>', '<strong>GTranslate</strong>') . '</p>';
             echo '</div>';
         }
@@ -738,8 +740,10 @@ add_action('init', function () {
             $current_lang = $options['default_language'];
         }
 
-        // cache for a month
-        setcookie('linguise_lang', $current_lang, time() + MONTH_IN_SECONDS, '/', COOKIE_DOMAIN);
+        // cache for a month - ensure header is not sent yet
+        if (!headers_sent()) {
+            setcookie('linguise_lang', $current_lang, time() + MONTH_IN_SECONDS, '/', COOKIE_DOMAIN);
+        }
     }
 }, 11);
 

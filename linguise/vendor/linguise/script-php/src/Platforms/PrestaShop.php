@@ -11,7 +11,7 @@ use Linguise\Vendor\Linguise\Script\Core\Processor;
 use Linguise\Vendor\Linguise\Script\Core\Request;
 use Linguise\Vendor\Linguise\Script\Core\Translation;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class PrestaShop
 {
@@ -345,7 +345,9 @@ class PrestaShop
 
         $ch = curl_init();
         list($translated_content, $response_code) = Translation::getInstance()->_translate($ch, $boundary);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if (!$translated_content || $response_code !== 200) {
             // We failed to translate
@@ -358,7 +360,7 @@ class PrestaShop
             $new_urls = get_object_vars($result->url_translations);
             Database::getInstance()->saveUrls((array)$new_urls);
         }
-    
+
         if (isset($result->urls_untranslated)) {
             Database::getInstance()->removeUrls((array)$result->urls_untranslated);
         }
@@ -370,7 +372,7 @@ class PrestaShop
 
         $translated_fragments = JsonWalker::intoJSONFragments($result->content);
         if (empty($translated_fragments)) {
-            return $json_content;
+            return $json_content; // @codeCoverageIgnore
         }
 
         // Clone $json_content
@@ -396,9 +398,14 @@ class PrestaShop
         return self::translateJson($json_content, $language, array_merge(self::$common_order_matchers, $additional_matchers));
     }
 
+    public static function translateSortOrder($json_content, $language)
+    {
+        return self::translateJson($json_content, $language, self::$autocomplete_matchers);
+    }
+
     public static function preprocessPrestashopVariables($content)
     {
-        preg_match('/var prestashop = {(.+?)};/', $content, $matches, PREG_OFFSET_CAPTURE);
+        preg_match('/var prestashop = {(.+?)};/s', $content, $matches, PREG_OFFSET_CAPTURE);
 
         if (empty($matches)) {
             return $content;
@@ -420,7 +427,7 @@ class PrestaShop
 
     public static function translatePrestashopVariables($content)
     {
-        preg_match('/var prestashop = {(.+?)};/', $content, $matches, PREG_OFFSET_CAPTURE);
+        preg_match('/var prestashop = {(.+?)};/s', $content, $matches, PREG_OFFSET_CAPTURE);
 
         if (empty($matches)) {
             return $content;
@@ -441,7 +448,7 @@ class PrestaShop
         }
 
         // Replace the var prestashop
-        $replaced = preg_replace_callback('/var prestashop = {(.+?)};/', function () use ($json_content) {
+        $replaced = preg_replace_callback('/var prestashop = {(.+?)};/s', function () use ($json_content) {
             return 'var prestashop = ' . json_encode($json_content) . ';';
         }, $content);
 
@@ -519,11 +526,6 @@ class PrestaShop
         }
 
         return $content;
-    }
-
-    public static function translateSortOrder($json_content, $language)
-    {
-        return self::translateJson($json_content, $language, self::$autocomplete_matchers);
     }
 
     public static function isAjaxSearchRequest()
@@ -627,7 +629,7 @@ class PrestaShop
         }
 
         if (array_key_exists('from-xhr', $_GET)) {
-          return false;
+            return false;
         }
 
         return true;

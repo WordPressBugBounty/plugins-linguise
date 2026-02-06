@@ -9,6 +9,7 @@ $translation_strings = [
     'help_header' => __('How-to load the language switcher flags:', 'linguise'),
     'wp_menu' => [
         'title' => __('WordPress menu', 'linguise'),
+        /* translators: 1: Link to WordPress menu system, 2: Menu item name, 3: Display mode setting */
         'description' => __('If your theme support navigation menus, you can go to your %1$s and insert a menu element called "%2$s". It is recommended to set the %3$s to in-place to avoid duplicates switchers.', 'linguise'),
         'link_name' => __('menu system', 'linguise'),
         'menu_name' => __('Linguise Languages', 'linguise'),
@@ -23,6 +24,7 @@ $translation_strings = [
     ],
     'auto' => [
         'title' => __('Automatic', 'linguise'),
+        /* translators: 1: Settings page name, 2: Setting option name */
         'description' => __('You can set the switcher to be automatically displayed in your pages. Go to %1$s and enable "%2$s."', 'linguise'),
         'add_switcher' => __('Add language switcher automatically', 'linguise'),
     ],
@@ -69,7 +71,7 @@ function make_error_message($error)
 
 <div class="tab-linguise-options">
     <!-- [BLOCK] Switcher loading -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -142,7 +144,7 @@ function make_error_message($error)
         </div>
     </div>
     <!-- [BLOCK] Latest errors -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">

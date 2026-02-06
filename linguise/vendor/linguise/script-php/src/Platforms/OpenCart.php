@@ -5,7 +5,7 @@ namespace Linguise\Vendor\Linguise\Script\Core\Platforms;
 use Linguise\Vendor\Linguise\Script\Core\Helper;
 use Linguise\Vendor\Linguise\Script\Core\Request;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class OpenCart
 {
@@ -21,11 +21,11 @@ class OpenCart
         // Endswith /
         if (substr($base_dir, -1) === '/') {
             // Trim the last /
-            $base_dir = substr($base_dir, 0, -1);
+            $base_dir = substr($base_dir, 0, -1); // @codeCoverageIgnore
         }
         if (substr($language_dir, -1) === '/') {
             // Trim the last /
-            $language_dir = substr($language_dir, 0, -1);
+            $language_dir = substr($language_dir, 0, -1); // @codeCoverageIgnore
         }
 
         $base_dir = preg_quote($base_dir, '/');

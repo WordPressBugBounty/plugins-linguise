@@ -30,6 +30,8 @@ class FluentCRMIntegration extends LinguiseBaseIntegrations
     /**
      * Determines if the integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -40,6 +42,8 @@ class FluentCRMIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -57,6 +61,8 @@ class FluentCRMIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -116,6 +122,8 @@ class FluentCRMIntegration extends LinguiseBaseIntegrations
      *
      * @param \FluentCrm\App\Models\Subscriber $subscriber The subscriber model itself
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     protected function hookRegisterUserFluent($subscriber)
@@ -154,6 +162,8 @@ class FluentCRMIntegration extends LinguiseBaseIntegrations
      *
      * @param \FluentCrm\App\Models\Subscriber $subscriber The subscriber model itself
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function hookRegisterUser($subscriber)
@@ -171,16 +181,20 @@ class FluentCRMIntegration extends LinguiseBaseIntegrations
      *
      * @param \FluentCrm\App\Models\Subscriber $subscriber FluentCRM Subscriber model
      *
+     * @codeCoverageIgnore
+     *
      * @return string|null Language code, null if missing
      */
     protected function getLanguageFromSubscriber($subscriber)
     {
+        // @codeCoverageIgnoreStart
         if (!function_exists('fluentcrm_get_subscriber_meta')) {
             // Try importing fluentcrm
             $fluentcrm_path = wp_normalize_path(WP_PLUGIN_DIR . '/fluent-crm/app/functions/helpers.php');
 
             include_once $fluentcrm_path;
         }
+        // @codeCoverageIgnoreEnd
 
         // Still check in case import still fails
         if (function_exists('fluentcrm_get_subscriber_meta')) {

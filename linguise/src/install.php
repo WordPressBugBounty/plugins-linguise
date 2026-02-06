@@ -1,4 +1,5 @@
 <?php
+
 add_action('admin_init', function () {
     $installed_version = get_option('linguise_version', null);
 
@@ -8,7 +9,7 @@ add_action('admin_init', function () {
          * Linguise throw error on first install.
          */
         if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
-            define('LINGUISE_SCRIPT_TRANSLATION', 1);
+            define('LINGUISE_SCRIPT_TRANSLATION', 1); // @codeCoverageIgnore
         }
         require_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Databases' . DIRECTORY_SEPARATOR . 'Mysql.php');
 
@@ -76,33 +77,36 @@ function linguise_feedback_notice()
             </p>
             <p class="linguise_notice_buttons">
                 <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin-ajax.php?action=linguise_feedback_dismiss'), '_linguise_feedback_nonce_')); ?>" class="button" id="linguise_feedback_notice_dismiss" ><?php esc_html_e('I already left a review', 'linguise') ?></a>
-                <a target="_blank" class="button button-primary" href="https://wordpress.org/support/plugin/linguise/reviews/?filter=5#new-post" title="<?php esc_html_e('Leave a review', 'linguise') ?>"><?php esc_html_e('Leave a review', 'linguise') ?></a>
+                <a target="_blank" class="button button-primary" href="https://wordpress.org/support/plugin/linguise/reviews/" title="<?php esc_html_e('Leave a review', 'linguise') ?>"><?php esc_html_e('Leave a review', 'linguise') ?></a>
             </p>
         </div>
 
     </div>
     <script type="text/javascript">
         jQuery(function($) {
-          $(document).ready(function() {
-            $(document).on('click', '#linguise_admin_notice .notice-dismiss', function(e) {
-              e.preventDefault();
-              $('#linguise_feedback_notice_dismiss').trigger('click');
-              return false;
-            }).on('click', '#linguise_feedback_notice_dismiss', function(e) {
-              e.preventDefault();
-              // Send ajax to dismiss URL
-              $.ajax({
-                url: $(this).prop('href'),
-                method: 'GET',
-                success: function(data) {
-                  $('#linguise_admin_notice').fadeOut('fast', function() {
-                    $(this).remove();
-                  })
-                }
-              });
-              return false;
+            $(document).ready(function() {
+                $(document)
+                    .on('click', '#linguise_admin_notice .notice-dismiss', function(e) {
+                        e.preventDefault();
+
+                        $('#linguise_feedback_notice_dismiss').trigger('click');
+                        return false;
+                    })
+                    .on('click', '#linguise_feedback_notice_dismiss', function(e) {
+                        e.preventDefault();
+                        // Send ajax to dismiss URL
+                        $.ajax({
+                            url: $(this).prop('href'),
+                            method: 'GET',
+                            success: function(data) {
+                                $('#linguise_admin_notice').fadeOut('fast', function() {
+                                    $(this).remove();
+                                })
+                            }
+                        });
+                        return false;
+                    });
             });
-          });
         });
     </script>
     <?php
@@ -112,9 +116,11 @@ add_action('wp_ajax_linguise_feedback_dismiss', function () {
     check_admin_referer('_linguise_feedback_nonce_');
     // check user capabilities
     if (!current_user_can('manage_options')) {
+        // @codeCoverageIgnoreStart
         header('Content-Type: application/json; charset=UTF-8;');
-        echo json_encode(['success' => false]);
+        echo wp_json_encode(['success' => false]);
         die();
+        // @codeCoverageIgnoreEnd
     }
 
     update_option('linguise_feedback_notify_dismissed', true);

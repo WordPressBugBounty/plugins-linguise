@@ -20,7 +20,7 @@ add_action('updated_option', function ($option, $old_value, $value) {
     // If the config updated by Api-JS via REST API
     // We don't need to sync
     if (defined('REST_REQUEST') && REST_REQUEST) {
-        return $original_data;
+        return $original_data; // @codeCoverageIgnore
     }
 
     try {
@@ -35,11 +35,11 @@ add_action('updated_option', function ($option, $old_value, $value) {
             $result = $management->pushRemoteSync($configs, $token, $api_url);
     
             if (!$result) {
-                Debug::saveError('configuration synchronization to Linguise failed:'. $token);
+                Debug::saveError('configuration synchronization to Linguise failed:'. $token); // @codeCoverageIgnore
             }
         }
-    } catch (Exception $e) {
-        Debug::saveError('configuration synchronization to Linguise failed: ' . $e->getMessage());
+    } catch (Exception $e) { // @codeCoverageIgnore
+        Debug::saveError('configuration synchronization to Linguise failed: ' . $e->getMessage()); // @codeCoverageIgnore
     }
 
     return $original_data;
@@ -52,7 +52,7 @@ add_action('updated_option', function ($option, $old_value, $value) {
  *
  * @return WP_REST_Response
  */
-function update_config(WP_REST_Request $request)
+function linguise_synchronize_update_config($request)
 {
     $jwt_token = $request->get_header('X-Linguise-Hash');
     $options =  linguiseGetOptions();
@@ -74,8 +74,8 @@ function update_config(WP_REST_Request $request)
     try {
         $config = $synchronization->convertparamsToWPOptions($params);
         $merged_config = array_merge($options, $config);
-    } catch (Exception $e) {
-        return new WP_Error('error', $e->getMessage(), array( 'status' => 500 ));
+    } catch (Exception $e) { // @codeCoverageIgnore
+        return new WP_Error('error', $e->getMessage(), array( 'status' => 500 )); // @codeCoverageIgnore
     }
 
     update_option('linguise_options', $merged_config);
@@ -83,10 +83,12 @@ function update_config(WP_REST_Request $request)
     return rest_ensure_response(['message' => 'Config successfully updated']);
 }
 
+// @codeCoverageIgnoreStart
 add_action('rest_api_init', function () {
     register_rest_route('linguise/v1', '/sync', array(
         'methods' => 'POST',
-        'callback' => 'update_config',
+        'callback' => 'linguise_synchronize_update_config',
         'permission_callback' => '__return_true',
     ));
 });
+// @codeCoverageIgnoreEnd

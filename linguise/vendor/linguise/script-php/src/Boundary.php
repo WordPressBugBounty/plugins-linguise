@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Boundary
 {
@@ -113,6 +113,7 @@ class Boundary
             $content .= '--'.$this->boundary."\r\n";
             $content .= "Content-Disposition: form-data; name=\"" . $name . "\"\r\n\r\n" . $value . "\r\n";
         }
+        // @codeCoverageIgnoreStart
         foreach ($this->files as $name => $file) {
             $real_path = realpath($file['path']);
             $post_filename = $file['name'] ?? basename($real_path);
@@ -126,6 +127,7 @@ class Boundary
             $content .= "\r\n";
             $content .= file_get_contents($real_path)."\r\n";
         }
+        // @codeCoverageIgnoreEnd
         $content .= $this->endPostFields();
         return $content;
     }

@@ -59,6 +59,11 @@
     "original_name": "Български",
     "code": "bg"
   },
+  "my": {
+    "name": "Burmese",
+    "original_name": "မြန်မာဘာသာ",
+    "code": "my"
+  },
   "ca": {
     "name": "Catalan",
     "original_name": "Català",
@@ -189,6 +194,11 @@
     "name": "Khmer",
     "original_name": "ភាសាខ្មែរ",
     "code": "km"
+  },
+  "rw": {
+    "name": "Kinyarwanda",
+    "original_name": "Kinyarwanda",
+    "code": "rw"
   },
   "ko": {
     "name": "Korean",

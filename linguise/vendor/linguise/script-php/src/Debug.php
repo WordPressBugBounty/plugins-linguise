@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Debug
 {
@@ -18,7 +18,9 @@ class Debug
     {
         self::$error_file = dirname(__FILE__) . '/../debug.php';
 
-        if (!file_exists(self::$error_file)) {
+        $is_testing = defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING;
+
+        if (!file_exists(self::$error_file) && !$is_testing) {
             file_put_contents(self::$error_file, '<?php die(); ?>' . PHP_EOL);
         }
 
@@ -40,6 +42,11 @@ class Debug
             return;
         }
 
+        if (defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING) {
+            // during testing, do not write to file
+            return;
+        }
+
         if (!is_writable(self::$error_file)) {
             return;
         }
@@ -54,6 +61,11 @@ class Debug
     public static function timing($message, $start, $end = null, $verbosity = 0)
     {
         if (self::$enabled === false) {
+            return;
+        }
+
+        if (defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING) {
+            // during testing, do not write to file
             return;
         }
 
@@ -85,6 +97,11 @@ class Debug
      */
     public static function saveError($error)
     {
+        if (defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING) {
+            // during testing, do not write to file
+            return;
+        }
+
         $file = dirname(__FILE__) . '/../errors.php';
 
         // Retrieve content if it exists

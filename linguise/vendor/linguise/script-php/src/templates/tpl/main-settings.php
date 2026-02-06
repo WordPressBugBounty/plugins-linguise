@@ -448,6 +448,7 @@ $site_url = Request::getInstance()->getBaseUrl();
                     <select id="ms-translate-into" class="chosen-select chosen-sortable mt-2 w-full mw-full" name="linguise_options[enabled_languages][]" multiple data-placeholder="<?php echo esc_attr($translation_strings['translate_into']['placeholder']); ?>">
                     <?php foreach ($languages_contents as $language_code => $language) : ?>
                         <option
+                            data-code="<?php echo esc_attr($language_code); ?>"
                             value="<?php echo esc_attr($language_code); ?>"
                             <?php echo isset($options['enabled_languages']) ? (AdminHelper::selected(in_array($language_code, $options['enabled_languages']), true, false)) : (''); ?>
                             <?php echo $language_code === $options['default_language'] ? 'disabled' : ''; ?>>

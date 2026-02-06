@@ -22,6 +22,7 @@ $translation_strings = [
     ],
     'cookies_redirect' => [
         'title' => __('Cookies Language Redirect', 'linguise'),
+        /* translators: %s: Setting name that has lower priority */
         'help' => __('Automatically redirect user to their last-used languages, useful for Newsletter and more. The user will still be able to change the language manually. This takes priority compared to %s', 'linguise'),
     ],
     'emails' => [
@@ -80,7 +81,7 @@ $translation_strings = [
 
     'third-party' => [
         'title' => __('Third-party integrations', 'linguise'),
-        'help' => __('The following are 3rd-party integrations that is available for Linguise. The integration is automatically enabled.'),
+        'help' => __('The following are 3rd-party integrations that is available for Linguise. The integration is automatically enabled.', 'linguise'),
         'empty' => __('No third-party integrations loaded', 'linguise'),
         'active' => __('(Active)', 'linguise'),
     ],
@@ -150,7 +151,7 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
 
 <div class="tab-linguise-options">
     <!-- [BLOCK] Caching & Performance -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -190,7 +191,7 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
         </div>
     </div>
     <!-- [BLOCK] Translation settings -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -254,7 +255,7 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
         </div>
     </div>
     <!-- [BLOCK] Popup text -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -286,7 +287,7 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
         </div>
     </div>
     <!-- [BLOCK] Advanced settings -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -364,7 +365,7 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
         </div>
     </div>
     <!-- [BLOCK] Advanced settings -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">

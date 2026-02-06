@@ -21,6 +21,8 @@ class WooCommerceAdminEmailsIntegration extends WooCommerceEmailsIntegration
     /**
      * Determines if the integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()

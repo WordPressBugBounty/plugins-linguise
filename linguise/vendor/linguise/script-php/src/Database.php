@@ -5,7 +5,7 @@ namespace Linguise\Vendor\Linguise\Script\Core;
 use Linguise\Vendor\Linguise\Script\Core\Databases\Mysql;
 use Linguise\Vendor\Linguise\Script\Core\Databases\Sqlite;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Database
 {
@@ -166,7 +166,7 @@ class Database
                         if ((!empty($config_line[3]) && (int)$config_line[3] > 0) || empty($config_line[4]) || empty($config_line[5])) {
                             $config->multisite = true;
                         } else {
-                            $config->multisite = false;
+                            $config->multisite = false; // @codeCoverageIgnore
                         }
                         break;
                     case 'DOMAIN_CURRENT_SITE':

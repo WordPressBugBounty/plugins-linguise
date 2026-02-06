@@ -21,9 +21,12 @@ $translation_strings = [
     'default_language' => [
         'title' => __('Website original language', 'linguise'),
         'help' => __('Select the default language of your website. Make sure it\'s similar to your Linguise dashboard configuration', 'linguise'),
+        /* translators: 1: WordPress site language, 2: Linguise language */
         'compat_support' => __('Your WordPress installation language is set to %1$s while Linguise is set to %2$s. This will prevent Linguise from working correctly.', 'linguise'),
+        /* translators: %s: WordPress site language */
         'compat_unsupported' => __('Your WordPress installation language (%s) is unsupported by Linguise. This will prevent Linguise from working correctly.', 'linguise'),
-        'compat_suggest' => __('You can change your WordPress installation language in the %1$s. You can also check %2$s'),
+        /* translators: 1: Link to WordPress General Settings page, 2: Link to Linguise documentation */
+        'compat_suggest' => __('You can change your WordPress installation language in the %1$s. You can also check %2$s', 'linguise'),
         'compat_suggest_wp' => __('main settings page', 'linguise'),
         'compat_suggest_docs' => __('our documentation page', 'linguise'),
     ],
@@ -35,6 +38,7 @@ $translation_strings = [
     'auto_switcher' => [
         'title' => __('Add language switcher automatically', 'linguise'),
         'description' => __('The flag switcher will be added automatically to all front pages of your website.', 'linguise'),
+        /* translators: %1$s: Link to documentation about displaying flags via shortcode or PHP */
         'description_2' => __('If you want to display the flag in a menu item through shortcode or php code, please look into the %1$s', 'linguise'),
         'target' => __('help section.', 'linguise'),
     ],
@@ -65,7 +69,8 @@ $translation_strings = [
         'full' => __('Full names (English, Spanish...)', 'linguise'),
         'short' => __('Short names (EN, ES...)', 'linguise'),
         'label_popup' => __('Show language names in Popup', 'linguise'),
-        'help_popup' => __('Display the language names in the popup box when clicking on the language switcher, "%1s" will take priority over this!', 'linguise'),
+        /* translators: %1$s: A link to documentation about displaying flags via shortcode or PHP */
+        'help_popup' => __('Display the language names in the popup box when clicking on the language switcher, "%1$s" will take priority over this!', 'linguise'),
     ],
     'language_prefer' => [
         'label' => __('Language names display', 'linguise'),
@@ -439,7 +444,7 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
         <div class="text-neutral mt-3">
             <?php echo esc_html($translation_strings['token']['description']); ?>
         </div>
-        <div id="login-register-btn-area" class="flex flex-row gap-2 mt-3<?php echo $has_api_key ? ' hidden' : ''; ?>">
+        <div id="login-register-btn-area" class="flex flex-row gap-2 mt-3<?php echo esc_attr($has_api_key ? ' hidden' : ''); ?>">
             <button type="button" class="linguise-btn rounder btn-sm" data-linguise-register-action="register" disabled>
                 <?php echo esc_html($translation_strings['register']); ?>
             </button>
@@ -461,7 +466,7 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
         </div>
     </div>
     <!-- [BLOCK] Translation -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -508,7 +513,7 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
                 <div class="mw-full w-full">
                     <select id="ms-translate-into" class="chosen-select chosen-sortable mt-2 w-full mw-full" name="linguise_options[enabled_languages][]" multiple data-placeholder="<?php echo esc_attr($translation_strings['translate_into']['placeholder']); ?>">
                     <?php foreach ($language_contents as $language_code => $language) : ?>
-                        <option value="<?php echo esc_attr($language_code); ?>" <?php echo isset($options['enabled_languages']) ? (selected(in_array($language_code, $options['enabled_languages']), true, false)) : (''); ?>>
+                        <option data-code="<?php echo esc_attr($language_code); ?>" value="<?php echo esc_attr($language_code); ?>" <?php echo isset($options['enabled_languages']) ? (selected(in_array($language_code, $options['enabled_languages']), true, false)) : (''); ?>>
                             <?php echo esc_html($language->name); ?> (<?php echo esc_html($language_code); ?>)
                         </option>
                     <?php endforeach; ?>
@@ -545,7 +550,7 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
         </div>
     </div>
     <!-- [BLOCK] Display -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -698,7 +703,7 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
         </div>
     </div>
     <!-- [BLOCK] Flag display -->
-    <div class="linguise-options full-widt<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-widt<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">
@@ -839,7 +844,7 @@ if (!\Linguise\WordPress\Helper::localeCompare($linguise_default_wp, $website_lo
         </div>
     </div>
     <!-- [BLOCK] Appearance -->
-    <div class="linguise-options full-width<?php echo $has_api_key ? '' : ' is-disabled'; ?>">
+    <div class="linguise-options full-width<?php echo esc_attr($has_api_key ? '' : ' is-disabled'); ?>">
         <div class="disabled-warning-inset"></div>
         <div class="disabled-warning">
             <h2 class="disabled-warning-text">

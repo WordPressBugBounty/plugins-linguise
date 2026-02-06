@@ -3,7 +3,6 @@
 namespace Linguise\WordPress\Frontend;
 
 use Linguise\Vendor\Linguise\Script\Core\Database;
-use Linguise\Vendor\Linguise\Script\Core\Helper;
 use Linguise\WordPress\Helper as WPHelper;
 
 defined('ABSPATH') || die('No direct script access allowed!');
@@ -211,13 +210,16 @@ class LinguiseRedirector
             $parsed_url['query'] = $_SERVER['QUERY_STRING'];
         }
 
-        $final_url = Helper::buildUrl($parsed_url);
+        $final_url = WPHelper::buildUrl($parsed_url);
         $final_url = preg_replace('#(?<!:)//+#', '/', $final_url);
         setcookie(static::$cookie_name, '1', time() + 60);
         header('Linguise-Translated-Redirect: 1');
         header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
         header('Location: ' . $final_url, true, 302);
-        exit();
+        if (defined('LINGUISE_WP_PLUGIN_TEST_MODE') && LINGUISE_WP_PLUGIN_TEST_MODE) {
+            return;
+        }
+        exit(); // @codeCoverageIgnore
     }
 
     /**

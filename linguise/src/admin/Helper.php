@@ -26,17 +26,19 @@ class Helper
              */
             $errors = defined('LINGUISE_TESTING_ERRORS') ? LINGUISE_TESTING_ERRORS : '';
         } else {
+            // @codeCoverageIgnoreStart
             $errorsFile = LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR. 'vendor' . DIRECTORY_SEPARATOR . 'linguise' . DIRECTORY_SEPARATOR . 'script-php' . DIRECTORY_SEPARATOR . 'errors.php';
             if (file_exists($errorsFile)) {
                 $errors = file_get_contents($errorsFile);
             } else {
                 $errors = '';
             }
+            // @codeCoverageIgnoreEnd
         }
 
         $errorsList = [];
         if (!preg_match_all('/^\[([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\] (?:([0-9]{3}): )?(.*)$/m', $errors, $matches, PREG_SET_ORDER)) {
-            return $errorsList;
+            return $errorsList; // @codeCoverageIgnore
         }
 
         foreach ($matches as $error) {
@@ -155,6 +157,7 @@ class Helper
         if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
             return 'Testing (' .  $lang_code . ')'; // In testing mode, we return the code as is
         }
+        // @codeCoverageIgnoreStart
         require_once ABSPATH . 'wp-admin/includes/translation-install.php';
         $translations = wp_get_available_translations();
         if (isset($translations[$lang_code])) {
@@ -162,12 +165,15 @@ class Helper
         }
     
         return 'Unknown';
+        // @codeCoverageIgnoreEnd
     }
 
     /**
      * Get multisite data information
      *
      * @param string $mode The mode to check for multisite
+     *
+     * @codeCoverageIgnore
      *
      * @return array the multisite information
      */

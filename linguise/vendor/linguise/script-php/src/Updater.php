@@ -56,7 +56,9 @@ class Updater
             }
         }
         $content = curl_exec($ch);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if (!$content) {
             Debug::log('Failed load update information');
@@ -92,7 +94,9 @@ class Updater
             }
         }
         $file_content = curl_exec($ch);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if (!$file_content) {
             Debug::log('Failed load update information');

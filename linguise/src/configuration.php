@@ -137,7 +137,11 @@ class LinguiseConfiguration
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
                         $api_web_errors[] = [
                             'type' => 'error',
-                            'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), linguiseGetSite()),
+                            'message' => sprintf(
+                                /* translators: %s: Site domain name */
+                                __('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'),
+                                linguiseGetSite()
+                            ),
                         ];
                     } else {
                         $api_web_errors[] = [
@@ -188,6 +192,7 @@ class LinguiseConfiguration
                     if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
                         $api_web_errors[] = [
                             'type' => 'error',
+                            /* translators: %s: Site domain name */
                             'message' => sprintf(__('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'), linguiseGetSite()),
                         ];
                     } else {

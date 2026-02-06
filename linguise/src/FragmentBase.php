@@ -16,6 +16,11 @@ class FragmentBase
      */
     protected static $default_filters = [
         [
+            'key' => '(state|country)\.label$',
+            'mode' => 'regex_full',
+            'kind' => 'allow'
+        ],
+        [
             'key' => 'nonce',
             'mode' => 'wildcard',
             'kind' => 'deny',
@@ -219,11 +224,7 @@ class FragmentBase
 
         // Run through filters, provide our current default filters
         // User can change it by adding a filter and modify the array.
-        if (function_exists('apply_filters')) {
-            $wp_frag_list = apply_filters('linguise_fragment_filters', $merged_defaults);
-        } else {
-            $wp_frag_list = $merged_defaults;
-        }
+        $wp_frag_list = apply_filters('linguise_fragment_filters', $merged_defaults);
 
         // cache the list
         self::$key_filters = $wp_frag_list;
@@ -243,6 +244,10 @@ class FragmentBase
         $value = trim($value);
 
         if (empty($value) || !is_string($value)) {
+            return false;
+        }
+
+        if (is_string($value) && empty($value)) {
             return false;
         }
 
@@ -300,7 +305,7 @@ class FragmentBase
         if (substr($value, 0, 1) === '/' && !Helper::hasSpace($value)) {
             $as_url = parse_url($value);
             if (empty($as_url)) {
-                return false;
+                return false; // @codeCoverageIgnore
             }
 
             // Check if it only have "path" and not other keys
@@ -412,9 +417,11 @@ class FragmentBase
      */
     protected static function isCurrentTheme($theme_name, $parent_theme = \null)
     {
+        // @codeCoverageIgnoreStart
         if (!function_exists('wp_get_theme')) {
             return false;
         }
+        // @codeCoverageIgnoreEnd
 
         $theme = $parent_theme ?: wp_get_theme();
         if (empty($theme)) {
@@ -441,7 +448,7 @@ class FragmentBase
      *
      * @return boolean|null - True if it's allowed, false if it's not
      */
-    protected static function isKeyAllowed($key, $full_key)
+    public static function isKeyAllowed($key, $full_key)
     {
         $wp_frag_list = self::getKeyFilters();
 
@@ -476,6 +483,24 @@ class FragmentBase
         }
 
         return null;
+    }
+
+    /**
+     * Clean up the fragments from the HTML data.
+     *
+     * @param string $html_data The HTML data to be cleaned up
+     * @param array  $fragments The array of fragments to be cleaned up, from intoJSONFragments
+     *
+     * @return string
+     */
+    protected static function cleanupFragments($html_data, $fragments)
+    {
+        foreach ($fragments as $fragment) {
+            // remove the html fragment from the translated page
+            $html_data = str_replace($fragment['match'], '', $html_data);
+        }
+
+        return $html_data;
     }
 
     /**
@@ -564,6 +589,20 @@ class FragmentBase
             'encode' => true,
         ];
 
+        $current_list[] = [
+            'name' => 'wc-settings-encoded-alt',
+            'match' => 'var wcSettings = JSON\.parse\( decodeURIComponent\( \'(.*?)\' \) \);',
+            'replacement' => 'var wcSettings = JSON.parse( decodeURIComponent( \'$$JSON_DATA$$\' ) );',
+            'encode' => true,
+        ];
+
+        $current_list[] = [
+            'name' => 'wc-settings-api-inject',
+            'match' => 'wp\.apiFetch\.createPreloadingMiddleware\(\s*JSON\.parse\(\s*decodeURIComponent\(\s*\'(.*?)\'\s*\)\s*\)\s*\)',
+            'replacement' => 'wp.apiFetch.createPreloadingMiddleware( JSON.parse( decodeURIComponent( \'$$JSON_DATA$$\' ) ) )',
+            'encode' => true,
+        ];
+
         if (defined('CFCORE_VER')) {
             $current_list[] = [
                 'name' => 'calderaforms',
@@ -579,9 +618,7 @@ class FragmentBase
         ];
 
         // Merge with apply_filters
-        if (function_exists('apply_filters')) {
-            $current_list = apply_filters('linguise_fragment_override', $current_list, $html_data);
-        }
+        $current_list = apply_filters('linguise_fragment_override', $current_list, $html_data);
 
         return $current_list;
     }

@@ -1,7 +1,7 @@
 <?php
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Processor {
 
@@ -26,10 +26,12 @@ class Processor {
         Helper::prepareDataDir();
 
         // Finalize defer actions on shutdown
+        // @codeCoverageIgnoreStart
         register_shutdown_function(function() {
             Defer::getInstance()->finalize();
             Database::getInstance()->close();
         });
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -38,7 +40,17 @@ class Processor {
     public function run()
     {
         if (!isset($_GET['linguise_language'])) {
-            die();
+            if (defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING) {
+                // during testing, do not write to file
+                return;
+            }
+            die(); // @codeCoverageIgnore
+        }
+
+        // AI Translation Stuff
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['live_editor_ai_translation']) ) {
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            Translation::getInstance()->enableAiTranslation($_POST['live_editor_ai_translation']);
         }
 
         Database::getInstance()->ensureConnection();
@@ -54,7 +66,7 @@ class Processor {
 
         if (Response::getInstance()->getResponseCode() === 304) {
             Debug::log('304 Not modified');
-            Response::getInstance()->end();
+            return Response::getInstance()->end();
         }
 
         // We want to translate the page
@@ -80,6 +92,13 @@ class Processor {
         Response::getInstance()->end();
     }
 
+    /**
+     * Update the Linguise Script PHP to the latest version
+     *
+     * @codeCoverageIgnore
+     *
+     * @return void
+     */
     public function update()
     {
         Updater::getInstance()->update();
@@ -93,7 +112,12 @@ class Processor {
                 // Make sure the timestamp is not more than a few minutes old (120 seconds)
                 echo '<p>It seems you were trying the Live Editor with the wrong domain configuration. </p> 
                       <p>Please double-check on your configuration in your Linguise dashboard or reach out to our support team</p>';
-                die();
+
+                if (defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING) {
+                    // stop execution for testing purposes
+                    return;
+                }
+                die(); // @codeCoverageIgnore
             }
 
             $POST = $_POST;
@@ -113,7 +137,12 @@ class Processor {
             if ($signature !== $_POST['signature']) {
                 echo '<p>It seems you were trying the Live Editor with the wrong domain configuration. </p> 
                       <p>Please double-check on your configuration in your Linguise dashboard or reach out to our support team</p>';
-                die();
+
+                if (defined('LINGUISE_SCRIPT_TESTING') && LINGUISE_SCRIPT_TESTING) {
+                    // stop execution for testing purposes
+                    return;
+                }
+                die(); // @codeCoverageIgnore
             }
 
             Response::getInstance()->addCookie('linguiseEditorToken', $_POST['token'], strtotime($_POST['expires']));
@@ -145,5 +174,4 @@ class Processor {
     {
         Certificates::getInstance()->downloadCertificates();
     }
-
 }

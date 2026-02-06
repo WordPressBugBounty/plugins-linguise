@@ -58,7 +58,7 @@ add_action('wp_ajax_linguise_truncate_debug', function () {
 add_action('wp_ajax_linguise_disable_debug', function () {
     if (!current_user_can('manage_options')) {
         header('Content-Type: application/json; charset=UTF-8');
-        echo json_encode(['success' => false]);
+        echo wp_json_encode(['success' => false]);
         die();
     }
 

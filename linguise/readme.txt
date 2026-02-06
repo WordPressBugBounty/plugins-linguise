@@ -1,79 +1,81 @@
-=== Linguise - Automatic multilingual translation ===
+=== Linguise - AI Automatic Multilingual Translation ===
 Contributors: Linguise
-Tags: translate, translation, multilingual, automatic translation, WooCommerce translation
+Tags: translate, AI translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
-Tested up to: 6.8
-Stable tag:2.1.73
+Tested up to: 6.9
+Stable tag: 2.2.21
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Linguise is a top quality automatic translation with front-end translation editor. 5' install, SEO optimized translations, 85+ languages
+Linguise is a top-quality automatic AI translation with a front-end translation editor. 5' install, SEO-optimized translations, 85+ languages
 
 == Description ==
 
-Linguise plugin offers a direct connection to our automatic, high-quality translation service, with possible access to multiple translators for content revision. The automatic multilingual translation is free during the first month and up to 600 000 translated words (medium sized website with at least 4 languages), no language number or page view limitation. Increase your website traffic with instant multilingual translations in more than 80 languages and get 40% more traffic from Google, Baidu or Yandex search engines.
+Linguise plugin offers a direct connection to our automatic, high-quality AI translation service, with possible access to translators for content revision. The automatic multilingual translation is free during the first month and up to 600 000 translated words (medium-sized website with at least 4 languages), with no language count or page view limitation. Increase your website traffic with instant multilingual translations in more than 85+ languages and get 40% more traffic from Google, Baidu, or Yandex search engines.
+
+Linguise now offers advanced AI translation as an optional add-on package, powered by a dedicated and professionally trained translation model. This new AI translation solution delivers near-human quality, providing exceptional accuracy and natural-sounding results for your website's multilingual content.
 
 
-**Important note:** To avoid any confusion, Linguise is not a free-for-ever automatic translation plugin. High-quality, SEO optimized, and translation revision features comes with a price that we are trying to maintain as affordable as possible. Check the [YEARLY PRICES here.](https://www.linguise.com/yearly-prices "Linguise translation prices") As mentioned, we offer a one-month free trial with 600k words included and the translation involves an API key to start.
-
+**Important note:** To avoid any confusion, Linguise is not a free-forever automatic translation plugin. High-quality, SEO optimized, and translation revision features come with a price that we are trying to maintain as affordable as possible. Check the [YEARLY PRICES here.](https://www.linguise.com/yearly-prices "Linguise translation prices") As mentioned, we offer a one-month free trial with 600k words included, and the translation involves an API key to start.
 
 
 **Multilingual translation plugin main features**
 
 ##High-quality automatic multilingual translation
 
-* Best in class Cloud AI translation models
-* 90% of a human translator quality
+* Best-in-class cloud AI translation models
+* Optional Linguise AI perfect quality model
+* 95% of a human translator's quality
 * Automatic translation of all your WordPress websites
-* Full content, SEO ranked translations including URLs
+* Full content, SEO-ranked translations including URLs
 * 85+ languages available
 * Uses the latest and updated cloud AI translation models
 * Translate all your website content in 5 minutes
-* Make search queries in any languages including in WooCommerce content
+* Make search queries in any language, including in WooCommerce content
 * Translate WordPress dynamic Ajax content
-* Translation models automatically updated (translation quality)
+* Translation models automatically updated (translation quality improvement)
 
 
-##Multilingual translation revisions
-* From the Linguise translation dashboard, edit translation and manage translators
+##Multilingual AI translation revisions
+* From the Linguise translation dashboard, edit AI translations and manage translators
 * Register translators by language and by website for translation revision
-* Font-end automatic translations edition by admins or translators
+* Front-end automatic translations edition by admins or translators
 * Multilingual global rules to replace any content all over the website
 * Multilingual global rules to exclude any content from translation all over the website
-* Exclude and replace content by language, URL or CSS class
-* Multi-account management with user role access (Translators by language, Managers, Admins)
+* Exclude and replace content by language, URL, or CSS class
+* Multi-account management with user role access (translators by language, managers, admins)
 * Edit all meta information (SEO) from the frontend language editor
 
 
-##SEO optimized automatic translations
+##SEO-optimized automatic AI translations
 * URL and full-page content translation
 * Multilingual alternate URLs and default-x language tag
-* HTML language tag generation
+* HTML tag generation
 * Canonical URL generation
-* XML sitemap automatic translations
+* XML sitemap automatic AI translations
 * Super-fast translated page display
 * No impact on original, non-translated page loading time
 * Increase SEO rank of WooCommerce, especially large Eshop
-* Google feed translation (Google Merchant)
+* Google feed AI translation (Google Merchant)
 * Tested on the major “Search Console” tools: Google, Bing, Yandex, Baidu
-* Compatible with all SEO plugins including Yoast, Rank Math, AIO SEO
+* Compatible with all SEO plugins, including Yoast, Rank Math, AIO SEO
 
 
 ##WordPress integration and language switcher
-* Language switcher flags integration using WordPress menu
-* Language switcher flags displayed as popup, side by side, dropdown or in floating position
+* Language switcher flags integration using the WordPress menu
+* Language switcher flags displayed as popup, side by side, dropdown, or in floating position
 * Language switcher flag integration using PHP snippet
-* Display translated languages in English, original language or just language 1st letters
+* Display translated languages in English, original language, or just the language's first letters.
 * Super light multilingual plugin with less CSS and .svg flags
 * Automatically get Linguise language configuration with the API Key
-* Local cache option for translations and translated URLs
+* Local cache option for AI translations and translated URLs
 * Automatic redirect based on browser language
 * WooCommerce email translation based on client language
-* Possibility to display language names in English or in original language
+* Possibility to display language names in English or in the original language
 * Load several language switchers on the same page
-* Multi platform: works on Apache, Litespeed, Nginx and IIS servers
-* 100% tested with Elementor Pro, DIVI
+* Multiplatform: works on Apache, LiteSpeed, Nginx, and IIS servers
+* 100% tested with Elementor Pro, DIVI, Avada and all main page builders
 * Option to translate dynamic AJAX content
 
 
@@ -81,10 +83,11 @@ Linguise plugin offers a direct connection to our automatic, high-quality transl
 
 * $165 per YEAR (or $15/month) for a translation volume of 200 000 words (400 translated pages of 500 words)
 * More than 10 times cheaper than a human translation
-* No multilingual content revision required or at most only 10%
+* No multilingual content revision required, or at most only 10%
 * No language count limit
 * Unlimited human translations
 * Unlimited plan available for big websites
+* Pay as you go for Linguise AI translation (optional)
 
 
 https://www.youtube.com/watch?v=l6O4Dt5I5Cs
@@ -94,15 +97,94 @@ https://www.youtube.com/watch?v=l6O4Dt5I5Cs
 
 **Home Link:** [https://www.linguise.com](https://www.linguise.com "Linguise translation home")
 **WordPress page:** [https://www.linguise.com/integrations/wordpress-automatic-translation-plugin/](https://www.linguise.com/integrations/wordpress-automatic-translation-plugin/ "Linguise for WordPress")
-**Register an account and get API Key:** [https://dashboard.linguise.com/account/register](https://dashboard.linguise.com/account/register "Linguise translation registration")
+**Register an account and get an API key:** [https://dashboard.linguise.com/account/register](https://dashboard.linguise.com/account/register "Linguise translation registration")
 **Yearly prices:** [https://www.linguise.com/yearly-prices/](https://www.linguise.com/yearly-prices "Linguise translation prices")
 **Translation quality demo:** [https://demo.linguise.com](https://demo.linguise.com "WordPress automatic translation demo")
 **Legal mentions:** [https://www.linguise.com/legal-mentions/ "Legal mentions")
 
 Also available for any PHP CMS like Magento, Prestashop, Joomla, OpenCart... and cloud CMS like Shopify, Squarespace, Wix...
+Linguise plugin uses an API connection to execute and store the translation and also for the live chat support (you can use email as an alternative). Please check the legal mention link above for more information.
 
 
 == Changelog ==
+= 2.2.21 =
+- Feature: Support more languages for admin dashboard
+
+= 2.2.20 =
+- Feature: Support translating WPForms redirect URL
+
+= 2.2.19 =
+- Fix: Unable to switch using language switcher
+
+= 2.2.18 =
+- Fix: Unable to switch using language switcher
+
+= 2.2.17 =
+- Fix: Slow loading when Woo + WPForms installed
+
+= 2.2.16 =
+- Fix: WordPress Plugin Directory notices
+
+= 2.2.15 =
+- Feature: Patch attach shadow function
+
+= 2.2.14 =
+- Feature: Translate WPForm notification email
+
+= 2.2.13 =
+- Fix: PHP warning related to FragmentHandler
+
+= 2.2.12 =
+- Fix: Missing flags: Myanmar / Burmese
+
+= 2.2.11 =
+- Feature: Support Cookie Law Info/CookieYes
+
+= 2.2.10 =
+- Fix: Do not sent linguise_lang cookie header if already sent
+
+= 2.2.9 =
+- Fix: Locale/language code checking can be wrong in some cases
+
+= 2.2.8 =
+- Fix: WooCommerce Stripe Gateway not loaded in classic checkout
+
+= 2.2.7 =
+- Fix: Issues with style not enqueueing in WP 6.9
+
+= 2.2.6 =
+- Fix: Search translation toggle reverted when enabled in admin page
+
+= 2.2.5 =
+- Fix: Issues with fragment i18n is not getting translated because of CDATA
+- Feature: Try to capture and translate preloaded API request
+- Fix: Some fragment data not captured in WooCommerce should be translated now
+
+= 2.2.4 =
+- Feature: Support kinyarwanda (rw) language
+
+= 2.2.3 =
+- Fix: i18n not replaced as intended
+
+= 2.2.2 =
+- Fix: Unable to change language order
+
+= 2.2.1 =
+- Fix: Double close database
+
+= 2.2.0 =
+- Feature: AI Translation support
+- Fix: If Linguise language switcher exists the page is very slow and sometimes even not responding
+
+= 2.1.76 =
+- Fix: It does gets translated but then gets back again to default lang
+
+= 2.1.75 =
+- Fix: WooCommerce Issue: checkout process error
+
+= 2.1.74 =
+- Feature: AI Translation support
+
 = 2.1.73 =
 - Fix: WooCommerce Stripe Gateway Issue: the credit card form not showing up
 

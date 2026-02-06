@@ -113,7 +113,12 @@ class Synchronization
         }
 
         $api_host = Configuration::getInstance()->get('api_host') ?? 'api.linguise.com';
-        $api_port = (int)Configuration::getInstance()->get('api_port') ?? 443;
+        $api_port_raw = Configuration::getInstance()->get('api_port');
+        if ($api_port_raw === null || $api_port_raw === '') {
+            $api_port = 443;
+        } else {
+            $api_port = (int)$api_port_raw;
+        }
         $protocol = $api_port === 443 ? 'https' : 'http';
         return $protocol . '://' . $api_host . (in_array($api_port, $api_port_base) ? '' : ':' . $api_port) . $path;
     }

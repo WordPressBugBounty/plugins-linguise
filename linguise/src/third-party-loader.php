@@ -53,6 +53,7 @@ class ThirdPartyLoader
         'ajax-search-lite' => 'AjaxSearchLiteIntegration',
         'ameliabooking' => 'AmeliaBookingIntegration',
         'bookingpress' => 'BookingPressIntegration',
+        'cookie-law-info' => 'CookieLawInfoIntegration',
         'elementor' => 'ElementorIntegration',
         'elementor-pro' => 'ElementorProIntegration',
         'facetwp' => 'FacetWPIntegration',
@@ -70,7 +71,8 @@ class ThirdPartyLoader
         'wc/payment-plugin-paypal' => 'WCPaymentPluginPaypalIntegration',
         'wc/klarna-checkout' => 'WCKlarnaCheckoutIntergration',
         'wc/product-addons' => 'WCProductAddonsIntegration',
-        'wp-rocket' => 'WPRocketIntegration'
+        'wp-rocket' => 'WPRocketIntegration',
+        'wp-forms' => 'WPFormsIntegration',
     ];
 
     /**

@@ -7,6 +7,7 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         wp_send_json_error(array(
             'message' => __('Nonce verification failed', 'linguise')
         ));
+        return;
     }
 
     // check if user is logged in
@@ -15,6 +16,7 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         wp_send_json_error(array(
             'message' => __('User is not logged in', 'linguise')
         ));
+        return;
     }
     // check if user has permission to manage options
     if (!current_user_can('manage_options')) {
@@ -22,6 +24,7 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         wp_send_json_error(array(
             'message' => __('User does not have permission to manage options', 'linguise')
         ));
+        return;
     }
 
     // time to update the data, data is nested in $_POST['data']
@@ -30,6 +33,7 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         wp_send_json_error(array(
             'message' => __('No data to update', 'linguise')
         ));
+        return;
     }
 
     $data = $_POST['config'];
@@ -46,8 +50,13 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         if (!isset($data[$field])) {
             // response with error
             wp_send_json_error(array(
-                'message' => sprintf(__('Missing required field: %s', 'linguise'), $field)
+                'message' => sprintf(
+                    /* translators: %s: Missing required field name */
+                    __('Missing required field: %s', 'linguise'),
+                    esc_html($field)
+                )
             ));
+            return;
         }
     }
 
@@ -97,6 +106,7 @@ add_action('wp_ajax_linguise_get_headers', function () {
             'response' => 403,
             'back_link' => true,
         ));
+        return;
     }
 
     // check if user is logged in
@@ -106,6 +116,7 @@ add_action('wp_ajax_linguise_get_headers', function () {
             'response' => 403,
             'back_link' => true,
         ));
+        return;
     }
     // check if user has permission to manage options
     if (!current_user_can('manage_options')) {
@@ -114,6 +125,7 @@ add_action('wp_ajax_linguise_get_headers', function () {
             'response' => 403,
             'back_link' => true,
         ));
+        return;
     }
 
     // Dump request headers

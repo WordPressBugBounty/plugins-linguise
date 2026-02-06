@@ -2,10 +2,12 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 /**
  * Check if the array is an actual object or not.
+ *
+ * @codeCoverageIgnore
  *
  * @param array|object $arr_or_object The array or object to be checked
  *

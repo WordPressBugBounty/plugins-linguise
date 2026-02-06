@@ -77,7 +77,9 @@ class LinguiseSwitcher
         if (preg_match('@(\/+)$@', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), $matches) && !empty($matches[1])) {
             $trailing_slashes = $matches[1];
         } else {
+            // @codeCoverageIgnoreStart
             $trailing_slashes = '';
+            // @codeCoverageIgnoreEnd
         }
 
         linguiseSwitchMainSite();
@@ -151,7 +153,7 @@ class LinguiseSwitcher
         // do not load translate script for bricks edit page
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- View request, no action
         $is_wp_bricks = array_key_exists('bricks', $_GET) ? $_GET['bricks'] : false;
-        if (!$is_wp_bricks) {
+        if (!$is_wp_bricks && !empty($this->config['token'])) { // Only load if token is present
             wp_enqueue_script('linguise_switcher', Helper::getScriptUrl('/assets/js/front.bundle.js'), array(), LINGUISE_VERSION);
             wp_enqueue_style('linguise_switcher', Helper::getScriptUrl('/assets/css/front.bundle.css'), array(), LINGUISE_VERSION);
 
@@ -301,6 +303,7 @@ class LinguiseSwitcher
 
         add_filter('wp_get_nav_menu_items', [$this, 'hookNavMenuItems'], 20, 1);
         add_action('wp_footer', [$this, 'hookFooter'], 10, 1);
+        add_action('wp_enqueue_scripts', [$this, 'loadScripts'], 10);
         add_shortcode('linguise', [$this, 'hookShortcode']);
     }
 
@@ -326,7 +329,14 @@ class LinguiseSwitcher
             return;
         }
 
-        echo $this->renderShortcode(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- this should be secure enough
+        echo wp_kses(
+            $this->renderShortcode(),
+            [
+                'div' => [
+                    'class' => true,
+                ],
+            ]
+        );
     }
 
     /**
@@ -361,10 +371,6 @@ class LinguiseSwitcher
                     $item->classes[] = 'linguise_flag_rounded';
                 } else {
                     $item->classes[] = 'linguise_flag_rectangular';
-                }
-
-                if ($this->config['flag_display_type'] === 'side_by_side') {
-                    $item->classes[] = 'linguise_parent_menu_item_side_by_side';
                 }
 
                 if ($this->config['flag_display_type'] === 'side_by_side') {

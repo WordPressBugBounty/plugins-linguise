@@ -5,7 +5,7 @@ namespace Linguise\Vendor\Linguise\Script\Core\Platforms;
 use Linguise\Vendor\Linguise\Script\Core\Request;
 use Linguise\Vendor\Linguise\Script\Core\Response;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Zencart
 {

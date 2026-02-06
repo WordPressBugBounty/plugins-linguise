@@ -1,7 +1,7 @@
 <?php
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Translation {
 
@@ -16,6 +16,13 @@ class Translation {
      * @var null|string
      */
     private $editor_token = null;
+
+    /**
+     * The editor token in cas we are in edition mode
+     *
+     * @var null|string
+     */
+    private $live_editor_ai_translation = null;
 
     /**
      * Retrieve singleton instance
@@ -33,6 +40,10 @@ class Translation {
 
     public function enableEditor($token) {
         $this->editor_token = $token;
+    }
+
+    public function enableAiTranslation($isEnabled) {
+        $this->live_editor_ai_translation = $isEnabled;
     }
 
     public function translate()
@@ -61,6 +72,10 @@ class Translation {
             $boundary->addPostFields('editor_token', $this->editor_token);
         }
 
+        if ($this->live_editor_ai_translation) {
+            $boundary->addPostFields('live_editor_ai_translation', $this->live_editor_ai_translation);
+        }
+
         Hook::trigger('onBeforeTranslationRequest');
 
         $ch = curl_init();
@@ -78,10 +93,12 @@ class Translation {
                 Debug::saveError(curl_error($ch));
             }
             $response->setRedirect($non_translated_url, 307);
-            $response->end();
+            return $response->end();
         }
 
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         $result = json_decode($translated_content);
         if (!$result) {
@@ -90,7 +107,7 @@ class Translation {
             $non_translated_url = $request->getNonTranslatedUrl();
             Debug::log('Failed to decode translated content, redirect to ' . $non_translated_url);
             $response->setRedirect($non_translated_url, 307);
-            $response->end();
+            return $response->end();
         }
 
         Debug::log('Translation decoded ' . print_r($result, true), 5);
@@ -113,7 +130,7 @@ class Translation {
             Debug::log('Translation redirect to ' . $result->redirect);
             $response->clearContent();
             $response->setRedirect($result->redirect . $request->getQuery(true), 301);
-            $response->end();
+            return $response->end();
         }
 
         if (isset($result->content_type)) {
@@ -207,7 +224,9 @@ class Translation {
         Debug::log('Response code: ' . $response_code);
         Debug::log('Translated content: ' . PHP_EOL . '######################' . PHP_EOL . $translated_content . PHP_EOL . '######################', 5);
 
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if (!$translated_content || $response_code !== 200) {
             return false;

@@ -2,11 +2,9 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
-class Url
-{
-
+class Url {
     public static function translateUrl($redirect_url)
     {
         $request = Request::getInstance();

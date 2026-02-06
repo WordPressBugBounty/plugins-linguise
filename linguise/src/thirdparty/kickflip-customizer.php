@@ -23,6 +23,8 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -32,6 +34,8 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -78,6 +82,8 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
     /**
      * Common initialization for the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     private function commonInit()
@@ -88,6 +94,8 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
     /**
      * Unload the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function destroy()
@@ -97,6 +105,8 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
 
     /**
      * Reload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -122,7 +132,7 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
                 // No language set, return the buffer as is
                 return $output;
             }
-            
+
             // Map language to WordPress locale
             $wp_locale = WPHelper::mapLanguageToWordPressLocale($language);
             if (empty($wp_locale)) {
@@ -157,10 +167,12 @@ class KickflipCustomizerIntegration extends LinguiseBaseIntegrations
 
         if (preg_match_all('/<iframe[^>]+src=["\']([^"]+)["\']/', $buffer, $full_matches, PREG_SET_ORDER, 0)) {
             foreach ($full_matches as $matches) {
+                // @codeCoverageIgnoreStart
                 if (strpos($matches[0], 'mczrMainIframe') === false) {
                     // No Kickflip iframe found, return the buffer as is
                     continue;
                 }
+                // @codeCoverageIgnoreEnd
 
                 $iframeUrl = $matches[1];
                 $newIframeUrl = add_query_arg('lang', $correct_locale, html_entity_decode($iframeUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));

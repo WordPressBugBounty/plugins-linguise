@@ -1,4 +1,5 @@
 <?php
+
 namespace Linguise\Vendor\Linguise\Script\Core;
 
 defined('LINGUISE_SCRIPT_TRANSLATION') or die();
@@ -183,7 +184,7 @@ class Response {
     /**
      * Get Cookies
      * 
-     * @return array Cookies
+     * @return SetCookie[] Cookies
      */
     public function getCookies()
     {
@@ -243,6 +244,10 @@ class Response {
 
         ob_end_flush();
 
-        exit(0);
+        // @codeCoverageIgnoreStart
+        if (!defined('LINGUISE_SCRIPT_TESTING')) {
+            exit(0);
+        }
+        // @codeCoverageIgnoreEnd
     }
 }

@@ -1,0 +1,952 @@
+# Copyright (C) 2026 Linguise
+# This file is distributed under the GPL2.
+msgid ""
+msgstr ""
+"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.21\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/linguise\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-01-30T13:56:21+07:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: linguise\n"
+
+#. Plugin Name of the plugin
+#. Author of the plugin
+#: linguise.php
+msgid "Linguise"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: linguise.php
+msgid "https://www.linguise.com/"
+msgstr ""
+
+#. Description of the plugin
+#: linguise.php
+msgid "Linguise translation plugin"
+msgstr ""
+
+#. translators: %s: Name of the conflicting translation plugin
+#: linguise.php:466
+#, php-format
+msgid "We've detected that %s translation plugin is installed. Please disable it before using Linguise to avoid conflict with translated URLs mainly"
+msgstr ""
+
+#. translators: %1$s: GTranslate %2$s: GTranslate
+#: linguise.php:481
+#, php-format
+msgid "It looks like you have %1$s extension that hasn't been properly uninstalled and prevents Linguise from working properly, please contact our support team or remove %2$s code from your .htaccess file."
+msgstr ""
+
+#: linguise.php:495
+msgid "Linguise debug mode is currently enabled."
+msgstr ""
+
+#: linguise.php:498
+msgid "This mode is intended for debugging purposes only and will generate a ton of logs that will consume a lot of space."
+msgstr ""
+
+#: linguise.php:500
+msgid "Please disable it when you are done."
+msgstr ""
+
+#: linguise.php:505
+msgid "Disable debug!"
+msgstr ""
+
+#: src/admin/menu.php:29
+msgid "Linguise switcher"
+msgstr ""
+
+#: src/admin/menu.php:71
+#: src/admin/menu.php:78
+#: src/admin/views/tpl/help.php:15
+msgid "Linguise Languages"
+msgstr ""
+
+#: src/admin/menu.php:88
+msgid "Add to Menu"
+msgstr ""
+
+#: src/admin/views/expert-view.php:12
+msgid "Expert mode"
+msgstr ""
+
+#: src/admin/views/expert-view.php:13
+msgid "You can modify additional Linguise configuration here. Please be careful, as this is an advanced feature."
+msgstr ""
+
+#: src/admin/views/expert-view.php:16
+#: src/admin/views/view.php:29
+msgid "Save settings"
+msgstr ""
+
+#: src/admin/views/expert-view.php:17
+msgid "Go back"
+msgstr ""
+
+#: src/admin/views/expert-view.php:20
+#: src/admin/views/view.php:61
+msgid "You are using a multisite installation."
+msgstr ""
+
+#: src/admin/views/expert-view.php:21
+#: src/admin/views/view.php:62
+msgid "Please modify Linguise settings from your main site."
+msgstr ""
+
+#: src/admin/views/expert-view.php:22
+#: src/admin/views/view.php:63
+msgid "Go to main site"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:9
+msgid "Caching & Performance"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:11
+msgid "Use cache"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:12
+msgid "Store URLs and some translated content in a local cache to render the pages faster"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:13
+msgid "Maximum cache disk space usage"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:14
+msgid "in MB"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:15
+msgid "Clear cache"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:18
+msgid "Translation Settings"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:20
+msgid "Browser Language Redirect"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:21
+msgid "Automatically redirect users based on the browser language. The user will still be able to change the language manually but this is NOT recommended as users may use various browser languages or speak several languages"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:24
+msgid "Cookies Language Redirect"
+msgstr ""
+
+#. translators: %s: Setting name that has lower priority
+#: src/admin/views/tpl/advanced.php:26
+#, php-format
+msgid "Automatically redirect user to their last-used languages, useful for Newsletter and more. The user will still be able to change the language manually. This takes priority compared to %s"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:29
+msgid "Translate emails"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:30
+msgid "Translate supported third-party integraions emails depending on language being used on registration. (This option can increase a lot your translation quota)"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:33
+msgid "Translate searches"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:34
+msgid "Enable search translation. Visitors will be able to search in their language. (This option can increase a lot your translation quota)"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:37
+msgid "Dynamic translations"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:38
+msgid "Translate dynamic content generated by JavaScript or AJAX request (This option can increase a lot your translation quota)"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:39
+#: src/admin/views/tpl/footer.php:10
+#: src/admin/views/view.php:24
+msgid "Linguise dashboard"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:42
+msgid "Popup Text Customization"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:44
+msgid "Pre-text in language popup"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:45
+msgid "Add some text before the language switcher content in the popup view. HTML is also OK"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:48
+msgid "Post-text in language popup"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:49
+msgid "Add some text after the language switcher content in the popup view. HTML is also OK"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:51
+msgid "Type your text (you can use HTML)"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:53
+msgid "Advanced Settings"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:55
+msgid "Custom CSS"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:56
+msgid "Add custom CSS to apply on the Linguise language switcher"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:59
+msgid "Enable debug"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:60
+msgid "Use for debugging purpose only. It will create a file with a log of content. Only enable it if you need it and only for a limited time"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:61
+msgid "Download debug file"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:62
+msgid "Clear debug file"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:65
+msgid "Insert alternate link tag"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:66
+msgid "Add an alternate link to your site to improve SEO. This will help search engines understand the relationship between different languages and improve your site's visibility in search results."
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:67
+msgid "It's highly recommended keeping this setting activated for SEO purpose"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:70
+msgid "Ukrainian Language Redirect"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:71
+msgid "🇺🇦 Automatically redirect all users to the ukrainian language. This options is incompatible with the browser redirect option."
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:73
+msgid "Disclaimer: Linguise is not responsible for any legal issues that may arise from the use of this feature."
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:74
+msgid "Linguise endeavors to assist Ukrainian users in adhering to the law to the best of its ability, however, it cannot guarantee full compliance with legal regulations. It is strongly recommended that you consult with a lawyer to ensure your website is in compliance with all applicable laws. Linguise cannot be held liable for any legal action taken against your website in case of non-compliance."
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:77
+msgid "Note on SEO Impact"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:78
+msgid "This option will redirect all requests to the ukrainian language. It could have a negative impact on your SEO."
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:83
+msgid "Third-party integrations"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:84
+msgid "The following are 3rd-party integrations that is available for Linguise. The integration is automatically enabled."
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:85
+msgid "No third-party integrations loaded"
+msgstr ""
+
+#: src/admin/views/tpl/advanced.php:86
+msgid "(Active)"
+msgstr ""
+
+#: src/admin/views/tpl/footer.php:6
+#: src/admin/views/view.php:20
+msgid "Chat with us"
+msgstr ""
+
+#: src/admin/views/tpl/footer.php:8
+#: src/admin/views/view.php:22
+msgid "Edit your translations"
+msgstr ""
+
+#: src/admin/views/tpl/footer.php:9
+#: src/admin/views/view.php:23
+msgid "Documentation"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:9
+msgid "How-to load the language switcher flags:"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:11
+msgid "WordPress menu"
+msgstr ""
+
+#. translators: 1: Link to WordPress menu system, 2: Menu item name, 3: Display mode setting
+#: src/admin/views/tpl/help.php:13
+#, php-format
+msgid "If your theme support navigation menus, you can go to your %1$s and insert a menu element called \"%2$s\". It is recommended to set the %3$s to in-place to avoid duplicates switchers."
+msgstr ""
+
+#: src/admin/views/tpl/help.php:14
+msgid "menu system"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:18
+msgid "Shortcode"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:19
+msgid "You can copy the following shortcode to use Linguise anywhere in your pages or posts."
+msgstr ""
+
+#: src/admin/views/tpl/help.php:22
+msgid "PHP snippet"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:23
+msgid "You can copy the following PHP snippet to use Linguise anywhere in your theme"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:26
+msgid "Automatic"
+msgstr ""
+
+#. translators: 1: Settings page name, 2: Setting option name
+#: src/admin/views/tpl/help.php:28
+#, php-format
+msgid "You can set the switcher to be automatically displayed in your pages. Go to %1$s and enable \"%2$s.\""
+msgstr ""
+
+#: src/admin/views/tpl/help.php:29
+#: src/admin/views/tpl/main-settings.php:39
+msgid "Add language switcher automatically"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:33
+msgid "Latest 20 errors returned by Linguise"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:34
+msgid "No errors"
+msgstr ""
+
+#: src/admin/views/tpl/help.php:35
+msgid "Get more information about this error on Linguise"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:11
+msgid "Linguise API key"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:12
+msgid "Register or login to your Linguise dashboard using the link here. Then copy the API key attached to the domain"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:13
+msgid "To activate the translation, you need to log in to your account or register."
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:15
+msgid "Register"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:16
+msgid "Login"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:17
+msgid "Apply"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:18
+msgid "Copy to clipboard"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:20
+msgid "Translation"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:22
+msgid "Website original language"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:23
+msgid "Select the default language of your website. Make sure it's similar to your Linguise dashboard configuration"
+msgstr ""
+
+#. translators: 1: WordPress site language, 2: Linguise language
+#: src/admin/views/tpl/main-settings.php:25
+#, php-format
+msgid "Your WordPress installation language is set to %1$s while Linguise is set to %2$s. This will prevent Linguise from working correctly."
+msgstr ""
+
+#. translators: %s: WordPress site language
+#: src/admin/views/tpl/main-settings.php:27
+#, php-format
+msgid "Your WordPress installation language (%s) is unsupported by Linguise. This will prevent Linguise from working correctly."
+msgstr ""
+
+#. translators: 1: Link to WordPress General Settings page, 2: Link to Linguise documentation
+#: src/admin/views/tpl/main-settings.php:29
+#, php-format
+msgid "You can change your WordPress installation language in the %1$s. You can also check %2$s"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:30
+msgid "main settings page"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:31
+msgid "our documentation page"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:34
+msgid "Translate your website into"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:35
+msgid "Select the languages you want to translate your website into. Make sure it's similar to your Linguise dashboard configuration"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:36
+msgid "Choose your language into"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:40
+msgid "The flag switcher will be added automatically to all front pages of your website."
+msgstr ""
+
+#. translators: %1$s: Link to documentation about displaying flags via shortcode or PHP
+#: src/admin/views/tpl/main-settings.php:42
+#, php-format
+msgid "If you want to display the flag in a menu item through shortcode or php code, please look into the %1$s"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:43
+msgid "help section."
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:46
+msgid "Display options"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:48
+msgid "Language list display"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:49
+msgid "Display flag and/or language names. Language switcher default position could be anywhere in the content or in a fixed position that stays fixed or moves on scroll"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:50
+msgid "Side by side"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:51
+msgid "Dropdown"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:52
+msgid "Popup"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:55
+msgid "Position"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:56
+msgid "Top left"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:57
+msgid "Top right"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:58
+msgid "Bottom left"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:59
+msgid "Bottom right"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:60
+msgid "Top left (no-scroll)"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:61
+msgid "Top right (no-scroll)"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:62
+msgid "Bottom left (no-scroll)"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:63
+msgid "Bottom right (no-scroll)"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:64
+msgid "In place"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:66
+msgid "Show flag"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:68
+msgid "Show language names"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:69
+msgid "Full names (English, Spanish...)"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:70
+msgid "Short names (EN, ES...)"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:71
+msgid "Show language names in Popup"
+msgstr ""
+
+#. translators: %1$s: A link to documentation about displaying flags via shortcode or PHP
+#: src/admin/views/tpl/main-settings.php:73
+#, php-format
+msgid "Display the language names in the popup box when clicking on the language switcher, \"%1$s\" will take priority over this!"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:76
+msgid "Language names display"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:77
+msgid "In the language switcher, display the language names in English or in the original language, i.e. French or Français"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:78
+msgid "English"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:79
+msgid "Native language"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:82
+msgid "Flag style"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:83
+msgid "Select the flag style you want to use for the language switcher"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:84
+msgid "Round"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:85
+msgid "Rectangular"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:88
+msgid "Flag type settings"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:90
+msgid "English flag type"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:91
+msgid "Select the preferred flags for the English languages"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:92
+msgid "USA"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:93
+msgid "Great Britain"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:96
+msgid "German flag type"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:97
+msgid "Select the preferred flags for the German languages"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:98
+msgid "Germany"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:99
+msgid "Austria"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:102
+msgid "Portuguese flag type"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:103
+msgid "Select the preferred flags for the Portuguese languages"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:104
+msgid "Portugal"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:105
+msgid "Brazil"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:108
+msgid "Taiwanese flag type"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:109
+msgid "Select the preferred flags for the Taiwanese languages"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:110
+msgid "China"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:111
+msgid "Taiwan"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:114
+msgid "Spanish flag type"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:115
+msgid "Select the preferred flags for the Spanish languages"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:116
+msgid "Spain"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:117
+msgid "Mexico"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:118
+msgid "Peru"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:121
+msgid "Appearance"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:123
+msgid "Flag border radius"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:124
+msgid "If you're using the rectangle flag shape you can apply a custom border radius in pixels"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:127
+msgid "Flag size"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:128
+msgid "Adjust flag size in pixels. That doesn't change the image weight as it's a .svg format"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:131
+msgid "Text color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:132
+msgid "Language name color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:133
+msgid "Select the default text color for your language names"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:134
+msgid "Language name hover color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:135
+msgid "Select the mouse hover text color for your language names"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:137
+#: src/admin/views/tpl/main-settings.php:148
+msgid "Inherit from parent"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:138
+#: src/admin/views/tpl/main-settings.php:149
+msgid "Inherit the text color from the parent element rather than selecting here"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:140
+msgid "Popup settings"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:142
+msgid "Popup text color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:143
+msgid "Popup language color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:144
+msgid "Select the default text color for your language names in popup box"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:145
+msgid "Popup language hover color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:146
+msgid "Select the mouse hover text color for your language names in popup box"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:152
+msgid "Flag box shadow"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:153
+msgid "Adjust the color and shadow size of the language flags"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:154
+#: src/admin/views/tpl/main-settings.php:163
+msgid "X offset"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:155
+#: src/admin/views/tpl/main-settings.php:164
+msgid "Y offset"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:156
+#: src/admin/views/tpl/main-settings.php:165
+msgid "Blur"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:157
+#: src/admin/views/tpl/main-settings.php:166
+msgid "Spread"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:158
+#: src/admin/views/tpl/main-settings.php:167
+msgid "Shadow color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:161
+msgid "Flag box shadow on hover"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:162
+msgid "Adjust the color and shadow size when hovering the language flags"
+msgstr ""
+
+#: src/admin/views/view.php:15
+msgid "Main settings"
+msgstr ""
+
+#: src/admin/views/view.php:16
+msgid "Advanced"
+msgstr ""
+
+#: src/admin/views/view.php:17
+msgid "Help"
+msgstr ""
+
+#: src/admin/views/view.php:27
+msgid "Language List Preview"
+msgstr ""
+
+#: src/admin/views/view.php:28
+msgid "Preview"
+msgstr ""
+
+#: src/admin/views/view.php:32
+msgid "Activate translation"
+msgstr ""
+
+#: src/admin/views/view.php:35
+msgid "Activating the translation."
+msgstr ""
+
+#: src/admin/views/view.php:36
+msgid "Please wait."
+msgstr ""
+
+#: src/admin/views/view.php:39
+msgid "Activation was successful!"
+msgstr ""
+
+#: src/admin/views/view.php:40
+msgid "Continue plugin setup"
+msgstr ""
+
+#: src/admin/views/view.php:43
+msgid "Are you sure you want to leave?"
+msgstr ""
+
+#: src/admin/views/view.php:44
+msgid "All progress will be reset."
+msgstr ""
+
+#: src/admin/views/view.php:45
+msgid "Yes, leave"
+msgstr ""
+
+#: src/admin/views/view.php:46
+msgid "Cancel"
+msgstr ""
+
+#: src/admin/views/view.php:49
+msgid "Something went wrong."
+msgstr ""
+
+#: src/admin/views/view.php:50
+msgid "An unexpected error has occured, please try again."
+msgstr ""
+
+#: src/admin/views/view.php:51
+msgid "Try again"
+msgstr ""
+
+#: src/admin/views/view.php:52
+msgid "Back"
+msgstr ""
+
+#: src/admin/views/view.php:56
+msgid "Registration is required to access all settings."
+msgstr ""
+
+#: src/admin/views/view.php:57
+msgid "Settings will be available after registration."
+msgstr ""
+
+#: src/config-iframe.php:8
+#: src/config-iframe.php:105
+msgid "Nonce verification failed"
+msgstr ""
+
+#: src/config-iframe.php:17
+#: src/config-iframe.php:115
+msgid "User is not logged in"
+msgstr ""
+
+#: src/config-iframe.php:25
+#: src/config-iframe.php:124
+msgid "User does not have permission to manage options"
+msgstr ""
+
+#: src/config-iframe.php:34
+msgid "No data to update"
+msgstr ""
+
+#. translators: %s: Missing required field name
+#: src/config-iframe.php:55
+#, php-format
+msgid "Missing required field: %s"
+msgstr ""
+
+#: src/config-iframe.php:97
+#: src/configuration.php:284
+#: src/configuration.php:332
+msgid "Linguise settings saved!"
+msgstr ""
+
+#: src/config-iframe.php:105
+#: src/config-iframe.php:115
+#: src/config-iframe.php:124
+msgid "Unauthorized"
+msgstr ""
+
+#: src/config-iframe.php:142
+msgid "Request Headers"
+msgstr ""
+
+#. translators: %s: Site domain name
+#: src/configuration.php:142
+#: src/configuration.php:196
+#, php-format
+msgid "The API Key provided has been rejected, please make sure you use the right key associated with the domain %s"
+msgstr ""
+
+#: src/configuration.php:149
+#: src/configuration.php:201
+msgid "Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist."
+msgstr ""
+
+#: src/configuration.php:343
+msgid "Disabled debug!"
+msgstr ""
+
+#: src/configuration.php:352
+msgid "`xml` extension is not loaded, some Linguise features might not works properly!"
+msgstr ""
+
+#: src/configuration.php:360
+msgid "PHP version is lower than 7.0.0, some Linguise features might not works properly!"
+msgstr ""
+
+#: src/configuration.php:390
+msgid "Htaccess file doesn't exist. This may be a problem is you are under an Apache server. Please check the documentation to finish the installation manually: <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>"
+msgstr ""
+
+#: src/configuration.php:428
+msgid "Htaccess file is not writable, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
+msgstr ""
+
+#: src/configuration.php:433
+msgid "Failed to write to htaccess file, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
+msgstr ""
+
+#: src/install.php:74
+msgid "You're using Linguise for 2 months now. We hope you enjoyed our service. If you have 2 minutes to help us to grow, please drop us a quick review. We'd really appreciate."
+msgstr ""
+
+#: src/install.php:76
+msgid "Thanks again for using Linguise"
+msgstr ""
+
+#: src/install.php:79
+msgid "I already left a review"
+msgstr ""
+
+#: src/install.php:80
+msgid "Leave a review"
+msgstr ""

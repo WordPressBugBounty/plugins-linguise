@@ -96,6 +96,7 @@ class Management {
 
             $default_language = Helper::sanitizeKey($linguise_options['default_language']);
             $translate_languages = [];
+            $sorted_languages = [];
 
             $queried_api = false;
             $token_changed = false;
@@ -112,6 +113,8 @@ class Management {
                             $translate_languages[] = Helper::sanitizeKey($translation_language['code']);
                         }
                     }
+
+                    $sorted_languages = $translate_languages;
 
                     $dynamic_translations['public_key'] = $api_result['data']['public_key'];
                     $linguise_options = Helper::transformToLocalConfig($linguise_options, $api_result['data']);
@@ -135,9 +138,12 @@ class Management {
                 }
             } else {
                 if (!empty($_POST['enabled_languages_sortable'])) {
-                    $lang_lists = explode(',', $_POST['enabled_languages_sortable']);
+                    $exploded_lists = explode(',', $_POST['enabled_languages_sortable']);
+                    $sorted_languages = array_map('trim', $exploded_lists);
+                    $lang_lists = $sorted_languages;
                 } else {
                     $lang_lists = !empty($linguise_options['enabled_languages']) ? $linguise_options['enabled_languages'] : array();
+                    $sorted_languages = $lang_lists;
                 }
 
                 if (!empty($lang_lists)) {
@@ -237,7 +243,7 @@ class Management {
                 'flag_hover_shadow_spread' => isset($linguise_options['flag_hover_shadow_spread']) ? (int)$linguise_options['flag_hover_shadow_spread'] : 0,
                 'flag_hover_shadow_color' => isset($linguise_options['flag_hover_shadow_color']) ? $linguise_options['flag_hover_shadow_color'] : '#bfbfbf',
                 'flag_hover_shadow_color_alpha' => isset($linguise_options['flag_hover_shadow_color_alpha']) ? (float)$linguise_options['flag_hover_shadow_color_alpha'] : 1.0,
-                'language_flag_order' => $translate_languages,
+                'language_flag_order' => $sorted_languages,
 
                 'expert_mode' => $expert_mode_conf,
             ];
@@ -286,7 +292,7 @@ class Management {
                         'flag_hover_shadow_spread' => $linguise_options['flag_hover_shadow_spread'],
                         'flag_hover_shadow_color' => $linguise_options['flag_hover_shadow_color'],
                         'flag_hover_shadow_color_alpha' => $linguise_options['flag_hover_shadow_color_alpha'],
-                        'language_flag_order' => $translate_languages,
+                        'language_flag_order' => $sorted_languages,
                     ],
                 ];
 
@@ -502,8 +508,9 @@ class Management {
 
         curl_exec($ch);
         $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        // log error to apache error
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if ($response_code !== 200) {
             HttpResponse::errorJSON('Invalid JWT verification token: ' . print_r($response_code, true), 403);
@@ -539,7 +546,9 @@ class Management {
         // request
         $response = curl_exec($ch);
         $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if ($response_code !== 200) {
             return false;
@@ -596,7 +605,9 @@ class Management {
         // request
         $response = curl_exec($ch);
         $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if ($response_code !== 200) {
             return false;

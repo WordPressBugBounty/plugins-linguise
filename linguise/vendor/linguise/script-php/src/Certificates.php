@@ -105,7 +105,9 @@ class Certificates
 
             $etag = $this->getEtag($headers);
 
-            curl_close($ch);
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+            }
         }
 
         if ($etag && $latest_etag && $etag === $latest_etag) {
@@ -129,6 +131,9 @@ class Certificates
         $info = curl_getinfo($ch);
 
         if ($info['http_code'] !== 200 || $info['content_type'] !== 'application/x-pem-file') {
+            if (PHP_VERSION_ID < 80000) {
+                curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+            }            
             // Something went wrong
             return;
         }
@@ -137,6 +142,10 @@ class Certificates
         curl_setopt($ch, CURLOPT_URL, 'https://curl.se/ca/cacert.pem.sha256');
         $sha256sum = curl_exec($ch);
         $info = curl_getinfo($ch);
+
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
 
         if ($info['http_code'] !== 200) {
             // Something went wrong

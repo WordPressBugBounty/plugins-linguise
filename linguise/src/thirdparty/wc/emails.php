@@ -30,6 +30,8 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
     /**
      * Determines if the integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -41,6 +43,8 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
     /**
      * Load the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function init()
@@ -50,6 +54,8 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -99,7 +105,7 @@ class WooCommerceEmailsIntegration extends LinguiseBaseIntegrations
         if (is_a($wc_email->object, 'WC_Order')) {
             $language_meta = $wc_email->object->get_meta('linguise_language', true);
             if (empty($language_meta)) {
-                $language_meta = get_post_meta($wc_email->object->get_id(), 'linguise_language', true);
+                $language_meta = get_post_meta($wc_email->object->get_id(), 'linguise_language', true); // @codeCoverageIgnore
             }
         }
         if (empty($language_meta)) {

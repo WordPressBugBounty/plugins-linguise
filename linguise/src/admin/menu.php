@@ -1,4 +1,5 @@
 <?php
+
 /* Prohibit direct script loading */
 defined('ABSPATH') || die('No direct script access allowed!');
 
@@ -66,26 +67,26 @@ class LinguiseMenu
                     <li>
                         <label class="menu-item-title">
                             <input type="checkbox" class="menu-item-checkbox"
-                                   name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-object-id]"
-                                   value="-1"> <?php esc_html_e('Linguise Languages', 'linguise'); ?>
+                                name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-object-id]"
+                                value="-1"> <?php esc_html_e('Linguise Languages', 'linguise'); ?>
                         </label>
                         <input type="hidden" class="menu-item-type"
-                               name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-type]"
-                               value="custom">
+                            name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-type]"
+                            value="custom">
                         <input type="hidden" class="menu-item-title"
-                               name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-title]"
-                               value="<?php esc_html_e('Linguise Languages', 'linguise'); ?>">
+                            name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-title]"
+                            value="<?php esc_html_e('Linguise Languages', 'linguise'); ?>">
                         <input type="hidden" class="menu-item-url"
-                               name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-url]"
-                               value="#linguise_switcher">
+                            name="menu-item[<?php echo (int)$_nav_menu_placeholder; ?>][menu-item-url]"
+                            value="#linguise_switcher">
                     </li>
                 </ul>
             </div>
             <p class="button-controls">
                 <span class="add-to-menu">
                     <input type="submit" <?php disabled($nav_menu_selected_id, 0); ?> class="button-secondary submit-add-to-menu right"
-                           value="<?php esc_attr_e('Add to Menu', 'linguise'); ?>" name="add-post-type-menu-item"
-                           id="submit-posttype-lang-switch">
+                        value="<?php esc_attr_e('Add to Menu', 'linguise'); ?>" name="add-post-type-menu-item"
+                        id="submit-posttype-lang-switch">
                     <span class="spinner"></span>
                 </span>
             </p>

@@ -53,11 +53,21 @@ class AttributeHandler extends FragmentHandler
                     ]
                 ],
             ];
+
+            $current_list[] = [
+                'name' => 'linguise-demo-string-encoded',
+                'key' => 'data-label-encoded',
+                'mode' => 'string-encoded',
+                'matchers' => [
+                    [
+                        'key' => 'sc-linguise-demo-encoded',
+                        'type' => 'tag'
+                    ]
+                ],
+            ];
         }
 
-        if (function_exists('apply_filters')) {
-            $current_list = apply_filters('linguise_fragment_attributes', $current_list, $html_data);
-        }
+        $current_list = apply_filters('linguise_fragment_attributes', $current_list, $html_data);
 
         // loop through the list and add extra field, use reference
         foreach ($current_list as &$matcher) {
@@ -158,7 +168,7 @@ class AttributeHandler extends FragmentHandler
     {
         $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
-            return [];
+            return []; // @codeCoverageIgnore
         }
 
         $matchers = self::getMatcher($html_data);
@@ -169,7 +179,7 @@ class AttributeHandler extends FragmentHandler
         $elements = $html_dom->getElementsByTagName('*');
         foreach ($elements as $element) {
             if ($element->nodeType !== XML_ELEMENT_NODE) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             foreach ($matchers as $matcher) {
@@ -209,6 +219,16 @@ class AttributeHandler extends FragmentHandler
                         [
                             'key' => $matcher['key'],
                             'value' => $key_data,
+                            'format' => $cast_data,
+                        ]
+                    ];
+                } elseif (isset($matcher['mode']) && $matcher['mode'] === 'string-encoded') {
+                    $cast_data = isset($matcher['cast']) ? $matcher['cast'] : 'html-main';
+
+                    $collected_temp = [
+                        [
+                            'key' => $matcher['key'],
+                            'value' => html_entity_decode($key_data, ENT_QUOTES | ENT_SUBSTITUTE, 'utf-8'),
                             'format' => $cast_data,
                         ]
                     ];
@@ -259,7 +279,7 @@ class AttributeHandler extends FragmentHandler
         $elements = $html_dom->getElementsByTagName($tag_name);
         foreach ($elements as $element) {
             if ($element->nodeType !== XML_ELEMENT_NODE) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             if ($element->hasAttribute($attr_name) && $element->getAttribute($attr_name) === $attr_value) {
@@ -285,7 +305,7 @@ class AttributeHandler extends FragmentHandler
 
         $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
-            return $html_data;
+            return $html_data; // @codeCoverageIgnore
         }
 
         Debug::log('AttributeHandler -> Injecting: ' . json_encode($fragments, JSON_PRETTY_PRINT));
@@ -317,7 +337,7 @@ class AttributeHandler extends FragmentHandler
 
                 $match_data = $attr_html->getAttribute($matched['key']);
                 if (empty($match_data)) {
-                    continue;
+                    continue; // @codeCoverageIgnore
                 }
 
                 // Since we have protection enabled around this!
@@ -338,11 +358,30 @@ class AttributeHandler extends FragmentHandler
 
                     $first_value = isset($first_fragment['value']) ? $first_fragment['value'] : null;
                     if (empty($first_value)) {
-                        continue;
+                        continue; // @codeCoverageIgnore
                     }
 
                     // Replace the data
                     $replaced_text = $first_value;
+                    if ($should_encode) {
+                        $replaced_text = rawurlencode($replaced_text);
+                    }
+
+                    $protected_json = HTMLHelper::protectEntity($replaced_text);
+                } elseif (isset($matched['mode']) && $matched['mode'] === 'string-encoded') {
+                    // Get first item
+                    $first_fragment = isset($fragment_list['fragments'][0]) ? $fragment_list['fragments'][0] : null;
+                    if (empty($first_fragment)) {
+                        continue; // @codeCoverageIgnore
+                    }
+
+                    $first_value = isset($first_fragment['value']) ? $first_fragment['value'] : null;
+                    if (empty($first_value)) {
+                        continue; // @codeCoverageIgnore
+                    }
+
+                    // Replace the data
+                    $replaced_text = htmlspecialchars($first_value, ENT_QUOTES, 'UTF-8', false);
                     if ($should_encode) {
                         $replaced_text = rawurlencode($replaced_text);
                     }
@@ -360,8 +399,8 @@ class AttributeHandler extends FragmentHandler
                         $dec_key = self::unwrapKey($fragment['key']);
                         try {
                             $json_data->set('$.' . $dec_key, $fragment['value']);
-                        } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
-                            Debug::log('Failed to set key in attributes: ' . $dec_key . ' -> ' . $e->getMessage());
+                        } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) { // @codeCoverageIgnore
+                            Debug::log('Failed to set key in attributes: ' . $dec_key . ' -> ' . $e->getMessage()); // @codeCoverageIgnore
                         }
                     }
 

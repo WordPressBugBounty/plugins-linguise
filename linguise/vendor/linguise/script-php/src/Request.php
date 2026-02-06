@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Request
 {
@@ -40,16 +40,20 @@ class Request
         $this->metadata = [];
 
         if (!$silent_debug) {
-            Debug::log('Requested url: ' . $this->getRequestedUrl());
+            Debug::log('Requested url: ' . $this->getRequestedUrl()); // @codeCoverageIgnore
         }
     }
 
     protected function parseBaseDirectory() {
         $current_cms = CmsDetect::detect();
+        $is_wp = defined('ABSPATH') || (isset($_SERVER['IS_WP_REQUEST_TEST']) && $_SERVER['IS_WP_REQUEST_TEST'] === '1');
         if (defined('JPATH_ROOT') && method_exists('JURI', 'getPath')) {
             // We are in a Joomla installation
-            $this->base_directory = \JUri::getInstance()->root(true);
-        } elseif (defined('ABSPATH') && function_exists('site_url')) {
+            /**
+             * @disregard P1009 -- Intelliphense false positive
+             */
+            $this->base_directory = \JUri::getInstance()->root(true); // @codeCoverageIgnore
+        } elseif ($is_wp && function_exists('site_url')) {
             // We are in a WordPress installation
             if (function_exists('home_url')) {
                 // When home_url exist, use it as it give better and correct result
@@ -76,7 +80,7 @@ class Request
             if ($base_directory) {
                 $this->base_directory = '/' . trim($base_directory, '/');
             } else {
-                $this->base_directory = '';
+                $this->base_directory = ''; // @codeCoverageIgnore
             }
         }
     }

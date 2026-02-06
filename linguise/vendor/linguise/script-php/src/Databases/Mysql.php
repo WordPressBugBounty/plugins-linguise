@@ -286,6 +286,8 @@ class Mysql
     public function close() {
         if ($this->_database instanceof \mysqli) {
             mysqli_close($this->_database);
+            $this->_database = null;
         }
+        $this->_ready = false;
     }
 }

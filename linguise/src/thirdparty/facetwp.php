@@ -80,6 +80,8 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the FacetWP integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -89,6 +91,8 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -100,6 +104,8 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */

@@ -132,7 +132,7 @@ if (file_exists($errors_file)) {
         </h2>
         <div class="flex flex-col mt-4 gap-2 linguise-inner-options">
             <label class="linguise-slider-checkbox">
-                <input type="checkbox" class="slider-input" name="linguise_options[search_translation]" value="1" <?php echo isset($options['search_translation']) ? (AdminHelper::checked($options['search_translation'], 1)) : (''); ?> />
+                <input type="checkbox" class="slider-input" name="linguise_options[search_translation]" value="1" <?php echo isset($options['search_translations']) ? (AdminHelper::checked($options['search_translations'], 1)) : (''); ?> />
                 <span class="slider"></span>
                 <span class="slider-label font-semibold">
                     <?php echo esc_html($translation_strings['searches']['title']); ?>

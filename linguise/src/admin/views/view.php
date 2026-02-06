@@ -198,7 +198,7 @@ $config_array = array('vars' => array('configs' => $config));
         </div>
         <div class="drawer-navigation">
             <?php foreach ($linguise_tabs as $tab_key => $tab_d) : ?>
-                <div class="nav-tabs <?php echo $tab_key === 'main_settings' ? 'active' : ''; ?>" data-toggle="tab" data-target="<?php echo esc_attr($tab_d['content']); ?>" data-save-hide="<?php echo isset($tab_d['no-save']) && $tab_d['no-save'] ? '1' : '0'; ?>">
+                <div class="nav-tabs <?php echo esc_attr($tab_key === 'main_settings' ? 'active' : ''); ?>" data-toggle="tab" data-target="<?php echo esc_attr($tab_d['content']); ?>" data-save-hide="<?php echo isset($tab_d['no-save']) && $tab_d['no-save'] ? '1' : '0'; ?>">
                     <i class="material-icons tab-icon"><?php echo esc_html($tab_d['icon']); ?></i>
                     <span class="tab-name"><?php echo esc_html($tab_d['name']); ?></span>
                 </div>
@@ -223,12 +223,12 @@ $config_array = array('vars' => array('configs' => $config));
             </div>
         <?php endif; ?>
         <?php foreach ($linguise_tabs as $tab_key => $tab_d) : ?>
-            <div class="tab-content <?php echo $tab_key === 'main_settings' ? 'active' : ''; ?>" data-id="<?php echo esc_attr($tab_d['content']); ?>">
+            <div class="tab-content <?php echo esc_attr($tab_key === 'main_settings' ? 'active' : ''); ?>" data-id="<?php echo esc_attr($tab_d['content']); ?>">
                 <?php include_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . $tab_d['content'] . '.php'); ?>
             </div>
         <?php endforeach; ?>
         <div class="flex flex-row w-full justify-end box-border px-4 save-settings-btn">
-            <input type="submit" class="linguise-btn rounder save-settings-input" value="<?php echo esc_attr($translation_strings_root['save-btn']); ?>" <?php echo $has_api_key ? '' : 'disabled'; ?> />
+            <input type="submit" class="linguise-btn rounder save-settings-input" value="<?php echo esc_attr($translation_strings_root['save-btn']); ?>" <?php echo esc_attr($has_api_key ? '' : 'disabled'); ?> />
         </div>
     </form>
 
@@ -415,7 +415,7 @@ $config_array = array('vars' => array('configs' => $config));
 
 <!-- start of linguise config script -->
 <script id="config-script" type="text/javascript">
-    var linguise_configs = <?php echo json_encode($config_array); ?>;
+    var linguise_configs = <?php echo wp_json_encode($config_array); ?>;
     window.linguise_configs = linguise_configs;
 </script>
 <script type="text/javascript">

@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Session {
     /**
@@ -11,6 +11,8 @@ class Session {
     private static $_instance = null;
 
     private $state = 0;
+
+    private static $databaseFactory = null;
 
     private static $SESSION_READY = 1;
     private static $SESSION_NOT_READY = 0;
@@ -60,6 +62,24 @@ class Session {
             self::$_instance = new Session();
         }
         return self::$_instance;
+    }
+
+    /**
+     * @param callable|null $factory
+     */
+    public static function setDatabaseFactory($factory)
+    {
+        self::$databaseFactory = $factory;
+    }
+
+    private function resolveDatabase()
+    {
+        if (self::$databaseFactory !== null) {
+            $factory = self::$databaseFactory;
+            return $factory();
+        }
+
+        return Database::getInstance(true, true)->ensureConnection();
     }
 
     /**
@@ -168,7 +188,7 @@ class Session {
         $token_data = $_SESSION[self::$token_key];
         $password_mode = $_SESSION[self::$use_pass_key];
 
-        $db = Database::getInstance(true, true)->ensureConnection();
+    $db = $this->resolveDatabase();
         if ($password_mode) {
             $pass = $db->retrieveOtherParam('linguise_password');
             if (!hash_equals($pass, $token_data)) { // Use hash_equals to avoid timing attacks
@@ -268,7 +288,7 @@ class Session {
             return false;
         }
 
-        $decode_token = base64_decode($token);
+        $decode_token = base64_decode($token, true);
         if ($decode_token === false) {
             return false;
         }
@@ -278,8 +298,8 @@ class Session {
             return false;
         }
 
-        [$context, $hmac_data] = $token_parts;
-        if ($context !== $context) {
+        [$context_token, $hmac_data] = $token_parts;
+        if ($context_token !== $context) {
             return false;
         }
 

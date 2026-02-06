@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class CurlRequest
 {
@@ -13,10 +13,13 @@ class CurlRequest
      *
      * @return array|null|false Decoded JSON, null if no JSON, false if fail to read
      */
-    private function readJSONInput()
+    protected function readJSONInput()
     {
         if (isset($_SERVER['HTTP_CONTENT_TYPE']) && strpos($_SERVER['HTTP_CONTENT_TYPE'], 'application/json') === 0) {
-            $stream = fopen('php://input', 'r');
+            $stream = $this->openJsonInputStream();
+            if ($stream === false) {
+                return false;
+            }
 
             // Check if it's seeked already.
             $pos = ftell($stream);
@@ -25,8 +28,10 @@ class CurlRequest
                 $memory = stream_get_contents($stream);
                 if ($memory === false) {
                     // fail to read
+                    // @codeCoverageIgnoreStart
                     fclose($stream);
                     return false;
+                    // @codeCoverageIgnoreEnd
                 }
 
                 // Seek back to the start for further processing by other scripts
@@ -36,15 +41,17 @@ class CurlRequest
                 $success = fseek($stream, 0);
                 if ($success !== 0) {
                     // fail to seek
-                    return false;
+                    return false; // @codeCoverageIgnore
                 }
 
                 $memory = stream_get_contents($stream);
                 if ($memory === false) {
                     // fail to read, seek back to original $pos
+                    // @codeCoverageIgnoreStart
                     fseek($stream, $pos);
                     fclose($stream);
                     return false;
+                    // @codeCoverageIgnoreEnd
                 }
 
                 // Seek back to the original position
@@ -59,6 +66,18 @@ class CurlRequest
 
             return null;
         }
+    }
+
+    /**
+     * Opens the input stream for reading JSON data.
+     *
+     * @codeCoverageIgnore
+     *
+     * @return resource|false
+     */
+    protected function openJsonInputStream()
+    {
+        return fopen('php://input', 'r');
     }
 
     public function makeRequest()
@@ -86,7 +105,7 @@ class CurlRequest
             $content_type = isset($_SERVER['HTTP_CONTENT_TYPE']) ? $_SERVER['HTTP_CONTENT_TYPE'] : (isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '');
             if (isset($_SERVER['CONTENT_TYPE']) && !isset($_SERVER['HTTP_CONTENT_TYPE']) && !empty($content_type)) {
                 // Set HTTP_CONTENT_TYPE
-                $_SERVER['HTTP_CONTENT_TYPE'] = $content_type;
+                $_SERVER['HTTP_CONTENT_TYPE'] = $content_type; // @codeCoverageIgnore
             }
 
             if (count($post_fields) && !empty($content_type)) {
@@ -110,7 +129,7 @@ class CurlRequest
                             if (is_array($file_value['name'])) {
                                 foreach ($file_value['name'] as $index => $file_name_value) {
                                     if (!$file_value['tmp_name'][$index]) {
-                                        continue;
+                                        continue; // @codeCoverageIgnore
                                     }
 
                                     $boundary->addPostFile(
@@ -122,7 +141,7 @@ class CurlRequest
                                 }
                             } else {
                                 if (!$file_value['tmp_name']) {
-                                    continue;
+                                    continue; // @codeCoverageIgnore
                                 }
 
                                 $prefer_name = !empty($file_value['name']) ? $file_value['name'] : null;
@@ -206,7 +225,7 @@ class CurlRequest
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         if (Configuration::getInstance()->get('dl_certificates') === true) {
-            curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath());
+            curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath()); // @codeCoverageIgnore
         }
 
         $curl_multi = CurlMulti::getInstance();
@@ -244,7 +263,7 @@ class CurlRequest
             $header_parts = explode(':', $header, 2);
 
             if (count($header_parts) !== 2) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
 
             $response->addHeader($header_parts[0], ltrim($header_parts[1]));
@@ -259,7 +278,7 @@ class CurlRequest
                 $response->setContent($body);
                 Debug::log('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
                 Debug::saveError('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
-                $response->end();
+                return $response->end();
             }
 
             // Try to guess content type from body
@@ -277,7 +296,7 @@ class CurlRequest
                 $response->setContent($body);
                 Debug::log('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
                 Debug::saveError('Failed to retrieve content, cannot determine content type. Response code: ' . $response_code);
-                $response->end();
+                return $response->end();
             }
         }
 
@@ -290,14 +309,14 @@ class CurlRequest
             $response->setContent($body);
             // So in Configuration[Local] we can modify JSON response if we want.
             Hook::trigger('onJsonResponse');
-            $response->end();
+            return $response->end();
         }
 
         if ($response_code !== 304 && (!in_array($content_type, ['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml', 'application/rss+xml']) && $json_translate !== true)) {
             $response->setRedirect($url);
             Debug::log('Content type not translatable ' . $content_type);
             Debug::saveError('Content type not translatable ' . $content_type);
-            $response->end();
+            return $response->end();
         }
 
         $response->setResponseCode($response_code);
@@ -319,6 +338,5 @@ class CurlRequest
             Hook::trigger('onBeforeRedirect');
             $response->end();
         }
-
     }
 }

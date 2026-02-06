@@ -100,23 +100,6 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
     }
 
     /**
-     * Get the language for WooCommerce context.
-     *
-     * First it checks current language, if not set, then it checks referer.
-     *
-     * @return string|null
-     */
-    protected function getLanguageMeta()
-    {
-        $language_meta = WPHelper::getLanguage();
-        if (!$language_meta) {
-            // Check referer
-            $language_meta = WPHelper::getLanguageFromReferer();
-        }
-        return $language_meta;
-    }
-
-    /**
      * Translate Elementor JSON response fragments
      *
      * @param mixed  $data      The data returned from the fragment override

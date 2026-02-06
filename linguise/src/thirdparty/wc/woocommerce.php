@@ -2,9 +2,9 @@
 
 namespace Linguise\WordPress\Integrations;
 
-use Linguise\Vendor\Linguise\Script\Core\Helper;
 use Linguise\WordPress\FragmentHandler;
 use Linguise\WordPress\Helper as WPHelper;
+use Linguise\WordPress\HTMLHelper;
 
 defined('ABSPATH') || die('');
 
@@ -31,6 +31,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         'wc/store/v1/cart',
         'wc/store/v1/batch',
         'wc/store/v1/checkout',
+        'wc/store/v1/select-shipping-rate',
     ];
 
     /**
@@ -67,6 +68,55 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         'seocify_ajax_add_to_cart',
         'flatsome_ajax_add_to_cart',
         'bootscore_ajax_add_to_cart',
+    ];
+
+    /**
+     * A collection of HTML attributes that you want to translate
+     *
+     * @var string[]
+     */
+    protected static $fragment_attributes = [
+        [
+            'name' => 'wc-order-button-payment',
+            'key' => 'data-order_button_text',
+            'mode' => 'string',
+            'match_mode' => 'all',
+            'matchers' => [
+                [
+                    'type' => 'tag',
+                    'key' => 'input'
+                ],
+                [
+                    'type' => 'attribute',
+                    'key' => 'name',
+                    'value' => 'payment_method'
+                ]
+            ]
+        ],
+        [
+            'name' => 'wc-cart-order-summary-header',
+            'key' => 'data-content',
+            'mode' => 'string',
+            'matchers' => [
+                [
+                    'type' => 'attribute',
+                    'key' => 'data-block-name',
+                    'value' => 'woocommerce/cart-order-summary-heading-block'
+                ]
+            ]
+        ],
+        [
+            'name' => 'wc-checkout-terms',
+            'key' => 'data-text',
+            'mode' => 'string-encoded',
+            'matchers' => [
+                [
+                    'type' => 'attribute',
+                    'key' => 'data-block-name',
+                    'value' => 'woocommerce/checkout-terms-block'
+                ]
+            ]
+        ]
     ];
 
     /**
@@ -121,17 +171,65 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         ];
 
         // Used in payment method
-        $merged_defaults[] = [
-            'key' => 'currency',
-            'mode' => 'exact',
-            'kind' => 'deny',
+        $exact_disallowed = [
+            'currency',
+            'srcset',
+            'rate_id',
+            'method_id',
+            'catalog_visibility',
+            'sku',
+            'Nonce',
+            'Cart-Hash',
+            'Cart-Token',
+            'wcpbc_currency',
+            'wcpbc_stripe_upe',
         ];
+        foreach ($exact_disallowed as $disallowed_key) {
+            $fragment_keys[] = [
+                'key' => $disallowed_key,
+                'mode' => 'exact',
+                'kind' => 'deny',
+            ];
+        }
+
+        $disallowed_extras = [
+            '(shipping|billing)_address\..*',
+            'totals\..*',
+            'prices\..*',
+            'currency_(prefix|suffix|symbol|code|decimal_separator|thousand_separator|minor_unit)',
+            'meta_data\.\d+\.key',
+            'items\.\d+\.key',
+            'shipping_rates\.\d+\.destination\..*',
+        ];
+        foreach ($disallowed_extras as $disallowed_key) {
+            $fragment_keys[] = [
+                'key' => $disallowed_key,
+                'mode' => 'regex_full',
+                'kind' => 'deny',
+            ];
+        }
+
+        /* More AJAX specific allowed matches */
+        $allowed_matches = [
+            'shipping_rates\.\d+\.name$',
+            'shipping_rates\.\d+\.items\.\d+\.name$',
+            'shipping_rates\.\d+\.shipping_rates\.\d+\.(name|description|delivery_time)$',
+        ];
+        foreach ($allowed_matches as $allowed_key) {
+            $fragment_keys[] = [
+                'key' => $allowed_key,
+                'mode' => 'regex_full',
+                'kind' => 'allow',
+            ];
+        }
 
         self::$fragment_keys = $fragment_keys;
     }
 
     /**
      * Determines if the integration should be loaded.
+     *
+     * @codeCoverageIgnore
      *
      * @return boolean
      */
@@ -142,6 +240,8 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -182,6 +282,8 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     /**
      * Unload the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function destroy()
@@ -200,12 +302,21 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         // remove_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 10, 2);
         remove_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000, 1);
 
+        remove_filter('woocommerce_form_field_select', [$this, 'hookFormFieldsSelectTranslations'], 10);
+        remove_filter('woocommerce_form_field_state', [$this, 'hookFormFieldsSelectTranslations'], 10);
+        remove_filter('woocommerce_form_field_select', [$this, 'hookFormFieldsSelectTranslations'], 10);
+
         remove_action('wp_loaded', [$this, 'hookAddCartFragments']);
         remove_action('wp_redirect', [$this, 'hookWPRedirect']);
+
+        remove_filter('linguise_after_fragment_collection', [$this, 'linguiseFragmentCollectionAdjustment'], 20);
+        remove_filter('linguise_after_fragment_translation', [$this, 'linguiseFragmentTranslationAdjusment'], 20);
     }
 
     /**
      * Reload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -219,6 +330,8 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
 
     /**
      * Initializes the common hooks required for this integration to work
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -237,8 +350,15 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         // add_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 10, 2);
         add_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000, 1);
 
+        add_filter('woocommerce_form_field_select', [$this, 'hookFormFieldsSelectTranslations'], 10, 1);
+        add_filter('woocommerce_form_field_state', [$this, 'hookFormFieldsSelectTranslations'], 10, 1);
+        add_filter('woocommerce_form_field_select', [$this, 'hookFormFieldsSelectTranslations'], 10, 1);
+
         add_action('wp_loaded', [$this, 'hookAddCartFragments']);
         add_action('wp_redirect', [$this, 'hookWPRedirect']);
+
+        add_filter('linguise_after_fragment_collection', [$this, 'linguiseFragmentCollectionAdjustment'], 20, 3);
+        add_filter('linguise_after_fragment_translation', [$this, 'linguiseFragmentTranslationAdjusment'], 20, 2);
     }
 
     /**
@@ -276,7 +396,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         $url_path = isset($url['path']) ? $url['path'] : '';
         if (!empty($site_path) && $site_path !== '/') {
             // Remove the site path from the URL path
-            $url_path = str_replace($site_path, '', $url_path);
+            $url_path = str_replace($site_path, '', $url_path); // @codeCoverageIgnore
         }
 
         // Check if language already exists in the URL
@@ -287,7 +407,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         }
 
         $url['path'] = '/' . $url_path;
-        $result = Helper::buildUrl($url, $site_url, $language);
+        $result = WPHelper::buildUrl($url, $site_url, $language);
         return $result;
     }
 
@@ -302,7 +422,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     public function hookWCNewOrder($order_id, $order)
     {
         if (WPHelper::isAdminRequest()) {
-            return;
+            return; // @codeCoverageIgnore
         }
 
         $language_meta = $this->getWooLanguage();
@@ -400,7 +520,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
              * @see https://wordpress.org/plugins/funnel-builder/
              */
             if (is_plugin_active('funnel-builder/funnel-builder.php')) {
-                return add_query_arg('linguise_language', $language_meta, $endpoint);
+                return add_query_arg('linguise_language', $language_meta, $endpoint); // @codeCoverageIgnore
             }
 
             return str_replace('checkout', 'checkout&linguise_language=' . $language_meta, $endpoint);
@@ -476,6 +596,8 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
      * Hook WC reset password, this function will flush the reset password cookie from user browser
      * when reset password is successful and it's in translated pages
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function hookWCCustomerResetPassword()
@@ -515,10 +637,20 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             $html_content = $json->messages;
         } elseif (is_array($data)) {
             foreach ($data as $class => $fragment) {
+                if (!is_string($fragment)) {
+                    // Ignore non-string fragments
+                    continue; // @codeCoverageIgnore
+                }
+
                 $html_content .= '<divlinguise data-wp-linguise-class="' . $class . '">' . $fragment . '</divlinguise>';
             }
         } else {
             $html_content .= $data;
+        }
+
+        if (is_string($html_content)) {
+            // modify it a bit more
+            $html_content = $this->hookReviewOrderBeforePayment($html_content);
         }
 
         $html_content .= '</body></html>';
@@ -586,6 +718,54 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             return $html;
         }
         return str_replace('<button ', '<button data-linguise-translate-attributes="value data-value" ', $html);
+    }
+
+    /**
+     * Translate the payment method selection input in checkout page
+     *
+     * @param string $html The HTML of the payment method selection input
+     *
+     * @return string
+     */
+    public function hookReviewOrderBeforePayment($html)
+    {
+        // 1. Translate the payment method name
+        $replaced = preg_replace('/(<input[^>]+name=["\']payment_method["\'][^>]+)(>)/i', '$1 data-linguise-translate-attributes="data-order_button_text"$2', $html);
+        if (!empty($replaced)) {
+            return $replaced;
+        }
+        return $html; // @codeCoverageIgnore
+    }
+
+    /**
+     * Translate select form fields attributes like data-placeholder, data-label
+     *
+     * @param string $field The HTML of the select field
+     *
+     * @return string
+     */
+    public function hookFormFieldsSelectTranslations($field)
+    {
+        $matched_fields = [];
+        // find data-placeholder="..."
+        // find data-label="..."
+        preg_match_all('/data-(placeholder|label)=["\']([^"\']+)["\']/', $field, $matched_fields, PREG_SET_ORDER);
+        if (empty($matched_fields)) {
+            return $field;
+        }
+
+        $only_attrs = [];
+        foreach ($matched_fields as $match) {
+            $attr_name = $match[1];
+            $only_attrs[] = 'data-' . $attr_name;
+        }
+
+        $merged_attrs = implode(' ', array_unique($only_attrs));
+        $replaced = preg_replace('/(<(?:select|input)[^>]+)(>)/i', '$1 data-linguise-translate-attributes="' . $merged_attrs . '"$2', $field);
+        if (!empty($replaced)) {
+            return $replaced;
+        }
+        return $field; // @codeCoverageIgnore
     }
 
     /**
@@ -689,5 +869,140 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         header('Linguise-Translated-Redirect: true');
 
         return $location;
+    }
+
+    /**
+     * Add more fragment specially stringified JSON fragments
+     *
+     * @param array        $fragments   The fragments to be translated
+     * @param string       $html_string The HTML string containing the fragments
+     * @param \DOMDocument $html_dom    The DOMDocument object of the HTML
+     *
+     * @return array The modified fragments to be translated
+     */
+    public function linguiseFragmentCollectionAdjustment($fragments, $html_string, $html_dom)
+    {
+        require_once realpath(__DIR__ . '/../../HTMLHelper.php'); // in case not loaded yet
+        require_once realpath(__DIR__ . '/../../FragmentBase.php'); // in case not loaded yet
+        require_once realpath(__DIR__ . '/../../FragmentHandler.php'); // in case not loaded yet
+
+        $scripts = $html_dom->getElementsByTagName('script');
+        foreach ($scripts as $script) {
+            $script_content = HTMLHelper::unclobberCdataInternal($script->textContent);
+
+            // try to find var wc_address_i18n_params = { ... };
+            $match_res = preg_match('/var\s+wc_address_i18n_params\s*=\s*(\{.*?\});/s', $script_content, $matches);
+            if ($match_res === false || $match_res === 0) {
+                continue;
+            }
+
+            $json_data = json_decode($matches[1], true);
+            if ($json_data === null) {
+                continue;
+            }
+
+            if (isset($json_data['locale']) && is_string($json_data['locale'])) {
+                // try parsing as JSON
+                $inner_locale_json = json_decode($json_data['locale'], true);
+                // get last error
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    continue;
+                }
+
+                $collected = FragmentHandler::collectFragmentFromJson($inner_locale_json);
+                // loop through this one and add skip=true
+                foreach ($collected as &$fragment) {
+                    $fragment['skip'] = true;
+                }
+
+                if (!isset($fragments['wc_custom_fragment_handling_params'])) {
+                    $fragments['wc_custom_address_i18n_params'] = [];
+                }
+
+                if (!isset($fragments['wc_custom_address_i18n_params']['wc_address_i18n_params'])) {
+                    $fragments['wc_custom_address_i18n_params']['wc_address_i18n_params'] = [];
+                }
+
+                $fragments['wc_custom_address_i18n_params']['wc_address_i18n_params'] = [
+                    'mode' => 'skip',
+                    'fragments' => $collected,
+                ];
+            }
+        }
+
+        return $fragments;
+    }
+
+    /**
+     * Apply back the manually adjusted HTML after fragment translation
+     *
+     * @param string $html_data The HTML data after fragment translation
+     * @param array  $fragments The fragments that were translated
+     *
+     * @return string The modified HTML data after applying back the manually adjusted HTML
+     */
+    public function linguiseFragmentTranslationAdjusment($html_data, $fragments)
+    {
+        // We need to find the script tag that contains var wc_address_i18n_params = {...};
+        // Then we need to replace the locale part with the new translated JSON
+        require_once realpath(__DIR__ . '/../../HTMLHelper.php'); // in case not loaded yet
+        require_once realpath(__DIR__ . '/../../FragmentBase.php'); // in case not loaded yet
+        require_once realpath(__DIR__ . '/../../FragmentHandler.php'); // in case not loaded yet
+
+        // Nothing to do here for now
+        foreach ($fragments as $fragment_name => $fragment_jsons) {
+            if ($fragment_name !== 'wc_custom_address_i18n_params') {
+                continue;
+            }
+
+            foreach ($fragment_jsons as $fragment_param => $fragment_list) {
+                $mode = $fragment_list['mode'];
+                if ($mode !== 'skip') {
+                    continue;
+                }
+
+                $fragment_data = $fragment_list['fragments'];
+
+                if ($fragment_param === 'wc_address_i18n_params') {
+                    $match_res = preg_match('/var\s+wc_address_i18n_params\s*=\s*(\{.*?\});/s', $html_data, $matches);
+                    if ($match_res === false || $match_res === 0) {
+                        continue;
+                    }
+
+                    $json_data = json_decode($matches[1], true);
+                    if ($json_data === null) {
+                        continue;
+                    }
+
+                    // Remove the $skip key
+                    foreach ($fragment_data as &$fragment) {
+                        unset($fragment['skip']);
+                    }
+
+                    if (isset($json_data['locale']) && is_string($json_data['locale'])) {
+                        $inner_locale_json = json_decode($json_data['locale'], true);
+                        if ($inner_locale_json === null) {
+                            continue;
+                        }
+
+                        $replaced_json = FragmentHandler::applyTranslatedFragmentsForAuto($inner_locale_json, $fragment_data);
+
+                        $replaced_data = preg_replace(
+                            '/var\s+wc_address_i18n_params\s*=\s*\{.*?\};/s',
+                            'var wc_address_i18n_params = ' . json_encode(array_merge($json_data, ['locale' => json_encode($replaced_json)])) . ';',
+                            $html_data,
+                            1,
+                            $count
+                        );
+
+                        if ($count) {
+                            $html_data = $replaced_data;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $html_data;
     }
 }

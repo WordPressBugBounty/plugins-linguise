@@ -25,15 +25,17 @@ class Helper
     public static function isAdminRequest()
     {
         $admin_url = strtolower(admin_url());
+        $referrer  = strtolower(wp_get_referer());
+        $current_url = home_url(add_query_arg(null, null));
 
-        if (strpos(home_url(add_query_arg(null, null)), $admin_url) === 0) {
-            if (0 === strpos(strtolower(wp_get_referer()), $admin_url)) {
+        if (strpos($current_url, $admin_url) === 0) {
+            if (0 === strpos($referrer, $admin_url)) {
                 return true;
             } else {
                 if (function_exists('wp_doing_ajax')) {
-                    return !wp_doing_ajax();
+                    return !wp_doing_ajax(); // @codeCoverageIgnore
                 } else {
-                    return !(defined('DOING_AJAX') && DOING_AJAX );
+                    return !(defined('DOING_AJAX') && DOING_AJAX);
                 }
             }
         } else {
@@ -98,7 +100,7 @@ class Helper
         $site_path = parse_url(linguiseGetSite(), PHP_URL_PATH);
         if (!empty($site_path) && strpos($path, $site_path) === 0) {
             // Remove the site path from the URL
-            $path = substr($path, strlen($site_path));
+            $path = substr($path, strlen($site_path)); // @codeCoverageIgnore
         }
 
         $parts = explode('/', trim($path, '/'));
@@ -164,10 +166,11 @@ class Helper
             // Check if wp_code exist
             // If not set, we use the same as $language
             // If set and NULL we should return null
-            if (isset($languages->$language->wp_code) && !empty($languages->$language->wp_code)) {
-                return $languages->$language->wp_code;
-            } elseif (!isset($languages->$language->wp_code)) {
+            if (!array_key_exists('wp_code', (array)$languages->$language)) {
                 return $language;
+            }
+            if (!empty($languages->$language->wp_code)) {
+                return $languages->$language->wp_code;
             }
 
             return null;
@@ -190,7 +193,7 @@ class Helper
         linguiseRestoreMultisite();
 
         if (!$linguise_options) {
-            return false;
+            return false; // @codeCoverageIgnore
         }
 
         return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);
@@ -212,12 +215,26 @@ class Helper
             }
 
             if (self::localeCompare($lang_key, $locale)) {
-                return $lang_key;
+                return $lang_key; // @codeCoverageIgnore
             }
         }
         return null;
     }
 
+    /**
+     * Safe strpos function
+     *
+     * @param string $haystack The haystack string
+     * @param string $needle   The needle string
+     *
+     * @return integer The position of the needle in the haystack or the length of the haystack if
+     *                 the needle is not found
+     */
+    public static function ensureStrpos($haystack, $needle)
+    {
+        $pos = strpos($haystack, $needle);
+        return $pos === false ? strlen($haystack) : $pos;
+    }
 
     /**
      * Locale compare check with country code ignore check supported.
@@ -229,6 +246,10 @@ class Helper
      */
     public static function localeCompare($locale, $test_locale)
     {
+        if (empty($locale) || empty($test_locale)) {
+            return false;
+        }
+
         // Normalize underscore and dash to a dash
         $locale = str_replace('_', '-', $locale);
         $test_locale = str_replace('_', '-', $test_locale);
@@ -237,16 +258,16 @@ class Helper
         }
 
         // trim until _ or -
-        $test_substr = substr($test_locale, 0, strpos($test_locale, '_'));
-        $test_substr = substr($test_substr, 0, strpos($test_substr, '-'));
+        $test_locale = substr($test_locale, 0, self::ensureStrpos($test_locale, '_'));
+        $test_locale = substr($test_locale, 0, self::ensureStrpos($test_locale, '-'));
 
-        if (strcasecmp($locale, $test_substr) === 0) {
+        if (strcasecmp($locale, $test_locale) === 0) {
             return true;
         }
 
         // trim $locale until _ or -
-        $locale = substr($locale, 0, strpos($locale, '_'));
-        $locale = substr($locale, 0, strpos($locale, '-'));
+        $locale = substr($locale, 0, self::ensureStrpos($locale, '_'));
+        $locale = substr($locale, 0, self::ensureStrpos($locale, '-'));
 
         return strcasecmp($locale, $test_locale) === 0;
     }
@@ -268,7 +289,7 @@ class Helper
 
         // Check if LINGUISE_PLUGIN_URL has / at the end
         if (substr(LINGUISE_PLUGIN_URL, -1) === '/') {
-            return LINGUISE_PLUGIN_URL . $path;
+            return LINGUISE_PLUGIN_URL . $path; // @codeCoverageIgnore
         }
 
         return LINGUISE_PLUGIN_URL . '/' . $path;
@@ -304,15 +325,15 @@ class Helper
         } elseif (strlen($hex_color) !== 6) {
             return null;
         }
-    
+
         if (!ctype_xdigit($hex_color)) {
             return null;
         }
-    
+
         $r = hexdec(substr($hex_color, 0, 2));
         $g = hexdec(substr($hex_color, 2, 2));
         $b = hexdec(substr($hex_color, 4, 2));
-    
+
         return [
             'r' => $r,
             'g' => $g,
@@ -364,8 +385,10 @@ class Helper
             return array_is_list($arrOrObject) === false; // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.array_is_listFound
         }
 
+        // @codeCoverageIgnoreStart
         $keys = array_keys($arrOrObject);
         return implode('', $keys) !== implode(range(0, count($keys) - 1));
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -378,5 +401,59 @@ class Helper
     public static function hasSpace($str)
     {
         return preg_match('/\s/', $str) > 0;
+    }
+
+
+    /**
+     * Create a new URL based on the parsed_url output
+     *
+     * Code taken from Linguise Script Core Helper
+     *
+     * @param array   $parsed_url The parsed URL
+     * @param boolean $encoded    Should we encode the URL or not.
+     *
+     * @return string
+     */
+    public static function buildUrl($parsed_url, $encoded = \false)
+    {
+        $final_url = '';
+        if (empty($parsed_url['scheme'])) {
+            $final_url .= '//';
+        } else {
+            $final_url .= $parsed_url['scheme'] . '://';
+        }
+
+        if (!empty($parsed_url['user'])) {
+            $final_url .= $parsed_url['user'];
+            if (!empty($parsed_url['pass'])) {
+                $final_url .= ':' . $parsed_url['pass'];
+            }
+            $final_url .= '@';
+        }
+
+        $final_url .= empty($parsed_url['host']) ? '' : $parsed_url['host'];
+
+        if (!empty($parsed_url['port'])) {
+            $final_url .= ':' . $parsed_url['port'];
+        }
+
+        if (!empty($parsed_url['path'])) {
+            if ($encoded) {
+                $explode_path = array_map('rawurlencode', explode('/', $parsed_url['path']));
+                $final_url .= implode('/', $explode_path);
+            } else {
+                $final_url .= $parsed_url['path'];
+            }
+        }
+
+        if (!empty($parsed_url['query'])) {
+            $final_url .= '?' . $parsed_url['query'];
+        }
+
+        if (!empty($parsed_url['fragment'])) {
+            $final_url .= '#' . $parsed_url['fragment'];
+        }
+
+        return $final_url;
     }
 }

@@ -96,6 +96,8 @@ class LinguiseBaseIntegrations
     /**
      * Initialize the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function init()
@@ -106,6 +108,8 @@ class LinguiseBaseIntegrations
 
     /**
      * Unhook the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -119,6 +123,8 @@ class LinguiseBaseIntegrations
      * Reload the integration
      *
      * This is a helper function to reload the integration. By default it calls the destroy and init functions.
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -185,6 +191,8 @@ class LinguiseBaseIntegrations
      * We need to define the constant LINGUISE_SCRIPT_TRANSLATION to 1.
      * Then we load the configuration from the plugin's directory.
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     protected function initializeConfiguration()
@@ -225,6 +233,8 @@ class LinguiseBaseIntegrations
      * @param string $linguise_language Linguise language
      * @param string $url               The string URL
      *
+     * @codeCoverageIgnore
+     *
      * @return string
      */
     protected function translateUrl($linguise_language, $url)
@@ -240,15 +250,24 @@ class LinguiseBaseIntegrations
     
         $request = Request::getInstance();
         $language_reflection = new \ReflectionProperty(get_class($request), 'language');
-        $language_reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+            $language_reflection->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+        }
         $language_reflection->setValue($request, $linguise_language);
     
         $hostname_reflection = new \ReflectionProperty(get_class($request), 'hostname');
-        $hostname_reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+            $hostname_reflection->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+        }
         $hostname_reflection->setValue($request, $hostname);
     
         $protocol_reflection = new \ReflectionProperty(get_class($request), 'protocol');
-        $protocol_reflection->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+            $protocol_reflection->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+        }
         $protocol_reflection->setValue($request, $protocol);
     
         // Let Linguise\Vendor\Linguise\Script\Core\Url translate the url
@@ -260,6 +279,8 @@ class LinguiseBaseIntegrations
      *
      * @param array  $search_obj The search object to translate
      * @param string $language   The language to translate to
+     *
+     * @codeCoverageIgnore
      *
      * @return object|false The array object from Linguise API call. `false` if the translation failed or failed to decode JSON.
      */
@@ -291,6 +312,8 @@ class LinguiseBaseIntegrations
      * @param string $html_content   The HTML content
      * @param string $language       The language
      * @param string $requested_path The requested path
+     *
+     * @codeCoverageIgnore
      *
      * @return object|false The array object from Linguise API call. `false` if the translation failed or failed to decode JSON.
      */
@@ -325,7 +348,10 @@ class LinguiseBaseIntegrations
 
         $ch = curl_init();
         list($translated_content, $response_code) = Translation::getInstance()->_translate($ch, $boundary);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.curl_closeDeprecated,Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+            curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+        }
     
         if (!$translated_content || $response_code !== 200) {
             // We failed to translate
@@ -348,7 +374,10 @@ class LinguiseBaseIntegrations
         // if we don't replace it.
         $req_reflect = new \ReflectionClass($request);
         $reflect_lang = $req_reflect->getProperty('language');
-        $reflect_lang->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
+            $reflect_lang->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+        }
         // Get the old value first
         $req_language = $request->getLanguage();
         // Set the new value from the referer data

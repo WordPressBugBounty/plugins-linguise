@@ -54,7 +54,7 @@ class LinguiseBrowserLanguage extends LinguiseRedirector
             $accept_language = sanitize_text_field($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $accept_languages = self::splitAcceptLanguage($accept_language);
             if (empty($accept_languages)) {
-                return null;
+                return null; // @codeCoverageIgnore
             }
 
             // If one preferred lang and it's `*`, return null
@@ -90,7 +90,7 @@ class LinguiseBrowserLanguage extends LinguiseRedirector
             return self::normalizeAndCheckLanguage($cf_ipcountry, $languages_enabled);
         } else {
             // Nothing
-            return null;
+            return null; // @codeCoverageIgnore
         }
     }
 

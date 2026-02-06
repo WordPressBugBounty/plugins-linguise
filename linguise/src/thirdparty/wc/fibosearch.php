@@ -74,6 +74,8 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -83,6 +85,8 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
 
     /**
      * Initializes the integration.
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -95,6 +99,8 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -165,6 +171,8 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
      *
      * @param string $output The HTML output to be translated
      *
+     * @codeCoverageIgnore
+     *
      * @return string The translated HTML output
      */
     public function hookTranslateOutput($output)
@@ -180,6 +188,7 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
 
         // Add extra template to output
         add_filter('linguise_fragment_filters', function ($filters) {
+            // @codeCoverageIgnoreStart
             $filters[] = [
                 'key' => 'value',
                 'mode' => 'regex_full',
@@ -193,6 +202,7 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
             ];
 
             return $filters;
+            // @codeCoverageIgnoreEnd
         }, 15, 1);
 
         // Loop through the output and translate the values
@@ -213,35 +223,35 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
         $result = $this->translateFragments($content, $language, '/');
 
         if (empty($result)) {
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
 
         if (isset($result->redirect)) {
             // Somehow we got this...?
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
 
         $translated_fragments = FragmentHandler::intoJSONFragments($result->content);
         if (empty($translated_fragments)) {
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
 
         if (!isset($translated_fragments['fibosearch-tmpl'])) {
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
     
         if (!isset($translated_fragments['fibosearch-tmpl']['render-output'])) {
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
     
         $tl_json_frag = $translated_fragments['fibosearch-tmpl']['render-output'];
         if (empty($tl_json_frag)) {
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
     
         $tl_json_frag_list = $tl_json_frag['fragments'];
         if (empty($tl_json_frag_list)) {
-            return $output;
+            return $output; // @codeCoverageIgnore
         }
 
         $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($output, $tl_json_frag_list);
@@ -249,6 +259,6 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
             return $replaced_content;
         }
 
-        return $output;
+        return $output; // @codeCoverageIgnore
     }
 }

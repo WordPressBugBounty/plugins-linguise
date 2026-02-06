@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Helper {
     /**
@@ -66,6 +66,7 @@ class Helper {
         }
     }
 
+    // @codeCoverageIgnoreStart
     public static function checkDataDirAvailable()
     {
         $data_dir = Configuration::getInstance()->get('data_dir');
@@ -100,6 +101,7 @@ class Helper {
 
         return true;
     }
+    // @codeCoverageIgnoreEnd
 
     /**
      * Convert a query string to an array

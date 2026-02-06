@@ -73,6 +73,8 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the Ajax Search Lite – Live Search & Filter integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -83,17 +85,19 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
     /**
      * Unload the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function destroy()
     {
-        remove_filter('asl_query_args', [$this, 'translateSearchQuery'], 10, 1);
-        remove_filter('asl_print_search_query', [$this, 'replaceBackoriginalQuery'], 10, 1);
-        remove_filter('script_loader_tag', [$this, 'addHtmlAttribute'], 10, 3);
+        remove_filter('asl_query_args', [$this, 'translateSearchQuery'], 10);
+        remove_filter('asl_print_search_query', [$this, 'replaceBackoriginalQuery'], 10);
+        remove_filter('script_loader_tag', [$this, 'addHtmlAttribute'], 10);
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
         if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'ajaxsearchlite_search') {
-            add_filter('asl_before_ajax_output', [$this, 'translateAjaxResult'], 10, 1);
+            remove_filter('asl_before_ajax_output', [$this, 'translateAjaxResult'], 10);
         }
     }
 
@@ -156,7 +160,7 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
 
             $query_args['s'] = $translated_query;
         }
-        
+
         return $query_args;
     }
 
@@ -192,7 +196,6 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
      */
     public function addHtmlAttribute($tag, $handle, $src)
     {
-
         if (is_plugin_active('litespeed-cache/litespeed-cache.php')) {
             if ($handle === 'wd-asl-ajaxsearchlite') {
                 // Add data-no-optimize to prevent LiteSpeed from optimizing it
@@ -212,7 +215,6 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
      */
     public function translateAjaxResult($html_result)
     {
-
         $language = WPHelper::getLanguageFromReferer();
 
         if (!$language) {
@@ -239,7 +241,7 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
 
         if (!$matches) {
             // No body match
-            return $html_result;
+            return $html_result; // @codeCoverageIgnore
         }
 
         return $matches[1];
