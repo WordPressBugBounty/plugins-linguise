@@ -147,9 +147,11 @@ class FragmentI18nHandler extends FragmentBase
         $replaced_json = json_encode($json_data);
         $substr_ptrn = '/(id=["\']' . preg_quote($full_param_name) . '["\'].*?>.*?\(\s*function\(\s*domain,\s*translations\s*\)\s*\{.*?\}\s*\)\s*\(\s*["\']([\w_\-]+)["\']\s*,\s*)(.*?)(\s*\)\s*;.*?<\/script>)/si';
 
-        $replacement = preg_replace($substr_ptrn, '$1' . $replaced_json . '$4', $html_data, 1, $count);
+        $find_matchers = preg_replace_callback($substr_ptrn, function ($matches) use ($replaced_json) {
+            return $matches[1] . $replaced_json . $matches[4];
+        }, $html_data, 1, $count);
         if ($count) {
-            $html_data = $replacement;
+            $html_data = $find_matchers;
         }
 
         return $html_data;
