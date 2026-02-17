@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class CurlMulti
 {
@@ -65,7 +65,7 @@ class CurlMulti
             }
             $ch = $this->prepareRequest($instance);
             if (!$ch) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
             $at_least_one_request = true;
             curl_multi_add_handle($this->_curl_multi, $ch);

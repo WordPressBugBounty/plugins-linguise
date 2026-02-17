@@ -186,7 +186,7 @@ class CurlRequest
                 continue;
             }
 
-            if (in_array($header_name, array('HTTP_HOST', 'HTTP_ACCEPT_ENCODING', 'HTTP_CONTENT_LENGTH'))) {
+            if (in_array($header_name, array('HTTP_HOST', 'HTTP_ACCEPT_ENCODING', 'HTTP_CONTENT_LENGTH', 'HTTP_VIA'))) {
                 continue;
             }
 

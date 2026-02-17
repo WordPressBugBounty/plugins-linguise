@@ -3,7 +3,9 @@
 namespace Linguise\Vendor\Linguise\Script\Core;
 
 defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+
 use Linguise\Vendor\Linguise\Script\Core\Helper;
+
 class OobeManager {
     /**
      * @var null|OobeManager
