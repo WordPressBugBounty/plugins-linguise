@@ -73,6 +73,7 @@ class ThirdPartyLoader
         'wc/product-addons' => 'WCProductAddonsIntegration',
         'wp-rocket' => 'WPRocketIntegration',
         'wp-forms' => 'WPFormsIntegration',
+        'add-search-to-menu' => 'AddSearchToMenuIntegration',
     ];
 
     /**
