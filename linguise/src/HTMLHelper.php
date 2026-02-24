@@ -154,7 +154,7 @@ class HTMLHelper
     public static function loadHTML($html_data)
     {
         // Check if DOMDocument is available or xml extension is loaded
-        if (!class_exists('DOMDocument') && !extension_loaded('xml')) {
+        if (!class_exists('\\DOMDocument') || !extension_loaded('xml')) {
             return null;
         }
 

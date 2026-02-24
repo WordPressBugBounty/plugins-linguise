@@ -108,6 +108,12 @@ class LinguiseConfiguration
                 'message' => __('`xml` extension is not loaded, some Linguise features might not works properly!', 'linguise'),
             ];
         }
+        if (!class_exists('\\DOMDocument')) {
+            $api_web_errors[] = [
+                'type' => 'warning',
+                'message' => __('`DOMDocument` class is not available, some Linguise features might not works properly!', 'linguise'),
+            ];
+        }
 
         // Check if not running php7 or higher
         if (version_compare(PHP_VERSION, '7.0.0', '<')) {

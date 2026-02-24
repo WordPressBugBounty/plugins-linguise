@@ -2,14 +2,14 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.24\n"
+"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.25\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/linguise\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-30T13:56:21+07:00\n"
+"POT-Creation-Date: 2026-02-18T10:34:10+07:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: linguise\n"
@@ -860,6 +860,8 @@ msgstr ""
 
 #: src/config-iframe.php:8
 #: src/config-iframe.php:105
+#: src/configuration.php:211
+#: src/configuration.php:382
 msgid "Nonce verification failed"
 msgstr ""
 
@@ -884,14 +886,16 @@ msgid "Missing required field: %s"
 msgstr ""
 
 #: src/config-iframe.php:97
-#: src/configuration.php:284
-#: src/configuration.php:332
+#: src/configuration.php:368
+#: src/configuration.php:426
 msgid "Linguise settings saved!"
 msgstr ""
 
 #: src/config-iframe.php:105
 #: src/config-iframe.php:115
 #: src/config-iframe.php:124
+#: src/configuration.php:211
+#: src/configuration.php:382
 msgid "Unauthorized"
 msgstr ""
 
@@ -899,40 +903,46 @@ msgstr ""
 msgid "Request Headers"
 msgstr ""
 
+#: src/configuration.php:99
+msgid "Disabled debug!"
+msgstr ""
+
+#: src/configuration.php:108
+msgid "`xml` extension is not loaded, some Linguise features might not works properly!"
+msgstr ""
+
+#: src/configuration.php:114
+msgid "`DOMDocument` class is not available, some Linguise features might not works properly!"
+msgstr ""
+
+#: src/configuration.php:122
+msgid "PHP version is lower than 7.0.0, some Linguise features might not works properly!"
+msgstr ""
+
+#: src/configuration.php:152
+msgid "Htaccess file doesn't exist. This may be a problem is you are under an Apache server. Please check the documentation to finish the installation manually: <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>"
+msgstr ""
+
+#: src/configuration.php:190
+msgid "Htaccess file is not writable, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
+msgstr ""
+
+#: src/configuration.php:195
+msgid "Failed to write to htaccess file, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
+msgstr ""
+
+#: src/configuration.php:455
+msgid "API returns empty data when querying configuration. Please try again later or contact our support team if the problem persist."
+msgstr ""
+
 #. translators: %s: Site domain name
-#: src/configuration.php:142
-#: src/configuration.php:196
+#: src/configuration.php:464
 #, php-format
 msgid "The API Key provided has been rejected, please make sure you use the right key associated with the domain %s"
 msgstr ""
 
-#: src/configuration.php:149
-#: src/configuration.php:201
+#: src/configuration.php:471
 msgid "Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist."
-msgstr ""
-
-#: src/configuration.php:343
-msgid "Disabled debug!"
-msgstr ""
-
-#: src/configuration.php:352
-msgid "`xml` extension is not loaded, some Linguise features might not works properly!"
-msgstr ""
-
-#: src/configuration.php:360
-msgid "PHP version is lower than 7.0.0, some Linguise features might not works properly!"
-msgstr ""
-
-#: src/configuration.php:390
-msgid "Htaccess file doesn't exist. This may be a problem is you are under an Apache server. Please check the documentation to finish the installation manually: <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>"
-msgstr ""
-
-#: src/configuration.php:428
-msgid "Htaccess file is not writable, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
-msgstr ""
-
-#: src/configuration.php:433
-msgid "Failed to write to htaccess file, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
 msgstr ""
 
 #: src/install.php:74
