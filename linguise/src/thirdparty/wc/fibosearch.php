@@ -48,7 +48,7 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
         $regex_full_key_disallowed = [
             'img_url',
             'magnifier_icon',
-            'custom_params'
+            'custom_params',
         ];
 
         foreach ($regex_full_key_disallowed as $regex_full_key) {
@@ -66,6 +66,13 @@ class WCFiboSearchIntegration extends LinguiseBaseIntegrations
             'key' => 'labels\.no_results',
             'mode' => 'regex_full',
             'kind' => 'allow',
+        ];
+
+        // Deny ajax_search_endpoint key
+        $fragment_filters[] = [
+            'key' => 'ajax_search_endpoint',
+            'mode' => 'exact',
+            'kind' => 'deny',
         ];
 
         self::$fragment_keys = $fragment_filters;

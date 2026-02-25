@@ -2,7 +2,7 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.26\n"
+"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.27\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/linguise\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

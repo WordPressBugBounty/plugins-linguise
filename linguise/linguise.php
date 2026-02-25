@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.26
+ * Version:2.2.27
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
