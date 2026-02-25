@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, AI translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.9
-Stable tag: 2.2.25
+Stable tag: 2.2.26
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -107,6 +107,10 @@ Linguise plugin uses an API connection to execute and store the translation and 
 
 
 == Changelog ==
+= 2.2.26 =
+- Fix: Try to re-hook order URL again
+- Fix: Re-add back the site path
+
 = 2.2.25 =
 - Fix: Make the requirement for DOMDocument more strict
 

@@ -111,7 +111,7 @@ class AddSearchToMenuIntegration extends LinguiseBaseIntegrations
         try {
             $ajax->ajax_load_posts();
         } catch (\Exception $e) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-            /** Stub */
+            // Stub
         }
 
         remove_filter('wp_die_ajax_handler', [$this, 'captureAjaxDieHandler']);

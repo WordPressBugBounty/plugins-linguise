@@ -288,19 +288,19 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
      */
     public function destroy()
     {
-        remove_filter('woocommerce_ajax_get_endpoint', [$this, 'hookWCAjaxEndpoint'], 10, 2);
+        remove_filter('woocommerce_ajax_get_endpoint', [$this, 'hookWCAjaxEndpoint'], 10);
         remove_action('woocommerce_customer_reset_password', [$this, 'hookWCCustomerResetPassword'], 10);
 
         // We skip removing the ajax methods overrides
-        remove_action('woocommerce_new_order', [$this, 'hookWCNewOrder'], 100, 2);
-        remove_filter('woocommerce_after_order_object_save', [$this, 'hookWCNewOrderSave'], 100, 1);
-        remove_filter('woocommerce_update_order_review_fragments', [$this, 'hookWCFragments'], 1000, 1);
-        remove_filter('woocommerce_add_to_cart_fragments', [$this, 'hookWCFragments'], 1000, 1);
+        remove_action('woocommerce_new_order', [$this, 'hookWCNewOrder'], 100);
+        remove_filter('woocommerce_after_order_object_save', [$this, 'hookWCNewOrderSave'], 100);
+        remove_filter('woocommerce_update_order_review_fragments', [$this, 'hookWCFragments'], 1000);
+        remove_filter('woocommerce_add_to_cart_fragments', [$this, 'hookWCFragments'], 1000);
 
-        remove_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 10, 2);
-        remove_filter('woocommerce_get_endpoint_url', [$this, 'hookWCEndpoint'], 10, 2);
-        // remove_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 10, 2);
-        remove_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000, 1);
+        remove_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 1000);
+        remove_filter('woocommerce_get_endpoint_url', [$this, 'hookWCEndpoint'], 1000);
+        remove_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 1000);
+        remove_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000);
 
         remove_filter('woocommerce_form_field_select', [$this, 'hookFormFieldsSelectTranslations'], 10);
         remove_filter('woocommerce_form_field_state', [$this, 'hookFormFieldsSelectTranslations'], 10);
@@ -345,9 +345,9 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         add_filter('woocommerce_update_order_review_fragments', [$this, 'hookWCFragments'], 1000, 1);
         add_filter('woocommerce_add_to_cart_fragments', [$this, 'hookWCFragments'], 1000, 1);
 
-        add_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 10, 2);
-        add_filter('woocommerce_get_endpoint_url', [$this, 'hookWCEndpoint'], 10, 2);
-        // add_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 10, 2);
+        add_filter('woocommerce_get_return_url', [$this, 'hookWCReturnUrl'], 1000, 2);
+        add_filter('woocommerce_get_endpoint_url', [$this, 'hookWCEndpoint'], 1000, 2);
+        add_filter('woocommerce_get_checkout_order_received_url', [$this, 'hookWCOrderUrl'], 1000, 2);
         add_filter('woocommerce_order_button_html', [$this, 'hookOrderButtonHTML'], 1000, 1);
 
         add_filter('woocommerce_form_field_select', [$this, 'hookFormFieldsSelectTranslations'], 10, 1);
@@ -389,25 +389,39 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
      */
     protected function rewriteWooUrl($url, $language)
     {
-        $site_url = parse_url(linguiseGetSite());
-        $url = parse_url($url);
-        $site_path = rtrim(isset($site_url['path']) ? $site_url['path'] : '', '/');
+        $parsed_url = parse_url($url);
+        $site_path  = rtrim(parse_url(linguiseGetSite(), PHP_URL_PATH) ?? '', '/');
 
-        $url_path = isset($url['path']) ? $url['path'] : '';
+        $url_path = $parsed_url['path'] ?? '';
+
         if (!empty($site_path) && $site_path !== '/') {
-            // Remove the site path from the URL path
-            $url_path = str_replace($site_path, '', $url_path); // @codeCoverageIgnore
+            $site_path_slug = ltrim($site_path, '/'); // e.g. 'uk'
+
+            $url_path = ltrim($url_path, '/');
+
+            // Strip language prefix if already present (language may sit before site path)
+            if (strpos($url_path, $language . '/') === 0) {
+                $url_path = substr($url_path, strlen($language) + 1);
+            }
+
+            // Strip site path slug if present
+            if (strpos($url_path, $site_path_slug . '/') === 0) {
+                $url_path = substr($url_path, strlen($site_path_slug) + 1);
+            } elseif ($url_path === $site_path_slug) {
+                $url_path = '';
+            }
+
+            $url_path = $language . '/' . $site_path_slug . '/' . $url_path;
+        } else {
+            // No multisite path — just ensure language prefix, no duplicates
+            $url_path = ltrim($url_path, '/');
+            if (strpos($url_path, $language . '/') !== 0 && $url_path !== $language) {
+                $url_path = $language . '/' . $url_path;
+            }
         }
 
-        // Check if language already exists in the URL
-        $url_path = ltrim($url_path, '/');
-        if (strpos($url_path, $language . '/') !== 0) {
-            // If not, prepend the language code
-            $url_path = $language . '/' . $url_path;
-        }
-
-        $url['path'] = '/' . $url_path;
-        $result = WPHelper::buildUrl($url, $site_url, $language);
+        $parsed_url['path'] = '/' . $url_path;
+        $result = WPHelper::buildUrl($parsed_url);
         return $result;
     }
 
@@ -487,8 +501,8 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             $language_meta = $order->get_meta('linguise_language', true);
         }
 
-        if (empty($language_meta) && isset($order->id)) {
-            $language_meta = get_post_meta($order->id, 'linguise_language', true);
+        if (empty($language_meta) && method_exists($order, 'get_id')) {
+            $language_meta = get_post_meta($order->get_id(), 'linguise_language', true);
         }
 
         if (empty($language_meta)) {
