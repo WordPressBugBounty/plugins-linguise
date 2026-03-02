@@ -401,7 +401,7 @@ class FragmentHandler extends FragmentBase
 
             $script_content = HTMLHelper::unclobberCdataInternal($script->textContent);
 
-            $match_res = preg_match('/var ' . str_replace('-', '_', $frag_id) . '_params = (.*);/', $script_content, $json_matches);
+            $match_res = preg_match('/var ' . preg_quote(str_replace('-', '_', $frag_id), '/') . '_params = (.*);/', $script_content, $json_matches);
             if ($match_res === false || $match_res === 0) {
                 $unmatched_res = preg_match_all('/var (.+)_params = (.*);/', $script_content, $json_multi_matches, PREG_SET_ORDER, 0);
                 if ($unmatched_res === false || $unmatched_res === 0) {
