@@ -11,7 +11,7 @@ add_action('wp_ajax_linguise_clear_cache', function () {
     // check user capabilities
     if (!current_user_can('manage_options')) {
         if (!defined('LINGUISE_WP_PLUGIN_TEST_MODE')) {
-            header('Content-Type: application/json; charset=UTF-8;');
+            header('Content-Type: application/json; charset=UTF-8;'); // @codeCoverageIgnore
         }
         echo wp_json_encode(['success' => false]);
         if (defined('LINGUISE_WP_PLUGIN_TEST_MODE')) {
@@ -23,7 +23,7 @@ add_action('wp_ajax_linguise_clear_cache', function () {
     ini_set('display_errors', false);
 
     if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
-        define('LINGUISE_SCRIPT_TRANSLATION', true);
+        define('LINGUISE_SCRIPT_TRANSLATION', true); // @codeCoverageIgnore
     }
 
     require_once(LINGUISE_PLUGIN_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');

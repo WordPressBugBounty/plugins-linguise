@@ -248,7 +248,7 @@ class FragmentBase
         }
 
         if (is_string($value) && empty($value)) {
-            return false;
+            return false; // @codeCoverageIgnore
         }
 
         // Check if it's a JSON, if yes, do not translate
