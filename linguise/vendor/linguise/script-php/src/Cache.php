@@ -2,7 +2,7 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Cache
 {
@@ -38,21 +38,23 @@ class Cache
      *
      * @return Cache
      */
-    public static function getInstance() {
-
-        if(is_null(self::$_instance)) {
+    public static function getInstance()
+    {
+        if (is_null(self::$_instance)) {
             self::$_instance = new Cache();
         }
 
         return self::$_instance;
     }
 
-    public function getPath() {
+    public function getPath()
+    {
         Helper::prepareDataDir();
         return Configuration::getInstance()->get('data_dir') . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
     }
 
-    public function serve() {
+    public function serve()
+    {
         $response = Response::getInstance();
 
         $content = $response->getContent();
@@ -68,7 +70,7 @@ class Cache
 
         // In case we failed to json_encode (non utf8 chars and no mbstring extension)
         if (!$this->_hash) {
-            return false;
+            return false; // @codeCoverageIgnore
         }
 
         $language = Request::getInstance()->getLanguage();
@@ -81,7 +83,7 @@ class Cache
         $this->_language = $language;
 
         if (!$this->load()) {
-            return false;
+            return false; // @codeCoverageIgnore
         }
 
         $response->setContent($this->_content);
@@ -89,7 +91,8 @@ class Cache
         $response->end();
     }
 
-    protected function load() {
+    protected function load()
+    {
         $cache_file = Configuration::getInstance()->get('data_dir') . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . $this->_language . '_' . $this->_hash . '.php';
 
         if (!file_exists($cache_file)) {
@@ -107,7 +110,8 @@ class Cache
         return true;
     }
 
-    public function save() {
+    public function save()
+    {
         if (!$this->_hash || !$this->_language) {
             return false;
         }
@@ -127,8 +131,41 @@ class Cache
             mkdir($cache_path, 0766, true);
         }
 
+        // Run clear first
+        $this->clear(true, 30); // aggresive 30s cache time check
+
         file_put_contents($cache_file, '<?php die(); ?>' . $content);
 
+        return true;
+    }
+
+    /**
+     * Internal method to check if the cache should be cleared based on the last cleared time and the cache time check defined in configuration
+     *
+     * @param int $cache_time_check The time in seconds to check if the cache should be cleared or not
+     *
+     * @return boolean
+     */
+    private function internalShouldBeExecuted($cache_time_check)
+    {
+        $cache_info_file = $this->getPath() . 'clear.txt';
+
+        if (file_exists($cache_info_file)) {
+            $last_cleared = file_get_contents($cache_info_file);
+            if ($last_cleared === false) {
+                // If we cannot read the file, consider it as not cleared
+                return true; // @codeCoverageIgnore
+            }
+
+            // Strip then cast to int
+            $last_cleared = (int)trim($last_cleared);
+            if (time() - $last_cleared < $cache_time_check) {
+                // Cache was cleared recently, skip
+                return false;
+            }
+        }
+
+        // too old, we can clear it again
         return true;
     }
 
@@ -137,19 +174,29 @@ class Cache
      *
      * @return bool
      */
-    public function shouldBeExecuted() {
+    public function shouldBeExecuted()
+    {
         if (!Configuration::getInstance()->get('cache_enabled')) {
             return false;
         }
-        $cache_info_file = $this->getPath() . 'clear.txt';
-        if (file_exists($cache_info_file) && (int)file_get_contents($cache_info_file) + Configuration::getInstance()->get('cache_time_check') > time()) {
-            return false;
-        }
-        return true;
+
+        $cache_time_check = Configuration::getInstance()->get('cache_time_check') ?? 600;
+        // cast to int
+        $cache_time_check = (int)$cache_time_check;
+        return $this->internalShouldBeExecuted($cache_time_check);
     }
 
-    public function clear() {
-        if (!$this->shouldBeExecuted()) {
+    /**
+     * Clear cache files until the total size is under the limit defined in configuration
+     *
+     * @param boolean $no_output Whether to output the response or not, set to true when this method is not called from web request
+     * @param boolean $real_timing The real timing to check if the cache should be cleared or not, used for testing purposes
+     */
+    public function clear($no_output = false, $real_timing = null)
+    {
+        if ($real_timing !== null && !$this->internalShouldBeExecuted($real_timing)) {
+            return;
+        } elseif ($real_timing === null && !$this->shouldBeExecuted()) {
             return;
         }
 
@@ -157,11 +204,12 @@ class Cache
 
         $files = glob($cache_path . '*.php');
 
-        usort($files, function($x, $y) {
+        usort($files, function ($x, $y) {
             $x_mtime = @filemtime($x); // Silent both errors if the file does not exist or is not readable
             $y_mtime = @filemtime($y);
             if ($x_mtime === false || $y_mtime === false) {
-                return 0; // If we cannot get the modification time, consider them equal
+                // If we cannot get the modification time, consider them equal
+                return 0; // @codeCoverageIgnore
             }
             return ($x_mtime < $y_mtime) ? -1 : 1;
         });
@@ -175,7 +223,8 @@ class Cache
             }
             $size = @filesize($file); // Silent the error if the file does not exist or is not readable
             if ($size === false) {
-                continue; // If we cannot get the size, skip this file
+                // If we cannot get the size, skip this file
+                continue; // @codeCoverageIgnore
             }
             $total_size += $size;
             if ($total_size > $max_size) {
@@ -187,9 +236,13 @@ class Cache
 
         file_put_contents($cache_path . 'clear.txt', time());
 
+        if ($no_output) {
+            return;
+        }
+
         $response = Response::getInstance();
         $response->setResponseCode(200, false);
-        $response->setContent('Cleared cache: ' . (int)($total_cleared/1000) . 'kb');
+        $response->setContent('Cleared cache: ' . (int)($total_cleared / 1000) . 'kb');
         $response->end();
     }
 
@@ -199,11 +252,12 @@ class Cache
         $cache_path = $this->getPath();
         $files = glob($cache_path . '*.php');
 
-        foreach($files as $file) {
+        foreach ($files as $file) {
             if (!in_array($file, ['.', '..']) && is_file($file)) {
                 $size = @filesize($file); // Silent the error if the file does not exist or is not readable
                 if ($size === false) {
-                    continue; // If we cannot get the size, skip this file
+                    // If we cannot get the size, skip this file
+                    continue; // @codeCoverageIgnore
                 }
                 $total_cleared += $size;
                 @unlink($file); // Silent the error if the file cannot be deleted
@@ -212,7 +266,7 @@ class Cache
 
         $response = Response::getInstance();
         if ($total_cleared > 0) {
-            $response->setContent('Cleared cache: ' . (int)($total_cleared/1000) . 'kb');
+            $response->setContent('Cleared cache: ' . (int)($total_cleared / 1000) . 'kb');
         } else {
             $response->setContent('Cache Empty!');
         }

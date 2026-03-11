@@ -3,7 +3,7 @@ namespace Linguise\Vendor\Linguise\Script\Core;
 
 use ReflectionProperty;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Configuration {
     /**
@@ -119,7 +119,7 @@ class Configuration {
     public function load($basePath) {
         $configurationLocalLoaded = $this->loadFile($basePath . DIRECTORY_SEPARATOR . 'ConfigurationLocal.php', true);
         if (!$configurationLocalLoaded) {
-            $this->load($basePath . DIRECTORY_SEPARATOR . 'Configuration.php');
+            $this->loadFile($basePath . DIRECTORY_SEPARATOR . 'Configuration.php');
         }
     }
 

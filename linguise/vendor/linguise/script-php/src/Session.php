@@ -79,7 +79,7 @@ class Session {
             return $factory();
         }
 
-        return Database::getInstance(true, true)->ensureConnection();
+        return Database::getInstance(true, true)->ensureConnection(); // @codeCoverageIgnore
     }
 
     /**

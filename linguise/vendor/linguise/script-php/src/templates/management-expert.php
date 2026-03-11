@@ -88,7 +88,7 @@ function make_action_url($action) {
     if (empty($action)) {
         return $root . '/' . AdminHelper::getManagementBase();
     }
-    return $root . '/' . AdminHelper::getManagementBase() . '?linguise_action=' . $action;
+    return $root . '/' . AdminHelper::getManagementBase() . '?linguise_action=' . $action; // @codeCoverageIgnore
 }
 
 $main_root = Request::getInstance()->getBaseUrl() . '/' . AdminHelper::getManagementBase();

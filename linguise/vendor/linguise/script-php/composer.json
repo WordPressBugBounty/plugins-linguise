@@ -11,7 +11,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "Linguise\\Script\\Core\\": "src/"
+      "Linguise\\Script\\Core\\": "src/",
+      "Linguise\\Script\\Core\\Templates\\": "src/templates/"
     }
   },
   "config": {

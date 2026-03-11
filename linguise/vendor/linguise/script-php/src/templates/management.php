@@ -80,7 +80,7 @@ function make_action_url($action) {
 function make_nonce_url($action, $nonce_key = '_linguise_nonce_') {
     $nonce = Session::getInstance()->getCsrfToken($nonce_key);
     if (empty($nonce)) {
-        return make_action_url($action);
+        return make_action_url($action); // @codeCoverageIgnore
     }
     return make_action_url($action) . '&nonce=' . $nonce;
 }
@@ -97,7 +97,7 @@ if (isset($languages_contents[$global_options['default_language']])) {
 }
 foreach ($global_options['enabled_languages'] as $language) {
     if ($language === $global_options['default_language']) {
-        continue;
+        continue; // @codeCoverageIgnore
     }
     if (isset($languages_contents[$language])) {
         $sorted_languages[$language] = $languages_contents[$language];

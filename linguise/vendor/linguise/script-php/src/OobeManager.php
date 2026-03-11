@@ -2,11 +2,12 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 use Linguise\Vendor\Linguise\Script\Core\Helper;
 
-class OobeManager {
+class OobeManager
+{
     /**
      * @var null|OobeManager
      */
@@ -36,7 +37,8 @@ class OobeManager {
         return self::$_instance;
     }
 
-    public function oobeRun($html_message = \null) {
+    public function oobeRun($html_message = \null)
+    {
         // Start session
         $sess = Session::getInstance()->start();
         // Set our CSRF token, always overrides
@@ -53,8 +55,15 @@ class OobeManager {
         require_once LINGUISE_BASE_DIR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'footer.php';
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function writeOOBE($database_store)
     {
+        if (defined('LINGUISE_SCRIPT_TESTING_SKIP_OOBE_WRITE') && LINGUISE_SCRIPT_TESTING_SKIP_OOBE_WRITE) {
+            return;
+        }
+
         // Modify OOBE status in ui-config.php
         $ui_config = realpath(__DIR__ . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR . 'ui-config.php';
         $content = file_get_contents($ui_config);
@@ -62,6 +71,7 @@ class OobeManager {
         $replaced_content = preg_replace('/define\([\'"]LINGUISE_OOBE_DONE[\'"], .*\);/m', 'define(\'LINGUISE_OOBE_DONE\', true);', $content);
         if (empty($replaced_content)) {
             HttpResponse::errorJSON('Failed to update ui-config.php', 500);
+            return;
         }
 
         // Update the database connection
@@ -79,7 +89,9 @@ class OobeManager {
         $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>' . $message_str . '</div>';
         http_response_code($status_code);
         $this->oobeRun($message);
-        die();
+        if (!defined('LINGUISE_SCRIPT_TESTING')) {
+            die(); // @codeCoverageIgnore
+        }
     }
 
     private function createOptionsWithToken($token)
@@ -157,10 +169,12 @@ class OobeManager {
         if ($testMode) {
             if (!isset($_POST['_token'])) {
                 HttpResponse::errorJSON('Missing CSRF token', 400);
+                return;
             }
             $sess = Session::getInstance()->start();
             if (!$sess->verifyCsrfToken('linguise_oobe_register', $_POST['_token'])) {
                 HttpResponse::errorJSON('Invalid CSRF token', 403);
+                return;
             }
         }
 
@@ -175,23 +189,28 @@ class OobeManager {
 
         if (empty($mode)) {
             HttpResponse::errorJSON('Missing `db_mode` data', 400);
+            return;
         }
 
         switch ($mode) {
             case 'mysql':
                 if (empty($host) || empty($user) || empty($name)) {
                     HttpResponse::errorJSON('Missing `db_host`, `db_user` or `db_name` data', 400);
+                    return;
                 }
                 if (!$testMode && (empty($prefix))) {
                     HttpResponse::errorJSON('Missing `db_prefix` data', 400);
+                    return;
                 }
 
                 if ($testMode) {
                     $result = $this->testMySQL($host, $user, $password, $name, $port, $prefix);
                     if ($result !== true) {
                         HttpResponse::errorJSON($result, 500);
+                        return;
                     }
                     HttpResponse::successJSON(true, 'MySQL connection test successful', 200);
+                    return;
                 }
 
                 return [
@@ -209,8 +228,10 @@ class OobeManager {
                     $result = $this->testSqlite();
                     if ($result !== true) {
                         HttpResponse::errorJSON($result, 500);
+                        return;
                     }
                     HttpResponse::successJSON(true, 'SQLite connection test successful', 200);
+                    return;
                 }
 
                 // Store the SQLite connection
@@ -227,43 +248,52 @@ class OobeManager {
         // Check if OOBE
         if (defined('LINGUISE_OOBE_DONE') && LINGUISE_OOBE_DONE) {
             $this->oobeRunError('Not allowed', 403);
+            return;
         } elseif (!defined('LINGUISE_OOBE_DONE')) {
             // Missing data
             $this->oobeRunError('Unknown status', 500);
+            return;
         }
 
         if (!isset($_POST['_token'])) {
             $this->oobeRunError('Missing CSRF token', 400);
+            return;
         }
         $sess = Session::getInstance()->start();
         if (!$sess->verifyCsrfToken('linguise_oobe_register', $_POST['_token'])) {
             $this->oobeRunError('Invalid CSRF token', 403);
+            return;
         }
 
         $new_pass = isset($_POST['password']) ? $_POST['password'] : null;
         if (empty($new_pass)) {
             $this->oobeRunError('Missing password', 400);
+            return;
         }
 
         // == Password check ==
         // Must be at least 10 characters long
         if (strlen($new_pass) < 10) {
             $this->oobeRunError('Password must be at least 10 characters long', 400);
+            return;
         }
 
         if ($sess->hasSession()) {
             $this->oobeRunError('Already activated', 403);
+            return;
         }
 
         $is_token = defined('LINGUISE_OOBE_TOKEN_EXIST') && LINGUISE_OOBE_TOKEN_EXIST;
         if ($is_token) {
             if (!isset($_POST['token'])) {
                 $this->oobeRunError('Missing token', 400);
+                return;
             }
 
             $token = $_POST['token'];
             if ($token !== Configuration::getInstance()->get('token')) {
                 $this->oobeRunError('Invalid token provided in session', 401);
+                return;
             }
 
             // This will automatically return error response
@@ -287,6 +317,7 @@ class OobeManager {
                 $sqlite_test = $this->prepareRootDatabaseSQLite();
                 if ($sqlite_test !== true) {
                     $this->oobeRunError($sqlite_test, 500);
+                    return;
                 }
             }
 
@@ -340,7 +371,9 @@ class OobeManager {
             $sess->setOobeForced();
             $sess->setSession($hashed_pass, true); // Set session with password mode
             $this->run();
-            die();
+            if (!defined('LINGUISE_SCRIPT_TESTING')) {
+                die(); // @codeCoverageIgnore
+            }
         } else {
             // This will automatically return error response
             $database_store = $this->storeDatabaseConnection(false);
@@ -363,6 +396,7 @@ class OobeManager {
                 $sqlite_test = $this->prepareRootDatabaseSQLite();
                 if ($sqlite_test !== true) {
                     $this->oobeRunError($sqlite_test, 500);
+                    return;
                 }
             }
 
@@ -375,6 +409,7 @@ class OobeManager {
             $existing_password = $db->retrieveOtherParam('linguise_password');
             if ($existing_password) {
                 $this->oobeRunError('Password already set', 400);
+                return;
             }
 
             // Set the password
@@ -393,11 +428,14 @@ class OobeManager {
             $sess->setOobeForced();
             $sess->setSession($hashed_pass, true); // Set session with password mode
             $this->run();
-            die();
+            if (!defined('LINGUISE_SCRIPT_TESTING')) {
+                die(); // @codeCoverageIgnore
+            }
         }
     }
 
-    public function run($html_message = \null, $api_web_errors = []) {
+    public function run($html_message = \null, $api_web_errors = [])
+    {
         // Start session
         $sess = Session::getInstance()->start();
         // Set our CSRF token, always overrides
@@ -410,7 +448,7 @@ class OobeManager {
             switch ($_GET['linguise_action']) {
                 case 'download-debug':
                     $this->downloadDebug();
-                    break;
+                    return; // @codeCoverageIgnore
                 case 'update-config':
                     break;
                 default:
@@ -419,7 +457,7 @@ class OobeManager {
                     } else {
                         HttpResponse::unknownGETAction();
                     }
-                    break;
+                    return; // @codeCoverageIgnore
             }
         }
 
@@ -448,7 +486,9 @@ class OobeManager {
             }
         }
         require_once LINGUISE_BASE_DIR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'footer.php';
-        die();
+        if (!defined('LINGUISE_SCRIPT_TESTING')) {
+            die(); // @codeCoverageIgnore
+        }
     }
 
     public function logout()
@@ -463,7 +503,6 @@ class OobeManager {
         } else {
             // No session, we just redirect to login page
             HttpResponse::successJSON(true, 'No session found', 200);
-            exit;
         }
     }
 
@@ -472,11 +511,13 @@ class OobeManager {
         if (!isset($_POST['_token'])) {
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Missing CSRF token</div>';
             $this->oobeRun($message);
+            return;
         }
         $sess = Session::getInstance()->start();
         if (!$sess->verifyCsrfToken('linguise_oobe_login', $_POST['_token'])) {
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Invalid CSRF token</div>';
             $this->oobeRun($message);
+            return;
         }
 
         // Authenticate ourself, get the token or password
@@ -497,8 +538,15 @@ class OobeManager {
         }
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function testMySQL($host, $user, $password, $name, $port = 3306, $prefix = '')
     {
+        if (defined('LINGUISE_TESTING_SKIP_DB_CHECK')) {
+            return LINGUISE_TESTING_SKIP_DB_CHECK;
+        }
+
         // Check if MySQLi is enabled
         if (!extension_loaded('mysqli')) {
             return 'MySQLi extension not loaded';
@@ -531,8 +579,15 @@ class OobeManager {
         return true;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function testSqlite()
     {
+        if (defined('LINGUISE_TESTING_SKIP_DB_CHECK')) {
+            return LINGUISE_TESTING_SKIP_DB_CHECK;
+        }
+
         // Check if SQLite3 is enabled
         if (!extension_loaded('sqlite3')) {
             return 'SQLite3 extension not loaded';
@@ -556,8 +611,15 @@ class OobeManager {
         return true;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function prepareRootDatabaseSQLite()
     {
+        if (defined('LINGUISE_TESTING_SKIP_DB_CHECK')) {
+            return LINGUISE_TESTING_SKIP_DB_CHECK;
+        }
+
         $databases_dir = LINGUISE_BASE_DIR . '.databases' . DIRECTORY_SEPARATOR;
         if (!file_exists($databases_dir)) {
             if (!mkdir($databases_dir, 0766, true)) {
@@ -595,11 +657,16 @@ class OobeManager {
         // Verify session
         $sess = Session::getInstance()->start();
         if (!$sess->hasSession()) {
-            die('Unauthorized');
+            if (!defined('LINGUISE_SCRIPT_TESTING')) {
+                die('Unauthorized'); // @codeCoverageIgnore
+            } else {
+                throw new \Exception('Unauthorized');
+            }
         }
 
         $debug_file = LINGUISE_BASE_DIR . 'debug.php';
         if (file_exists($debug_file)) {
+            // @codeCoverageIgnoreStart
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename="debug.txt"');
@@ -616,9 +683,16 @@ class OobeManager {
                 echo fread($handle, 1000);
             }
 
-            die();
+            if (!defined('LINGUISE_SCRIPT_TESTING')) {
+                die(); // @codeCoverageIgnore
+            }
+            // @codeCoverageIgnoreEnd
         } else {
-            die('No debug file found');
+            if (!defined('LINGUISE_SCRIPT_TESTING')) {
+                die('No debug file found'); // @codeCoverageIgnore
+            } else {
+                echo 'No debug file found';
+            }
         }
     }
 
@@ -649,12 +723,14 @@ class OobeManager {
         }
 
         // Connect to database and install options
-        Helper::prepareDataDir();
+        if (!defined('LINGUISE_TESTING_SKIP_DB_CHECK')) {
+            Helper::prepareDataDir(); // @codeCoverageIgnore
+        }
         $db = Database::getInstance(true);
 
         if (!LINGUISE_OOBE_DONE) {
             // Not yet ready
-            return;
+            return; // @codeCoverageIgnore
         }
 
         $db->ensureConnection()->installOptions();
@@ -693,12 +769,15 @@ class OobeManager {
         $sess = Session::getInstance()->start();
         if (!$sess->hasSession()) {
             HttpResponse::errorJSON('Unauthorized', 401);
+            return;
         }
         if (!isset($_GET['nonce'])) {
             HttpResponse::errorJSON('Missing nonce token', 400);
+            return;
         }
         if (!$sess->verifyCsrfToken('linguise_clear_debug', $_GET['nonce'])) {
             HttpResponse::errorJSON('Invalid nonce token', 403);
+            return;
         }
 
         // Clear the debug file
@@ -720,12 +799,15 @@ class OobeManager {
         $sess = Session::getInstance()->start();
         if (!$sess->hasSession()) {
             HttpResponse::errorJSON('Unauthorized', 401);
+            return;
         }
         if (!isset($_GET['nonce'])) {
             HttpResponse::errorJSON('Missing nonce token', 400);
+            return;
         }
         if (!$sess->verifyCsrfToken('linguise_clear_cache', $_GET['nonce'])) {
             HttpResponse::errorJSON('Invalid nonce token', 403);
+            return;
         }
 
         // Clear the cache

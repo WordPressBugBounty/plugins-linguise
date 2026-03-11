@@ -2,9 +2,10 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
-class HttpResponse {
+class HttpResponse
+{
     static function errorJSON($message, $code = 500)
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -13,7 +14,7 @@ class HttpResponse {
             'error' => true,
             'message' => $message
         ]);
-        exit;
+        Helper::stop();
     }
 
     static function successJSON($data, $message = '', $code = 200)
@@ -25,7 +26,7 @@ class HttpResponse {
             'message' => $message,
             'data' => $data
         ]);
-        exit;
+        Helper::stop();
     }
 
     static function rejectGET()
@@ -34,7 +35,7 @@ class HttpResponse {
         http_response_code(403);
         echo '<h1>403 Forbidden</h1>';
         echo '<p>You are not allowed to access this page.</p>';
-        die();
+        Helper::stop();
     }
 
     static function unknownGETAction()
@@ -43,6 +44,6 @@ class HttpResponse {
         http_response_code(400);
         echo '<h1>400 Bad Request</h1>';
         echo '<p>Unknown action.</p>';
-        die();
+        Helper::stop();
     }
 }

@@ -4,7 +4,7 @@ namespace Linguise\Vendor\Linguise\Script\Core\Templates;
 
 use Linguise\Vendor\Linguise\Script\Core\Request;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
 
 class Helper {
     /**

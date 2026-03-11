@@ -12,6 +12,7 @@ return array(
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Polyfill\\Intl\\Normalizer\\' => array($vendorDir . '/symfony/polyfill-intl-normalizer'),
     'Symfony\\Polyfill\\Intl\\Idn\\' => array($vendorDir . '/symfony/polyfill-intl-idn'),
+    'Linguise\\Script\\Core\\Templates\\' => array($vendorDir . '/linguise/script-php/src/templates'),
     'Linguise\\Script\\Core\\' => array($vendorDir . '/linguise/script-php/src'),
     'JsonPath\\' => array($vendorDir . '/galbar/jsonpath/src/Galbar/JsonPath'),
 );

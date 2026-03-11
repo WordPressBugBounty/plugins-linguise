@@ -2,10 +2,12 @@
 
 namespace Linguise\Vendor\Linguise\Script\Core;
 
-defined('LINGUISE_SCRIPT_TRANSLATION') or die();
+defined('LINGUISE_SCRIPT_TRANSLATION') or die(); // @codeCoverageIgnore
+
 use Linguise\Vendor\Linguise\Script\Core\HttpResponse;
 
-class Management {
+class Management
+{
     /**
      * @var null|Management
      */
@@ -45,7 +47,8 @@ class Management {
         return self::$_instance;
     }
 
-    public function editorRun() {
+    public function editorRun()
+    {
         Helper::defineConstants(false);
 
         require_once LINGUISE_BASE_DIR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'stubs.php';
@@ -66,17 +69,20 @@ class Management {
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Not authorized</div>';
             $oobe = OobeManager::getInstance();
             $oobe->run($message, $api_web_errors);
+            return;
         }
         if (!isset($_POST['_token'])) {
             HttpResponse::errorJSON('Missing CSRF token', 400);
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Missing CSRF token</div>';
             $oobe = OobeManager::getInstance();
             $oobe->run($message, $api_web_errors);
+            return;
         }
         if (!$sess->verifyCsrfToken('linguise_config', $_POST['_token'])) {
             $message = '<div class="linguise-notification-popup"><span class="material-icons fail">check</span>Invalid CSRF token</div>';
             $oobe = OobeManager::getInstance();
             $oobe->run($message, $api_web_errors);
+            return;
         }
 
         $db = Database::getInstance()->ensureConnection();
@@ -126,10 +132,12 @@ class Management {
                         'message' => 'The API key provided has been rejected, make sure you use the right key with the associated domain ' . Request::getInstance(true)->getBaseUrl(),
                     ];
                 } else {
+                    // @codeCoverageIgnoreStart
                     $api_web_errors[] = [
                         'type' => 'error',
                         'message' => 'Unable to load configuration from Linguise, please try again later or contact our support team if the problem persist.',
                     ];
+                    // @codeCoverageIgnoreEnd
                 }
 
                 // Has error and we don't have any languages? We just use the old ones
@@ -157,7 +165,7 @@ class Management {
             }
 
             if (empty($dynamic_translations['public_key']) && !empty($old_options['dynamic_translations']['public_key'])) {
-                $dynamic_translations['public_key'] = $old_options['dynamic_translations']['public_key'];
+                $dynamic_translations['public_key'] = $old_options['dynamic_translations']['public_key']; // @codeCoverageIgnore
             }
 
             if (empty($dynamic_translations['public_key']) && $dynamic_translations['enabled'] === 1 && $token !== '') {
@@ -168,7 +176,9 @@ class Management {
 
                     if ($token_changed) {
                         // If token changed, we update enabled state
+                        // @codeCoverageIgnoreStart
                         $dynamic_translations['enabled'] = Helper::boolInt($api_result['data']['dynamic_translations']['enabled']);
+                        // @codeCoverageIgnoreEnd
                     }
                 } else if ($api_result !== false && isset($api_result['status_code'])) {
                     $api_web_errors[] = [
@@ -328,12 +338,12 @@ class Management {
 
                 if ($original['value'] === $value) {
                     // Skip if value is the same as original
-                    continue;
+                    continue; // @codeCoverageIgnore
                 }
 
                 if ($original['value'] === null && empty($value)) {
                     // If original is null and value is empty, we don't need to save it
-                    continue;
+                    continue; // @codeCoverageIgnore
                 }
 
                 $patched_options['expert_mode'][$key] = $value;
@@ -354,12 +364,15 @@ class Management {
         $sess = Session::getInstance()->start();
         if (!$sess->hasSession()) {
             HttpResponse::errorJSON('Unauthorized', 401);
+            return;
         }
         if (!isset($_POST['nonce'])) {
             HttpResponse::errorJSON('Missing nonce token', 400);
+            return;
         }
         if (!$sess->verifyCsrfToken('linguise_config_iframe', $_POST['nonce'])) {
             HttpResponse::errorJSON('Invalid nonce token', 403);
+            return;
         }
 
         $data = $_POST['config'];
@@ -377,6 +390,7 @@ class Management {
             if (!isset($data[$field])) {
                 // response with error
                 HttpResponse::errorJSON('Missing required field: ' . $field, 400);
+                return;
             }
         }
 
@@ -413,24 +427,31 @@ class Management {
         HttpResponse::successJSON(true, 'Configuration updated successfully', 200);
     }
 
-    // This is from API -> Website
+    /**
+     * This is from API -> Website (here)
+     *
+     * @codeCoverageIgnore
+     */
     public function remoteUpdate()
     {
         // Get X-Linguise-Hash header
         $jwt_token = isset($_SERVER['HTTP_X_LINGUISE_HASH']) ? $_SERVER['HTTP_X_LINGUISE_HASH'] : null;
         if (empty($jwt_token)) {
             HttpResponse::errorJSON('Missing Hash header', 400);
+            return;
         }
 
         // Read JSON input
         $input_data = file_get_contents('php://input');
         if (empty($input_data)) {
             HttpResponse::errorJSON('Invalid request', 400);
+            return;
         }
 
         $input_data = json_decode($input_data, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             HttpResponse::errorJSON('Invalid JSON data', 400);
+            return;
         }
 
         // XXX: In WP/Joomla, change with how the get the options
@@ -439,6 +460,7 @@ class Management {
 
         if ($input_data['token'] !== $options['token']) {
             HttpResponse::errorJSON('Invalid token', 401);
+            return;
         }
 
         // Verify hash data
@@ -502,18 +524,21 @@ class Management {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
             if (Configuration::getInstance()->get('dl_certificates') === true) {
-                curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath());
+                curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath()); // @codeCoverageIgnore
             }
         }
 
         curl_exec($ch);
         $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if (PHP_VERSION_ID < 80000) {
+            // @codeCoverageIgnoreStart
             curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+            // @codeCoverageIgnoreEnd
         }
 
         if ($response_code !== 200) {
             HttpResponse::errorJSON('Invalid JWT verification token: ' . print_r($response_code, true), 403);
+            return;
         }
 
         // Nothing goes wrong, we can just return
@@ -537,7 +562,7 @@ class Management {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
             if (Configuration::getInstance()->get('dl_certificates') === true) {
-                curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath());
+                curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath()); // @codeCoverageIgnore
             }
         }
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -547,7 +572,9 @@ class Management {
         $response = curl_exec($ch);
         $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if (PHP_VERSION_ID < 80000) {
+            // @codeCoverageIgnoreStart
             curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+            // @codeCoverageIgnoreEnd
         }
 
         if ($response_code !== 200) {
@@ -596,7 +623,7 @@ class Management {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
             if (Configuration::getInstance()->get('dl_certificates') === true) {
-                curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath());
+                curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath()); // @codeCoverageIgnore
             }
         }
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -606,7 +633,9 @@ class Management {
         $response = curl_exec($ch);
         $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if (PHP_VERSION_ID < 80000) {
+            // @codeCoverageIgnoreStart
             curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+            // @codeCoverageIgnoreEnd
         }
 
         if ($response_code !== 200) {
@@ -635,7 +664,7 @@ class Management {
             $protocol = $api_port === 443 ? 'https' : 'http';
 
             if (!empty($api_host)) {
-                return $protocol . '://' . $api_host . (in_array($api_port, $api_port_base) ? '' : ':' . $api_port) . '';
+                return $protocol . '://' . $api_host . (in_array($api_port, $api_port_base) ? '' : ':' . $api_port) . ''; // @codeCoverageIgnore
             }
         }
 

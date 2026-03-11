@@ -343,4 +343,18 @@ class Helper {
             define('LINGUISE_BASE_URL', $base_dir . '/linguise');
         }
     }
+
+    /**
+     * Stop the script execution
+     *
+     * @param string $message Optional message to display upon stopping
+     *
+     * @return void
+     */
+    public static function stop($message = '')
+    {
+        if (!defined('LINGUISE_SCRIPT_TESTING')) {
+            die($message); // @codeCoverageIgnore
+        }
+    }
 }
