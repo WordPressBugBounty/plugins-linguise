@@ -13,6 +13,7 @@ add_action('wp_ajax_linguise_download_debug', function () {
     }
 
     if (file_exists($debug_file)) {
+        // @codeCoverageIgnoreStart
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="debug.txt"');
@@ -29,6 +30,7 @@ add_action('wp_ajax_linguise_download_debug', function () {
             echo fread($handle, 1000);
         }
         die();
+        // @codeCoverageIgnoreEnd
     }
 });
 
@@ -57,9 +59,11 @@ add_action('wp_ajax_linguise_truncate_debug', function () {
 
 add_action('wp_ajax_linguise_disable_debug', function () {
     if (!current_user_can('manage_options')) {
+        // @codeCoverageIgnoreStart
         header('Content-Type: application/json; charset=UTF-8');
         echo wp_json_encode(['success' => false]);
         die();
+        // @codeCoverageIgnoreEnd
     }
 
     check_admin_referer('_linguise_nonce_');
