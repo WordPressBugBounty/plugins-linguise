@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.31
+ * Version:2.2.32
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -20,8 +20,8 @@ use Linguise\WordPress\LinguiseSwitcher;
 
 defined('ABSPATH') || die('');
 
-include_once('src/Helper.php');
-include_once plugin_dir_path(__FILE__) . 'src' . DIRECTORY_SEPARATOR .'constants.php';
+include_once plugin_dir_path(__FILE__) . 'src' . DIRECTORY_SEPARATOR . 'Helper.php';
+include_once plugin_dir_path(__FILE__) . 'src' . DIRECTORY_SEPARATOR . 'constants.php';
 
 // Check plugin requirements
 $curlInstalled = function_exists('curl_version');
@@ -563,7 +563,7 @@ add_action('parse_query', function ($query_object) {
             define('LINGUISE_SCRIPT_TRANSLATION', 1);
         }
 
-        include_once('vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+        include_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
         Configuration::getInstance()->set('cms', 'wordpress');
         Configuration::getInstance()->set('token', $options['token']);
@@ -613,7 +613,7 @@ function linguiseFirstHook()
         return;
     }
 
-    include_once('vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+    include_once(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
     $base_dir = linguiseGetSite('', 'relative');
     $path = substr($_SERVER['REQUEST_URI'], strlen($base_dir));
@@ -648,7 +648,7 @@ function linguiseFirstHook()
     // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- This is a WP Global variable override
     $GLOBALS['wp_rewrite'] = new \WP_Rewrite();
 
-    include_once('script.php');
+    include_once __DIR__ . DIRECTORY_SEPARATOR . 'script.php';
 }
 
 /**
