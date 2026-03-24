@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.32
+ * Version:2.2.33
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -724,8 +724,18 @@ add_action('init', function () {
         }
 
         $allowed_request_methods = array('GET', 'HEAD', 'OPTIONS');
+        $is_rest_request = (defined('REST_REQUEST') && REST_REQUEST); // disallow in REST API requests
+        $has_wp_json_in_url = strpos($_SERVER['REQUEST_URI'], '/wp-json/') !== false; // disallow in REST API requests based on URL
 
-        if (empty($_SERVER['REQUEST_METHOD']) || !in_array($_SERVER['REQUEST_METHOD'], $allowed_request_methods) || is_admin() || wp_doing_ajax() || $GLOBALS['pagenow'] === 'wp-login.php') {
+        if (
+            empty($_SERVER['REQUEST_METHOD']) // don't have request method
+            || !in_array($_SERVER['REQUEST_METHOD'], $allowed_request_methods) // check if it's an allowed request method
+            || is_admin() // disallow in admin
+            || wp_doing_ajax() // disallow in ajax
+            || $is_rest_request
+            || $has_wp_json_in_url
+            || $GLOBALS['pagenow'] === 'wp-login.php' // disallow in login page
+        ) {
             // Do not set cookie if we are in admin, ajax or login page
             return;
         }
