@@ -51,7 +51,9 @@ class FragmentHandler extends FragmentBase
         if ($array_index !== null) {
             $use_key .= '.' . $array_index;
         }
-        if (!empty($current_key)) {
+
+        // Fix FragmentAttribute become invalid if value is array object
+        if ($current_key !== null && $current_key !== '') {
             if ($key === $use_key) {
                 $use_key = '.' . $use_key;
             }

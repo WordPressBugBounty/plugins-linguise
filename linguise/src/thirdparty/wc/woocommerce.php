@@ -116,7 +116,12 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
                     'value' => 'woocommerce/checkout-terms-block'
                 ]
             ]
-        ]
+        ],
+        [
+            'name'  => 'wc-product-variations',
+            'key'   => 'data-product_variations',
+            'strict' => true,
+        ],
     ];
 
     /**
@@ -214,6 +219,9 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             'shipping_rates\.\d+\.name$',
             'shipping_rates\.\d+\.items\.\d+\.name$',
             'shipping_rates\.\d+\.shipping_rates\.\d+\.(name|description|delivery_time)$',
+            '^\d+\.variation_description$',
+            '^\d+\.availability_html$',
+            '^\d+\.price_html$',
         ];
         foreach ($allowed_matches as $allowed_key) {
             $fragment_keys[] = [
