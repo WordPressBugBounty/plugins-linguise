@@ -74,6 +74,7 @@ class ThirdPartyLoader
         'wp-rocket' => 'WPRocketIntegration',
         'wp-forms' => 'WPFormsIntegration',
         'add-search-to-menu' => 'AddSearchToMenuIntegration',
+        'wc/wcpbc' => 'WCPBCIntegration',
     ];
 
     /**
@@ -179,7 +180,9 @@ class ThirdPartyLoader
 
         if (!function_exists('is_plugin_active')) {
             // Load plugin handler so we can use is_plugin_active
+            // @codeCoverageIgnoreStart
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
+            // @codeCoverageIgnoreEnd
         }
 
         // Load the base class

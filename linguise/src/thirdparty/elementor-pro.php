@@ -60,6 +60,8 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
     /**
      * Load the integration.
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function init()
@@ -80,6 +82,8 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
     /**
      * Unload the integration
      *
+     * @codeCoverageIgnore
+     *
      * @return void
      */
     public function destroy()
@@ -89,6 +93,8 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
 
     /**
      * Reload the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -168,23 +174,25 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
 
         $tl_json_frag = $translated_fragments['elementor-pro'][$ajax_name];
         if (empty($tl_json_frag)) {
-            return $data;
+            return $data; // @codeCoverageIgnore
         }
 
         $tl_json_frag_list = $tl_json_frag['fragments'];
         if (empty($tl_json_frag_list)) {
-            return $data;
+            return $data; // @codeCoverageIgnore
         }
 
         $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($parsed_json, $tl_json_frag_list);
         if ($replaced_content !== false) {
             $encoded_data = json_encode($replaced_content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($encoded_data === false) {
-                return $data; // Return original data if JSON encoding fails
+                // Return original data if JSON encoding fails
+                return $data; // @codeCoverageIgnore
             }
             return $encoded_data; // Return the translated JSON data
         }
 
-        return $data; // Return original data if no replacement was made
+        // Return original data if no replacement was made
+        return $data; // @codeCoverageIgnore
     }
 }

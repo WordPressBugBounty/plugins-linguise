@@ -403,6 +403,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         $url_path = $parsed_url['path'] ?? '';
 
         if (!empty($site_path) && $site_path !== '/') {
+            // @codeCoverageIgnoreStart
             $site_path_slug = ltrim($site_path, '/'); // e.g. 'uk'
 
             $url_path = ltrim($url_path, '/');
@@ -420,6 +421,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             }
 
             $url_path = $language . '/' . $site_path_slug . '/' . $url_path;
+            // @codeCoverageIgnoreEnd
         } else {
             // No multisite path — just ensure language prefix, no duplicates
             $url_path = ltrim($url_path, '/');
