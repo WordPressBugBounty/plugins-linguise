@@ -44,6 +44,18 @@ class WCPBCIntegration extends LinguiseBaseIntegrations
     }
 
     /**
+     * Cleans up filters for the integration.
+     *
+     * @codeCoverageIgnore
+     *
+     * @return void
+     */
+    public function destroy()
+    {
+        remove_filter('wc_price_based_country_ajax_geolocation_widget_content', [$this, 'translateWidgetContent'], 999);
+    }
+
+    /**
      * Translates the WCPBC geolocation widget HTML via the WooCommerce fragment translator.
      *
      * @param string $html The widget HTML returned by WCPBC.
