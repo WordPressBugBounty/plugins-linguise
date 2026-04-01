@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.36
+ * Version:2.2.37
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -247,6 +247,28 @@ function linguiseGetOptions()
 }
 
 /**
+ * Log message to debug log if debug is enabled
+ *
+ * Based on: https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
+ *
+ * @param mixed $data Data to log
+ *
+ * @return void
+ */
+function linguiseErrorLog($data)
+{
+    if (true === WP_DEBUG) {
+        if (is_array($data) || is_object($data)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r,WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug function
+            error_log(print_r($data, true));
+        } else {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug function
+            error_log($data);
+        }
+    }
+}
+
+/**
  * Load either local config or default config
  *
  * Used anywhere in the plugin that needs to load configuration before doing anything.
@@ -282,31 +304,32 @@ function linguiseInitializeConfiguration()
     // By default, we will use the data folder in upload folder
     $data_folder = $data_folder_in_upload_folder;
 
-    // Check if data has already been saved for this site
-    if (!file_exists($data_folder_in_upload_folder) && file_exists($data_folder_in_script_folder)) {
-        // Try to move the data to the new location
-        $success = true;
-        if (!file_exists($data_folder_in_upload_folder)) {
-            //First create the folder
-            $success = mkdir($linguise_upload_dir, 0755, true);
-            file_put_contents($linguise_upload_dir . DIRECTORY_SEPARATOR . 'index.html', '');
-        }
+    // Check if data has already been saved for this site (if not create the new linguise root)
+    if (!file_exists($data_folder_in_upload_folder) && file_exists($data_folder_in_script_folder) && mkdir($linguise_upload_dir, 0755, true)) {
+        $success = rename($data_folder_in_script_folder, $data_folder_in_upload_folder);
         if ($success) {
             // Then move the data
-            $success = rename($data_folder_in_script_folder, $data_folder_in_upload_folder);
-            file_put_contents($data_folder_in_upload_folder . DIRECTORY_SEPARATOR . 'index.html', '');
-        }
-        if (!$success) {
+            $index_html_made = file_put_contents($data_folder_in_upload_folder . DIRECTORY_SEPARATOR . 'index.html', '');
+            if ($index_html_made === false) {
+                linguiseErrorLog('Linguise: Failed to create index.html in ' . $data_folder_in_upload_folder);
+            }
+        } else {
             // If the move failed, we will use the old location
+            linguiseErrorLog('Linguise: Failed to move data folder to upload directory in ' . $data_folder_in_upload_folder . ', using script folder instead.');
             $data_folder = $data_folder_in_script_folder;
         }
     }
 
-    if (!file_exists($data_folder)) {
-        mkdir($data_folder, 0755, true);
-        mkdir($data_folder . DIRECTORY_SEPARATOR . 'cache');
-        file_put_contents($data_folder . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all');
-        file_put_contents($data_folder . DIRECTORY_SEPARATOR . 'index.html', '');
+    if (!file_exists($data_folder) && mkdir($data_folder . DIRECTORY_SEPARATOR . 'cache', 0755, true)) {
+        $htaccess_made = file_put_contents($data_folder . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all');
+        if ($htaccess_made === false) {
+            linguiseErrorLog('Linguise: Failed to create .htaccess in ' . $data_folder);
+        }
+
+        $index_html_made = file_put_contents($data_folder . DIRECTORY_SEPARATOR . 'index.html', '');
+        if ($index_html_made === false) {
+            linguiseErrorLog('Linguise: Failed to create index.html in ' . $data_folder);
+        }
     }
 
     Configuration::getInstance()->set('data_dir', $data_folder);
