@@ -75,6 +75,7 @@ class ThirdPartyLoader
         'wp-forms' => 'WPFormsIntegration',
         'add-search-to-menu' => 'AddSearchToMenuIntegration',
         'wc/wcpbc' => 'WCPBCIntegration',
+        'elementor-pro-search' => 'ElementorProSearchIntegration',
     ];
 
     /**

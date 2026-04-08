@@ -82,8 +82,17 @@ function linguise_intercept_ajax_request($response, $handler, $request)
         return $response;
     }
 
-    $raw_data = $response->get_data();
-    if (!is_array($raw_data)) {
+    $is_rest_response = ($response instanceof WP_REST_Response);
+    $is_elementor_pro_search = (is_array($response) && strpos($route, '/elementor-pro/') !== false);
+    if ($is_rest_response) {
+        $raw_data = $response->get_data();
+        if (!is_array($raw_data)) {
+            return $response;
+        }
+    } elseif ($is_elementor_pro_search) {
+        // Elementor-pro search response is an array
+        $raw_data = $response;
+    } else {
         return $response;
     }
 
@@ -209,7 +218,11 @@ function linguise_intercept_ajax_request($response, $handler, $request)
 
     $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($raw_data, $tl_json_frag_list);
     if ($replaced_content !== false) {
-        $response->set_data($replaced_content);
+        if ($is_rest_response) {
+            $response->set_data($replaced_content);
+        } elseif ($is_elementor_pro_search) {
+            $response = $replaced_content;
+        }
     }
 
     return $response;
