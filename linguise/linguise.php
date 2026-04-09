@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.38
+ * Version:2.2.39
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -750,8 +750,7 @@ add_action('init', function () {
         $is_rest_request = (defined('REST_REQUEST') && REST_REQUEST); // disallow in REST API requests
         $has_wp_json_in_url = strpos($_SERVER['REQUEST_URI'], '/wp-json/') !== false; // disallow in REST API requests based on URL
 
-        if (
-            empty($_SERVER['REQUEST_METHOD']) // don't have request method
+        if (empty($_SERVER['REQUEST_METHOD']) // don't have request method
             || !in_array($_SERVER['REQUEST_METHOD'], $allowed_request_methods) // check if it's an allowed request method
             || is_admin() // disallow in admin
             || wp_doing_ajax() // disallow in ajax

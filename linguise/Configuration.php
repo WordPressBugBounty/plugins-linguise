@@ -105,7 +105,8 @@ class Configuration
     {
         $response = Response::getInstance();
         $content  = $response->getContent();
-        $content = str_replace('<div id="wpadminbar" ', '<div id="wpadminbar" translate="no" ', $content);
+        // Use regex to handle cases where other attributes (e.g., data-rocket-location-hash) appear before id="wpadminbar"
+        $content = preg_replace('/<div\b[^>]*\bid="wpadminbar"/i', '$0 translate="no"', $content);
         $response->setContent($content);
     }
 
