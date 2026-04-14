@@ -459,4 +459,37 @@ class LinguiseBaseIntegrations
         // fail
         return $html_data;
     }
+
+    /**
+     * Checks if the given theme name is the current theme or the parent of the current theme.
+     *
+     * @param string         $theme_name   The name of the theme to check.
+     * @param \WP_Theme|null $parent_theme Optional. The parent theme to check. Default is null.
+     *
+     * @return boolean True if the given theme name is the current theme or its parent, false otherwise.
+     */
+    protected function isCurrentTheme($theme_name, $parent_theme = \null)
+    {
+        // @codeCoverageIgnoreStart
+        if (!function_exists('wp_get_theme')) {
+            return false;
+        }
+        // @codeCoverageIgnoreEnd
+
+        $theme = $parent_theme ?: wp_get_theme();
+        if (empty($theme)) {
+            return false;
+        }
+
+        $is_theme = $theme->name === $theme_name;
+        if ($is_theme) {
+            return true;
+        }
+
+        $parent = $theme->parent();
+        if ($parent !== false) {
+            return $this->isCurrentTheme($theme_name, $parent);
+        }
+        return false;
+    }
 }

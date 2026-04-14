@@ -37,11 +37,6 @@ class FragmentBase
             'kind' => 'deny',
         ],
         [
-            'key' => 'wc.*?_currency',
-            'mode' => 'regex',
-            'kind' => 'deny',
-        ],
-        [
             'key' => 'dateFormat',
             'mode' => 'exact',
             'kind' => 'deny',
@@ -57,11 +52,6 @@ class FragmentBase
             'kind' => 'deny',
         ],
         [
-            'key' => 'admin.wccomHelper.storeCountry',
-            'mode' => 'path',
-            'kind' => 'deny',
-        ],
-        [
             'key' => '.*-version',
             'mode' => 'regex',
             'kind' => 'deny',
@@ -70,11 +60,6 @@ class FragmentBase
             'key' => 'orderStatuses\..*',
             'mode' => 'regex_full',
             'kind' => 'allow',
-        ],
-        [
-            'key' => 'wc.*Url',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
         ],
         [
             'key' => '^defaultFields\..*\.(autocapitalize|autocomplete)',
@@ -92,11 +77,6 @@ class FragmentBase
             'kind' => 'deny',
         ],
         [
-            'key' => '^checkoutData\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
             'key' => 'api_key',
             'mode' => 'exact',
             'kind' => 'deny',
@@ -109,44 +89,6 @@ class FragmentBase
         [
             'key' => '.*?(hash_key|fragment_name|storage_key)',
             'mode' => 'regex',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'wc_ajax_url',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        /**
-         * Plugin : woocommerce-gateway-stripe
-         */
-        [
-            'key' => 'paymentMethodsConfig.*?(card|us_bank_account|alipay|klarna|afterpay_clearpay|link|wechat_pay|cashapp)\.countries',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'accountCountry',
-            'mode' => 'exact',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'appearance\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'blocksAppearance\..*',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'paymentMethodData.*?stripe\.plugin_url',
-            'mode' => 'regex_full',
-            'kind' => 'deny',
-        ],
-        [
-            'key' => 'currency',
-            'mode' => 'exact',
             'kind' => 'deny',
         ],
     ];
@@ -179,48 +121,6 @@ class FragmentBase
         }
 
         $merged_defaults = self::$default_filters;
-        if (self::isCurrentTheme('Woodmart')) {
-            $regex_key_disallowed = [
-                'add_to_cart_action.*',
-                'age_verify.*',
-                'ajax_(?!url)(\w+)',
-                'carousel_breakpoints\..*',
-                'comment_images_upload_mimes\..*',
-                'tooltip_\w+_selector',
-            ];
-
-            foreach ($regex_key_disallowed as $regex_key) {
-                $merged_defaults[] = [
-                    'key' => $regex_key,
-                    'mode' => 'regex_full',
-                    'kind' => 'deny',
-                ];
-            }
-
-            $exact_key_disallowed = [
-                'added_popup',
-                'base_hover_mobile_click',
-                'cart_redirect_after_add',
-                'categories_toggle',
-                'collapse_footer_widgets',
-                'compare_by_category',
-                'compare_save_button_state',
-                'countdown_timezone',
-                'whb_header_clone',
-                'vimeo_library_url',
-                'theme_dir',
-                'wishlist_page_nonce',
-                'photoswipe_template',
-            ];
-
-            foreach ($exact_key_disallowed as $exact_key) {
-                $merged_defaults[] = [
-                    'key' => $exact_key,
-                    'mode' => 'path',
-                    'kind' => 'deny',
-                ];
-            }
-        }
 
         // Run through filters, provide our current default filters
         // User can change it by adding a filter and modify the array.
@@ -408,39 +308,6 @@ class FragmentBase
     }
 
     /**
-     * Checks if the given theme name is the current theme or the parent of the current theme.
-     *
-     * @param string         $theme_name   The name of the theme to check.
-     * @param \WP_Theme|null $parent_theme Optional. The parent theme to check. Default is null.
-     *
-     * @return boolean True if the given theme name is the current theme or its parent, false otherwise.
-     */
-    protected static function isCurrentTheme($theme_name, $parent_theme = \null)
-    {
-        // @codeCoverageIgnoreStart
-        if (!function_exists('wp_get_theme')) {
-            return false;
-        }
-        // @codeCoverageIgnoreEnd
-
-        $theme = $parent_theme ?: wp_get_theme();
-        if (empty($theme)) {
-            return false;
-        }
-
-        $is_theme = $theme->name === $theme_name;
-        if ($is_theme) {
-            return true;
-        }
-
-        $parent = $theme->parent();
-        if ($parent !== false) {
-            return self::isCurrentTheme($theme_name, $parent);
-        }
-        return false;
-    }
-
-    /**
      * Check with the Configuration for the allow list and deny list.
      *
      * @param string $key      The key to be checked
@@ -522,66 +389,6 @@ class FragmentBase
     protected static function getJSONOverrideMatcher($html_data)
     {
         $current_list = [];
-
-        if (is_plugin_active('mailoptin/mailoptin.php')) {
-            $current_list[] = [
-                'name' => 'mailoptin',
-                'match' => '<script type="text\/javascript">var (.*)_lightbox = (.*);<\/script>',
-                'replacement' => '<script text="text/javascript">var $1_lightbox = $$JSON_DATA$$;</script>',
-                'position' => 2,
-            ];
-        }
-
-        if (is_plugin_active('ninja-forms/ninja-forms.php')) {
-            $current_list[] = [
-                'name' => 'ninjaforms_fields',
-                'match' => 'form.fields=(.*?);nfForms',
-                'replacement' => 'form.fields=$1;nfForms',
-            ];
-            $current_list[] = [
-                'name' => 'ninjaforms_i18n',
-                'match' => 'nfi18n = (.*?);',
-                'replacement' => 'nfi18n = $$JSON_DATA$$;',
-            ];
-            $current_list[] = [
-                'name' => 'ninjaforms_settings',
-                'match' => 'form.settings=(.*?);form',
-                'replacement' => 'form.settings=$$JSON_DATA$$;form',
-            ];
-        }
-
-        if (is_plugin_active('wpforms-lite/wpforms.php')) {
-            $current_list[] = [
-                'name' => 'wpforms-lite',
-                'match' => 'wpforms_settings = (.*?)(\n)(\/\* ]]> \*\/)',
-                'replacement' => 'wpforms_settings = $$JSON_DATA$$$2$3',
-            ];
-        }
-
-        if (is_plugin_active('popup-maker/popup-maker.php')) {
-            $current_list[] = [
-                'name' => 'popup-maker',
-                'match' => 'var pumAdminBarText = (.*?);',
-                'replacement' => 'var pumAdminBarText = $$JSON_DATA$$;',
-            ];
-        }
-
-        if (is_plugin_active('mailpoet/mailpoet.php')) {
-            $current_list[] = [
-                'name' => 'mailpoet',
-                'match' => 'var MailPoetForm = (.*?);',
-                'replacement' => 'var MailPoetForm = $$JSON_DATA$$;',
-            ];
-        }
-
-        if (self::isCurrentTheme('Woodmart')) {
-            $current_list[] = [
-                'name' => 'woodmart-theme',
-                'match' => 'var woodmart_settings = (.*?);',
-                'replacement' => 'var woodmart_settings = $$JSON_DATA$$;',
-            ];
-        }
-
         $current_list[] = [
             'name' => 'wc-settings-encoded',
             'match' => 'var wcSettings = wcSettings \|\| JSON\.parse\( decodeURIComponent\( \'(.*?)\' \) \);',
@@ -610,12 +417,6 @@ class FragmentBase
                 'replacement' => 'CF_VALIDATOR_STRINGS = $$JSON_DATA$$;',
             ];
         }
-
-        $current_list[] = [
-            'name' => 'surecart-store-data',
-            'key' => 'sc-store-data',
-            'mode' => 'app_json',
-        ];
 
         // Merge with apply_filters
         $current_list = apply_filters('linguise_fragment_override', $current_list, $html_data);

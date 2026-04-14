@@ -188,6 +188,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             'Cart-Token',
             'wcpbc_currency',
             'wcpbc_stripe_upe',
+            'wc_ajax_url',
         ];
         foreach ($exact_disallowed as $disallowed_key) {
             $fragment_keys[] = [
@@ -205,6 +206,8 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             'meta_data\.\d+\.key',
             'items\.\d+\.key',
             'shipping_rates\.\d+\.destination\..*',
+            'wc.*Url',
+            '^checkoutData\..*',
         ];
         foreach ($disallowed_extras as $disallowed_key) {
             $fragment_keys[] = [
@@ -230,6 +233,17 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
                 'kind' => 'allow',
             ];
         }
+
+        $fragment_keys[] = [
+            'key' => 'wc.*?_currency',
+            'mode' => 'regex',
+            'kind' => 'deny',
+        ];
+        $fragment_keys[] = [
+            'key' => 'admin.wccomHelper.storeCountry',
+            'mode' => 'path',
+            'kind' => 'deny',
+        ];
 
         self::$fragment_keys = $fragment_keys;
     }

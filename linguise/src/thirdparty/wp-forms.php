@@ -51,6 +51,19 @@ class WPFormsIntegration extends LinguiseBaseIntegrations
     ];
 
     /**
+     * A collection of fragment overrides that we want to translate
+     *
+     * @var array
+     */
+    protected static $fragment_overrides = [
+        [
+            'name' => 'wpforms-settings',
+            'match' => 'wpforms_settings = (.*?)(\n)(\/\* ]]> \*\/)',
+            'replacement' => 'wpforms_settings = $$JSON_DATA$$$2$3',
+        ],
+    ];
+
+    /**
      * Decides if the WPForms integration should be loaded.
      *
      * @return boolean
@@ -117,7 +130,7 @@ class WPFormsIntegration extends LinguiseBaseIntegrations
         // Ensure the language is supported
         if (!WPHelper::isTranslatableLanguage($linguise_lang)) {
             // Skip, language unsupported
-            return $args;
+            return $args; // @codeCoverageIgnore
         }
 
         $html_content = '';
