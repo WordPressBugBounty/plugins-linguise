@@ -81,7 +81,7 @@ class ElementorIntegration extends LinguiseBaseIntegrations
         $source_path = rtrim(str_replace(wp_parse_url(linguiseGetSite(), PHP_URL_PATH), '', parse_url($source_link, PHP_URL_PATH)), '/');
 
         global $wpdb;
-        $prefix = $wpdb->prefix;
+        $prefix = $wpdb->base_prefix;
         $results = $wpdb->get_results(
             $wpdb->prepare(
                 'SELECT translation

@@ -267,7 +267,7 @@ class LinguiseSwitcher
             foreach ($alternates as $language_code => $language_name) {
                 $url_translation = null;
                 if ($path) {
-                    $db_query = $wpdb->prepare('SELECT * FROM ' . $wpdb->prefix . 'linguise_urls WHERE hash_source=%s AND language=%s', md5($path), $language_code);
+                    $db_query = $wpdb->prepare('SELECT * FROM ' . $wpdb->base_prefix . 'linguise_urls WHERE hash_source=%s AND language=%s', md5($path), $language_code);
                     $url_translation = $wpdb->get_row($db_query);
                 }
 
