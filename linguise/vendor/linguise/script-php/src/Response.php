@@ -207,6 +207,28 @@ class Response {
         header('Location: '.$this->redirect, true, 301);
     }
 
+    /**
+     * Check if a response header must be skipped.
+     *
+     * @param string $header_name
+     * @return bool
+     */
+    protected function shouldSkipHeader($header_name)
+    {
+        $header_name = strtolower($header_name);
+
+        if (in_array($header_name, array('transfer-encoding', 'location', 'content-encoding'))) {
+            return true;
+        }
+
+        // Remove LiteSpeed headers, usually like X-LiteSpeed-*.
+        if (strpos($header_name, 'x-litespeed') === 0) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function end()
     {
         ignore_user_abort(true);
@@ -229,7 +251,7 @@ class Response {
         $this->redirect();
 
         foreach ($this->headers as $header_name => $header_value) {
-            if (in_array(strtolower($header_name), array('transfer-encoding', 'location', 'content-encoding'))) continue;
+            if ($this->shouldSkipHeader($header_name)) continue;
             header($header_name.': '.$header_value);
         }
 

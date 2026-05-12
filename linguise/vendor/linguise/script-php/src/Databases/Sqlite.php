@@ -85,7 +85,7 @@ class Sqlite
             }
             $this->_root_database = new \SQLite3($root_db);
         } else {
-            $this->_root_database = null;
+            $this->_root_database = null; // @codeCoverageIgnore
         }
 
         $database_exists = true;

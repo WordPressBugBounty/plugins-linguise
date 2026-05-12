@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, AI translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 6.9
-Stable tag: 2.2.44
+Stable tag: 2.2.45
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -107,6 +107,9 @@ Linguise plugin uses an API connection to execute and store the translation and 
 
 
 == Changelog ==
+= 2.2.45 =
+- Fix: Remove litespeed headers from response
+
 = 2.2.44 =
 - Fix: Avoid translating search query that is not the main one
 
