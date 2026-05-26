@@ -36,6 +36,13 @@ class Mysql
     protected $_ready = false;
 
     /**
+     * Last connection config, kept so we can reconnect if the connection drops
+     *
+     * @var array|object|null
+     */
+    protected $_config = null;
+
+    /**
      * Retrieve singleton instance
      *
      * @return Mysql
@@ -75,6 +82,8 @@ class Mysql
         if ($this->_ready) {
             return true;
         }
+
+        $this->_config = $config;
 
         $port = !empty($config->db_port) ? $config->db_port : 3306;
         $host = $config->host;
@@ -116,6 +125,31 @@ class Mysql
         $this->_ready = true;
 
         return true;
+    }
+
+    /**
+     * Reconnect if the connection has dropped.
+     *
+     * @return void
+     */
+    private function reconnectIfNeeded()
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            return;
+        }
+
+        if (!($this->_database instanceof \mysqli)) {
+            return;
+        }
+
+        if (@mysqli_ping($this->_database)) {
+            return;
+        }
+
+        $this->_ready = false;
+        if ($this->_config !== null) {
+            $this->connect($this->_config);
+        }
     }
 
     public function getInstallQuery($table_name)
@@ -160,6 +194,7 @@ class Mysql
 
     public function saveUrls($urls)
     {
+        $this->reconnectIfNeeded();
         $query = 'INSERT INTO '.mysqli_real_escape_string($this->_database, $this->_database_table_urls).' (language, source, translation, hash_source, hash_translation) VALUES ';
         $elements = array();
         foreach ($urls as $translation => $source) {
@@ -172,6 +207,7 @@ class Mysql
 
     public function removeUrls($urls)
     {
+        $this->reconnectIfNeeded();
         $query = 'DELETE FROM '.mysqli_real_escape_string($this->_database, $this->_database_table_urls).' WHERE (hash_source) IN ';
         $elements = array();
         foreach ($urls as $source) {
