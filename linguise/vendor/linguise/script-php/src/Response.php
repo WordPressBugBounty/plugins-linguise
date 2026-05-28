@@ -256,7 +256,12 @@ class Response {
         }
 
         foreach ($this->cookies as $cookie) {
-            setrawcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpires(), $cookie->getPath(), $cookie->getDomain(), $cookie->getSecure(), $cookie->getHttpOnly());
+            $cookie_name = $cookie->getName();
+            // PHP 8.0+ throws a fatal ValueError when setrawcookie() receives an empty name
+            if (PHP_VERSION_ID >= 80000 && ($cookie_name === null || $cookie_name === '')) {
+                continue;
+            }
+            setrawcookie($cookie_name, $cookie->getValue(), $cookie->getExpires(), $cookie->getPath(), $cookie->getDomain(), $cookie->getSecure(), $cookie->getHttpOnly());
         }
 
         header('Connection: close');
