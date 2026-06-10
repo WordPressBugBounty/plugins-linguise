@@ -208,6 +208,8 @@ The `.agents/skills/` directory contains reusable skill definitions that AI agen
 | **`scaffold-admin-action`** | Action name + description | Generates template partial, adds handler stub to `Management.php` (⚠ Plan Mode), adds switch case in `linguise.php`, writes test stub in `tests/ManagementTest.php`, and updates `memory-bank/managementFlow.md` |
 | **`update-memory-bank`** | Change type + description of work done | Reads all 11 memory-bank files, identifies which are stale based on change type, updates `activeContext.md` and `progress.md` for every invocation, applies targeted edits to other relevant files (architecture, CMS support, management flow, etc.), and reports which files need manual review. ⚠ Never auto-modifies `planModeFiles.md` |
 | **`plan-mode-preflight`** | One or more file paths to check | Reads the Plan Mode file list from `memory-bank/planModeFiles.md`, checks each input file against the list, outputs `BLOCKED` status with category + reason + Plan Mode workflow reference if a match is found (and halts), or `CLEAR` status with all checked files if none match. Read-only — never modifies any file |
+| **`debug-translation`** | (none — run directly) | Diagnoses translation failures by reading `Configuration.php` for token and debug state, checking `certificates/cacert.pem`, reading debug log entries, and cross-referencing findings against the pipeline in `memory-bank/architecture.md` to identify the most likely failure stage (CurlRequest, Cache, or Translation). Read-only — never modifies any file |
+| **`debug-management-ui`** | (none — run directly) | Diagnoses management interface failures by reading `ui-config.php` to inspect `LINGUISE_OOBE_DONE`, `LINGUISE_LOGIN_SECRET`, and DB constants, then mapping the constant state to the four silent failure modes from AGENTS.md (blank page, login failure, 403 on POST, stuck OOBE). Read-only — never modifies any file |
 
 ### When to Use a Skill
 
@@ -217,13 +219,19 @@ Invoke a skill when the user asks to:
 - **"Add an admin action for Z"** → use `scaffold-admin-action`
 - **"Update the memory bank after..."** or **"Sync the memory bank"** → use `update-memory-bank`
 - **"Check if these files need Plan Mode"** or **"Run Plan Mode preflight"** → use `plan-mode-preflight`
+- **"Debug a translation failure"** or **"Why is translation not working?"** → use `debug-translation`
+- **"Debug the management interface"** or **"Why is the admin panel broken?"** → use `debug-management-ui`
 
-Scaffolding skills produce a complete scaffold; the developer then fills in the TODO stubs with actual business logic. `update-memory-bank` and `plan-mode-preflight` are read/write and read-only utility skills for documentation and safety workflows.
+Scaffolding skills produce a complete scaffold; the developer then fills in the TODO stubs with actual business logic. `update-memory-bank` and `plan-mode-preflight` are read/write and read-only utility skills for documentation and safety workflows. `debug-translation` and `debug-management-ui` are read-only diagnostic skills.
 
 ### Skill Locations
 
 ```
 .agents/skills/
+├── debug-management-ui/
+│   └── SKILL.md
+├── debug-translation/
+│   └── SKILL.md
 ├── plan-mode-preflight/
 │   └── SKILL.md
 ├── scaffold-admin-action/

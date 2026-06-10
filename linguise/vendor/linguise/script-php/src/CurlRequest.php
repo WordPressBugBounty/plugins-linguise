@@ -80,24 +80,6 @@ class CurlRequest
         return fopen('php://input', 'r');
     }
 
-    /**
-     * Rewrite/attach CDN loop.
-     *
-     * @param array $input_headers
-     *
-     * @return void
-     */
-    protected function rewriteCdnLoop(&$input_headers)
-    {
-        $cdn_loop = isset($_SERVER['HTTP_CDN_LOOP']) ? $_SERVER['HTTP_CDN_LOOP'] : '';
-        if (empty($cdn_loop)) {
-            return;
-        }
-
-        // if exist CDN-Loop, add new CDN-Loop header for us
-        $input_headers[] = 'Cdn-Loop: linguise-tl-proxy';
-    }
-
     public function makeRequest()
     {
         session_write_close(); // Make sure to close session that could prevent curl to timeout
@@ -204,14 +186,12 @@ class CurlRequest
                 continue;
             }
 
-            if (in_array($header_name, array('HTTP_HOST', 'HTTP_ACCEPT_ENCODING', 'HTTP_CONTENT_LENGTH', 'HTTP_VIA', 'HTTP_CDN_LOOP'))) {
+            if (in_array($header_name, array('HTTP_HOST', 'HTTP_ACCEPT_ENCODING', 'HTTP_CONTENT_LENGTH', 'HTTP_VIA'))) {
                 continue;
             }
 
             $input_headers[] = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($header_name, 5))))) . ': ' . $header_value;
         }
-
-        $this->rewriteCdnLoop($input_headers);
 
         $additional_headers = [];
         Hook::trigger('onBeforeRequestHeaders', $additional_headers);
@@ -222,6 +202,8 @@ class CurlRequest
                 }
             }
         }
+
+        Hook::trigger('onAfterRequestHeaders', $input_headers); // allow user to modify headers
 
         $input_headers[] = 'Linguise-Original-Language: ' . preg_replace('[^a-zA-Z-]', '', Request::getInstance()->getLanguage());
 
