@@ -147,8 +147,16 @@ class Configuration
                 // Optional: percent-encode path segments for safety
                 $parts = parse_url($decoded);
                 if (isset($parts['path'])) {
+                    $has_trailing_slash = (substr($parts['path'], -1) === '/');
+
                     $segments = array_map('rawurlencode', explode('/', trim($parts['path'], '/')));
-                    $parts['path'] = '/' . implode('/', $segments) . '/';
+                    $joined_path = implode('/', $segments);
+
+                    if (empty($joined_path)) {
+                        $parts['path'] = $has_trailing_slash ? '/' : '';
+                    } else {
+                        $parts['path'] = '/' . $joined_path . ($has_trailing_slash ? '/' : '');
+                    }
                 }
 
                 // Rebuild URL
