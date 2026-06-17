@@ -23,6 +23,8 @@ class WPRocketIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
+     * @codeCoverageIgnore
+     *
      * @return boolean
      */
     public function shouldLoad()
@@ -32,6 +34,8 @@ class WPRocketIntegration extends LinguiseBaseIntegrations
 
     /**
      * Registers the filter for the integration.
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -45,6 +49,8 @@ class WPRocketIntegration extends LinguiseBaseIntegrations
 
     /**
      * Destroys the integration
+     *
+     * @codeCoverageIgnore
      *
      * @return void
      */
