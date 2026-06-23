@@ -115,6 +115,9 @@ class Boundary
         }
         // @codeCoverageIgnoreStart
         foreach ($this->files as $name => $file) {
+            if (!is_string($file['path'])) {
+                continue;
+            }
             $real_path = realpath($file['path']);
             $post_filename = $file['name'] ?? basename($real_path);
             $post_content_type = $file['type'] ?? mime_content_type($real_path);

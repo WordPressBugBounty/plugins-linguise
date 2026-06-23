@@ -125,29 +125,7 @@ class CurlRequest
 
                     // Add file here
                     if (!empty($_FILES)) {
-                        foreach ($_FILES as $file_name => $file_value) {
-                            if (is_array($file_value['name'])) {
-                                foreach ($file_value['name'] as $index => $file_name_value) {
-                                    if (!$file_value['tmp_name'][$index]) {
-                                        continue; // @codeCoverageIgnore
-                                    }
-
-                                    $boundary->addPostFile(
-                                        $file_name . '[' . $index . ']',
-                                        $file_value['tmp_name'][$index],
-                                        $file_name_value,
-                                        $file_value['type'][$index]
-                                    );
-                                }
-                            } else {
-                                if (!$file_value['tmp_name']) {
-                                    continue; // @codeCoverageIgnore
-                                }
-
-                                $prefer_name = !empty($file_value['name']) ? $file_value['name'] : null;
-                                $boundary->addPostFile($file_name, $file_value['tmp_name'], $prefer_name, $file_value['type']);
-                            }
-                        }
+                        $this->addFilesToBoundary($boundary, $_FILES);
                     }
 
                     Hook::trigger('onBeforePostFields', $boundary);
@@ -340,5 +318,59 @@ class CurlRequest
             Hook::trigger('onBeforeRedirect');
             $response->end();
         }
+    }
+
+    /**
+     * Add uploaded files to the multipart boundary.
+     *
+     * @param Boundary $boundary
+     * @param array    $files    Usually $_FILES
+     * @return void
+     */
+    public function addFilesToBoundary(Boundary $boundary, array $files)
+    {
+        foreach ($files as $field_name => $file_value) {
+            if (!isset($file_value['tmp_name'])) {
+                continue;
+            }
+
+            $this->addBoundaryFiles(
+                $boundary,
+                $field_name,
+                isset($file_value['name']) ? $file_value['name'] : null,
+                $file_value['tmp_name'],
+                isset($file_value['type']) ? $file_value['type'] : null
+            );
+        }
+    }
+
+    /**
+     * Recursively add a (possibly nested) file field to the boundary.
+     *
+     * @param Boundary $boundary
+     * @param string   $field_name Current bracketed field name
+     * @param mixed    $name       Original filename(s), mirrors $tmp_name shape
+     * @param mixed    $tmp_name   Temp path string, or nested array of them
+     * @param mixed    $type       Mime type(s), mirrors $tmp_name shape
+     * @return void
+     */
+    private function addBoundaryFiles(Boundary $boundary, $field_name, $name, $tmp_name, $type)
+    {
+        if (is_array($tmp_name)) {
+            foreach ($tmp_name as $key => $sub_tmp_name) {
+                $sub_name = (is_array($name) && array_key_exists($key, $name)) ? $name[$key] : null;
+                $sub_type = (is_array($type) && array_key_exists($key, $type)) ? $type[$key] : null;
+                $this->addBoundaryFiles($boundary, $field_name . '[' . $key . ']', $sub_name, $sub_tmp_name, $sub_type);
+            }
+            return;
+        }
+
+        if (!is_string($tmp_name) || $tmp_name === '') {
+            return;
+        }
+
+        $prefer_name = (is_string($name) && $name !== '') ? $name : null;
+        $prefer_type = (is_string($type) && $type !== '') ? $type : null;
+        $boundary->addPostFile($field_name, $tmp_name, $prefer_name, $prefer_type);
     }
 }

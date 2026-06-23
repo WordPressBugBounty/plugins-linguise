@@ -75,11 +75,12 @@ class ThirdPartyLoader
         'wc/payment-plugin-paypal' => 'WCPaymentPluginPaypalIntegration',
         'wc/klarna-checkout' => 'WCKlarnaCheckoutIntergration',
         'wc/product-addons' => 'WCProductAddonsIntegration',
+        'wc/wcpdf-ips-pro' => 'WCPDFIPSProIntegration',
+        'wc/wcpbc' => 'WCPBCIntegration',
         'woodmart' => 'WoodmartThemeIntegration',
         'wp-rocket' => 'WPRocketIntegration',
         'wp-forms' => 'WPFormsIntegration',
         'add-search-to-menu' => 'AddSearchToMenuIntegration',
-        'wc/wcpbc' => 'WCPBCIntegration',
         'elementor-pro-search' => 'ElementorProSearchIntegration',
     ];
 
