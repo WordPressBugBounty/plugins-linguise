@@ -571,6 +571,16 @@ jQuery(document).ready(($) => {
     });
     $('[name="linguise_options[cache_enabled]"]').trigger('change');
 
+    // Cache ignore params checkbox, show/hide the always-included input
+    $('[name="linguise_options[cache_ignore_parameters]"]').on('change', (ev) => {
+        if (ev.currentTarget.checked) {
+            $('[data-id="cache-ignore-params-wrapper"]').show();
+        } else {
+            $('[data-id="cache-ignore-params-wrapper"]').hide();
+        }
+    });
+    $('[name="linguise_options[cache_ignore_parameters]"]').trigger('change');
+
     // Clear cache
     $('[data-linguise-action="clear-cache"]').on('click', (ev) => {
         ev.preventDefault();

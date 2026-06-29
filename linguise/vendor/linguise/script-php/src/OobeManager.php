@@ -739,9 +739,13 @@ class OobeManager
         $existing_options = $db->retrieveOtherParam('linguise_options');
         if (!empty($existing_options)) {
             // Merge existing options
+            $ignore_params = isset($existing_options['cache_ignore_parameters']) ? $existing_options['cache_ignore_parameters'] : false;
+            $always_included = isset($existing_options['cache_params_always_included']) ? $existing_options['cache_params_always_included'] : '';
             Configuration::getInstance()->set('token', $existing_options['token']);
             Configuration::getInstance()->set('cache_enabled', $existing_options['cache_enabled']);
             Configuration::getInstance()->set('cache_max_size', $existing_options['cache_max_size']);
+            Configuration::getInstance()->set('cache_ignore_parameters', $ignore_params);
+            Configuration::getInstance()->set('cache_params_always_included', $always_included);
             Configuration::getInstance()->set('search_translations', $existing_options['search_translations']);
             Configuration::getInstance()->set('debug', $existing_options['debug']);
 

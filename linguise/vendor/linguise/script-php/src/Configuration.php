@@ -22,6 +22,10 @@ class Configuration {
     private $cache_max_size = 200; // In megabyte
     /** TTL of the cache (in seconds) */
     private $cache_time_check = 600; // In seconds
+    /** Ignore query parameters in cache key */
+    private $cache_ignore_parameters = false;
+    /** Comma-separated list of query params to always include in cache key - even when ignore is enabled */
+    private $cache_params_always_included = '';
     /** Enable search translations */
     private $search_translations = true;
 

@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.55
+ * Version:2.2.56
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -203,6 +203,8 @@ function linguiseGetOptions()
         'custom_css' => '',
         'cache_enabled' => 1,
         'cache_max_size' => 200,
+        'cache_ignore_parameters' => 0,
+        'cache_params_always_included' => 's,utm_source,utm_medium,utm_campaign,utm_term,utm_content',
         'language_name_color' => '#222',
         'language_name_hover_color' => '#222',
         'popup_language_name_color' => '#222',
@@ -344,15 +346,21 @@ function linguiseInitializeConfiguration()
         Configuration::getInstance()->loadFile(__DIR__ . DIRECTORY_SEPARATOR . 'Configuration.php');
     }
 
-    $cache_enabled = Database::getInstance()->retrieveWordpressOption('cache_enabled');
-    $cache_max_size = Database::getInstance()->retrieveWordpressOption('cache_max_size');
-    $debug = Database::getInstance()->retrieveWordpressOption('debug') ? 5 : false;
+    $options = linguiseGetOptions();
+
+    $cache_enabled = $options['cache_enabled'];
+    $cache_max_size = $options['cache_max_size'];
+    $debug = $options['debug'] ? 5 : false;
+    $cache_ignore_parameters = $options['cache_ignore_parameters'];
+    $cache_params_always_included = $options['cache_params_always_included'];
 
     Configuration::getInstance()->set('token', $token);
 
     Configuration::getInstance()->set('cache_enabled', $cache_enabled);
     Configuration::getInstance()->set('cache_max_size', $cache_max_size);
     Configuration::getInstance()->set('debug', $debug);
+    Configuration::getInstance()->set('cache_ignore_parameters', $cache_ignore_parameters);
+    Configuration::getInstance()->set('cache_params_always_included', $cache_params_always_included);
 
     $options = linguiseGetOptions();
     foreach ($options['expert_mode'] as $key => $value) {

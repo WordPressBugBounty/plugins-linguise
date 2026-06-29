@@ -161,6 +161,39 @@ class Request
     }
 
     /**
+     * Returns the current query string parsed into a key-value array.
+     *
+     * @return array
+     */
+    public function getQueryParams()
+    {
+        if ($this->query === '') {
+            return [];
+        }
+        parse_str($this->query, $params);
+        return $params;
+    }
+
+    /**
+     * Builds the requested URL keeping only the query params listed in $always_included.
+     * All other query params are stripped from the returned URL.
+     *
+     * @param array $always_included List of query param names to preserve
+     * @return string
+     */
+    public function getRequestedUrlFilteredQuery(array $always_included = [])
+    {
+        $params = $this->getQueryParams();
+        $filtered = !empty($always_included)
+            ? array_intersect_key($params, array_flip($always_included))
+            : [];
+        $query = !empty($filtered) ? '?' . http_build_query($filtered) : '';
+        return $this->getProtocol() . '://' . $this->getHostname() . $this->getBaseDir()
+            . '/' . $this->getLanguage() . $this->getPathname(false) . $this->getTrailingSlashes()
+            . $query;
+    }
+
+    /**
      * Retrieve current multilingual non translated url
      *
      * @return string

@@ -203,6 +203,8 @@ class Management
             // $browser_redirect = isset($linguise_options['browser_redirect']) && $linguise_options['browser_redirect'] === '1' ? 1 : 0;
             $cache_enabled = isset($linguise_options['cache_enabled']) && $linguise_options['cache_enabled'] === '1' ? 1 : 0;
             $cache_max_size = isset($linguise_options['cache_max_size']) ? (int)$linguise_options['cache_max_size'] : 200;
+            $cache_ignore_parameters = isset($linguise_options['cache_ignore_parameters']) && $linguise_options['cache_ignore_parameters'] === '1' ? 1 : 0;
+            $cache_params_always_included = isset($linguise_options['cache_params_always_included']) ? trim($linguise_options['cache_params_always_included']) : '';
             $search_translation = isset($linguise_options['search_translation']) && $linguise_options['search_translation'] === '1' ? 1 : 0;
             $debug = isset($linguise_options['debug']) && $linguise_options['debug'] === '1' ? 1 : 0;
 
@@ -210,6 +212,8 @@ class Management
                 'token' => $token,
                 'cache_enabled' => $cache_enabled,
                 'cache_max_size' => $cache_max_size,
+                'cache_ignore_parameters' => $cache_ignore_parameters,
+                'cache_params_always_included' => $cache_params_always_included,
                 'search_translations' => $search_translation,
                 'debug' => $debug,
                 'dynamic_translations' => $dynamic_translations,

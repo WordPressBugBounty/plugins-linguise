@@ -13,6 +13,15 @@ $translation_strings = [
         'usage_disk' => __('Maximum cache disk space usage', 'linguise'),
         'usage_size' => __('in MB', 'linguise'),
         'clear' => __('Clear cache', 'linguise'),
+        'ignore_params' => [
+            'title' => __('Ignore query parameters in cache key', 'linguise'),
+            'help'  => __('Strip query parameters from the cache key so URLs like /?utm_source=a and /?utm_source=b share one cache entry. Use the field below to keep specific parameters (e.g. the search parameter) as distinct cache entries.', 'linguise'),
+        ],
+        'always_included_params' => [
+            'title'       => __('Always include these parameters', 'linguise'),
+            'help'        => __('Comma-separated list of query parameter names that always produce distinct cache entries even when ignore is enabled (e.g. s, utm_source).', 'linguise'),
+            'placeholder' => __('e.g. s,utm_source,utm_medium', 'linguise'),
+        ],
     ],
 
     'translation_extra' => __('Translation Settings', 'linguise'),
@@ -186,6 +195,27 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
                     <button type="button" class="linguise-btn rounder" data-linguise-action="clear-cache" data-action-link="<?php echo esc_url(wp_nonce_url(admin_url('admin-ajax.php') . '?action=linguise_clear_cache', '_linguise_nonce_')); ?>">
                         <?php echo esc_html($translation_strings['cache']['clear']); ?>
                     </button>
+                </div>
+                <div class="mt-4">
+                    <label class="linguise-slider-checkbox">
+                        <input type="checkbox" class="slider-input" name="linguise_options[cache_ignore_parameters]" value="1" <?php echo isset($options['cache_ignore_parameters']) ? checked($options['cache_ignore_parameters'], 1) : ''; ?> />
+                        <span class="slider"></span>
+                        <span class="slider-label font-semibold">
+                            <?php echo esc_html($translation_strings['cache']['ignore_params']['title']); ?>
+                            <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['cache']['ignore_params']['help']); ?>">
+                                help_outline
+                            </span>
+                        </span>
+                    </label>
+                </div>
+                <div data-id="cache-ignore-params-wrapper" class="flex flex-col mt-2">
+                    <label for="opt-cache-always-included" class="m-0 text-base text-neutral">
+                        <?php echo esc_html($translation_strings['cache']['always_included_params']['title']); ?>
+                        <span class="material-icons help-tooltip" data-tippy="<?php echo esc_attr($translation_strings['cache']['always_included_params']['help']); ?>">
+                            help_outline
+                        </span>
+                    </label>
+                    <input id="opt-cache-always-included" type="text" class="linguise-input rounder mt-1" name="linguise_options[cache_params_always_included]" value="<?php echo esc_attr($options['cache_params_always_included'] ?? ''); ?>" placeholder="<?php echo esc_attr($translation_strings['cache']['always_included_params']['placeholder']); ?>" data-linguise-text="cache_params_always_included" />
                 </div>
             </div>
         </div>

@@ -310,6 +310,8 @@ class LinguiseConfiguration
         $ukraine_redirect = isset($_POST['linguise_options']['ukraine_redirect']) && $_POST['linguise_options']['ukraine_redirect'] === '1' ? 1 : 0;
         $cache_enabled = isset($_POST['linguise_options']['cache_enabled']) && $_POST['linguise_options']['cache_enabled'] === '1' ? 1 : 0;
         $cache_max_size = isset($_POST['linguise_options']['cache_max_size']) ? (int)$_POST['linguise_options']['cache_max_size'] : 200;
+        $cache_ignore_parameters = isset($_POST['linguise_options']['cache_ignore_parameters']) && $_POST['linguise_options']['cache_ignore_parameters'] === '1' ? 1 : 0;
+        $cache_params_always_included = isset($_POST['linguise_options']['cache_params_always_included']) ? trim($_POST['linguise_options']['cache_params_always_included']) : 's,utm_source,utm_medium,utm_campaign,utm_term,utm_content';
         $search_translation = isset($_POST['linguise_options']['search_translation']) && $_POST['linguise_options']['search_translation'] === '1' ? 1 : 0;
         $woocommerce_emails_translation = isset($_POST['linguise_options']['woocommerce_emails_translation']) && $_POST['linguise_options']['woocommerce_emails_translation'] === '1' ? 1 : 0;
         $debug = isset($_POST['linguise_options']['debug']) && $_POST['linguise_options']['debug'] === '1' ? 1 : 0;
@@ -359,6 +361,8 @@ class LinguiseConfiguration
             'ukraine_redirect' => $ukraine_redirect,
             'cache_enabled' => $cache_enabled,
             'cache_max_size' => $cache_max_size,
+            'cache_ignore_parameters' => $cache_ignore_parameters,
+            'cache_params_always_included' => $cache_params_always_included,
             'search_translation' => $search_translation,
             'woocommerce_emails_translation' => $woocommerce_emails_translation,
             'debug' => $debug,

@@ -63,9 +63,18 @@ class Cache
             return false;
         }
 
+        $request = Request::getInstance();
+        if (Configuration::getInstance()->get('cache_ignore_parameters')) {
+            $always_raw = Configuration::getInstance()->get('cache_params_always_included') ?? '';
+            $always_included = array_values(array_filter(array_map('trim', explode(',', $always_raw))));
+            $url = $request->getRequestedUrlFilteredQuery($always_included);
+        } else {
+            $url = $request->getRequestedUrl();
+        }
+
         $this->_hash = md5(json_encode(array(
             'content' => extension_loaded('mbstring') ? mb_convert_encoding($content, 'UTF-8', 'UTF-8') : $content,
-            'url' => Request::getInstance()->getRequestedUrl()
+            'url' => $url
         )));
 
         // In case we failed to json_encode (non utf8 chars and no mbstring extension)
@@ -99,6 +108,7 @@ class Cache
             return false;
         }
 
+        Debug::log('Loading cache with hash: ' . $this->_hash . ' and language: ' . $this->_language);
         $content = file_get_contents($cache_file);
 
         // Update cache file modified time
@@ -116,6 +126,7 @@ class Cache
             return false;
         }
 
+        Debug::log('Saving cache with hash: ' . $this->_hash . ' and language: ' . $this->_language);
         $response = Response::getInstance();
 
         $content = $response->getContent();
