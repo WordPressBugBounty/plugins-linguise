@@ -152,7 +152,7 @@ class FragmentHandler extends FragmentBase
         if (!empty($result)) {
             return $result;
         }
-        return $text; // @codeCoverageIgnore
+        return $text;
     }
 
     /**
@@ -169,7 +169,7 @@ class FragmentHandler extends FragmentBase
         if (!empty($result)) {
             return $result;
         }
-        return $text; // @codeCoverageIgnore
+        return $text;
     }
 
     /**
@@ -362,7 +362,7 @@ class FragmentHandler extends FragmentBase
     {
         $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
-            return []; // @codeCoverageIgnore
+            return [];
         }
 
         $scripts = $html_dom->getElementsByTagName('script');
@@ -554,7 +554,7 @@ class FragmentHandler extends FragmentBase
                 $replaced_json = apply_filters('linguise_after_apply_translated_fragments_auto', $replaced_json, $fragment_name);
 
                 if ($replaced_json === false) {
-                    throw new \LogicException('FragmentHandler -> Injection -> ' . $fragment_name . '/' . $fragment_param . ' -> JSON data is empty!'); // @codeCoverageIgnore
+                    throw new \LogicException('FragmentHandler -> Injection -> ' . $fragment_name . '/' . $fragment_param . ' -> JSON data is empty!');
                 }
 
                 $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);

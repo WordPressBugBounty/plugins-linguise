@@ -879,32 +879,44 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
      */
     public function hookWPRedirect($location)
     {
-        // Get Linguise language from HTTP request referer
-        $language_meta = WPHelper::getLanguageFromReferer();
+        // Check: is request for remove cart item or undo removed item from cart
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
+        $is_cart_redirect = isset($_REQUEST['remove_item']) || isset($_REQUEST['undo_item']);
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Redirect marker only
+        $is_login_redirect = ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && (isset($_REQUEST['redirect_to']) || isset($_REQUEST['redirect']));
+        $language_from_uri = WPHelper::getLanguageFromUrl($location);
+        $language_from_header = WPHelper::getLanguage();
+        $language_from_referer = WPHelper::getLanguageFromReferer();
+
+        $language_meta = $language_from_header;
+        if ($language_meta === null) {
+            $language_meta = $language_from_referer;
+        }
+        if ($language_meta === null && $is_login_redirect) {
+            $language_meta = $language_from_uri;
+        }
 
         if ($language_meta === null) {
             // original page, skip
             return $location;
         }
 
-        // Check: is request for remove cart item or undo removed item from cart
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- No action
-        if (!isset($_REQUEST['remove_item']) && !isset($_REQUEST['undo_item'])) {
-            /**
-            * Request is not remove cart item or is not undo removing cart item
-            */
-            return $location;
+        if ($is_login_redirect && $language_from_uri !== $language_meta) {
+            $is_login_redirect = false;
         }
 
-        /**
-        * Set header to prevent Script-PHP translate the translated url.
-        * If the header is not exist, Script-PHP would re-translated the URL that has been translated before.
-        * So we need to add this header to make sure the below code is not re-translate the translated URL.
-        *
-        * @see Linguise\Vendor\Linguise\Script\Core\CurlRequest
-        * the above class has code to check if the header has Linguise-Translated-Redirect or not
-        */
-        header('Linguise-Translated-Redirect: true');
+        if ($is_login_redirect || $is_cart_redirect) {
+            /**
+            * Set header to prevent Script-PHP translate the translated url.
+            * If the header is not exist, Script-PHP would re-translated the URL that has been translated before.
+            * So we need to add this header to make sure the below code is not re-translate the translated URL.
+            *
+            * @see Linguise\Vendor\Linguise\Script\Core\CurlRequest
+            * the above class has code to check if the header has Linguise-Translated-Redirect or not
+            */
+            header('Linguise-Translated-Redirect: true');
+        }
 
         return $location;
     }

@@ -168,7 +168,7 @@ class AttributeHandler extends FragmentHandler
     {
         $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
-            return []; // @codeCoverageIgnore
+            return [];
         }
 
         $matchers = self::getMatcher($html_data);
@@ -178,10 +178,6 @@ class AttributeHandler extends FragmentHandler
         // Loop through all valid DOM elements
         $elements = $html_dom->getElementsByTagName('*');
         foreach ($elements as $element) {
-            if ($element->nodeType !== XML_ELEMENT_NODE) {
-                continue; // @codeCoverageIgnore
-            }
-
             foreach ($matchers as $matcher) {
                 $key_data = $element->getAttribute($matcher['key']);
                 if (empty($key_data)) {
@@ -279,7 +275,7 @@ class AttributeHandler extends FragmentHandler
         $elements = $html_dom->getElementsByTagName($tag_name);
         foreach ($elements as $element) {
             if ($element->nodeType !== XML_ELEMENT_NODE) {
-                continue; // @codeCoverageIgnore
+                continue;
             }
 
             if ($element->hasAttribute($attr_name) && $element->getAttribute($attr_name) === $attr_value) {
@@ -305,7 +301,7 @@ class AttributeHandler extends FragmentHandler
 
         $html_dom = HTMLHelper::loadHTML($html_data);
         if (empty($html_dom)) {
-            return $html_data; // @codeCoverageIgnore
+            return $html_data;
         }
 
         Debug::log('AttributeHandler -> Injecting: ' . json_encode($fragments, JSON_PRETTY_PRINT));
@@ -337,7 +333,7 @@ class AttributeHandler extends FragmentHandler
 
                 $match_data = $attr_html->getAttribute($matched['key']);
                 if (empty($match_data)) {
-                    continue; // @codeCoverageIgnore
+                    continue;
                 }
 
                 // Since we have protection enabled around this!
@@ -358,7 +354,7 @@ class AttributeHandler extends FragmentHandler
 
                     $first_value = isset($first_fragment['value']) ? $first_fragment['value'] : null;
                     if (empty($first_value)) {
-                        continue; // @codeCoverageIgnore
+                        continue;
                     }
 
                     // Replace the data
@@ -372,12 +368,12 @@ class AttributeHandler extends FragmentHandler
                     // Get first item
                     $first_fragment = isset($fragment_list['fragments'][0]) ? $fragment_list['fragments'][0] : null;
                     if (empty($first_fragment)) {
-                        continue; // @codeCoverageIgnore
+                        continue;
                     }
 
                     $first_value = isset($first_fragment['value']) ? $first_fragment['value'] : null;
                     if (empty($first_value)) {
-                        continue; // @codeCoverageIgnore
+                        continue;
                     }
 
                     // Replace the data
@@ -399,8 +395,8 @@ class AttributeHandler extends FragmentHandler
                         $dec_key = self::unwrapKey($fragment['key']);
                         try {
                             $json_data->set('$.' . $dec_key, $fragment['value']);
-                        } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) { // @codeCoverageIgnore
-                            Debug::log('Failed to set key in attributes: ' . $dec_key . ' -> ' . $e->getMessage()); // @codeCoverageIgnore
+                        } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
+                            Debug::log('Failed to set key in attributes: ' . $dec_key . ' -> ' . $e->getMessage());
                         }
                     }
 
@@ -421,6 +417,10 @@ class AttributeHandler extends FragmentHandler
         $html_data = HTMLHelper::saveHTML($html_dom);
         foreach ($queued_deletions as $deletion) {
             foreach ($deletion as $fragment) {
+                if (!isset($fragment['match'])) {
+                    continue;
+                }
+
                 $decoded_match = html_entity_decode($fragment['match'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 $html_data = str_replace($fragment['match'], '', $html_data);
                 $html_data = str_replace($decoded_match, '', $html_data);

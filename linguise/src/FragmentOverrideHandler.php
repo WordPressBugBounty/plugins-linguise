@@ -51,7 +51,7 @@ class FragmentOverrideHandler extends FragmentBase
 
             if (isset($override_item['key']) && $override_item['key'] !== $script_id) {
                 // If the key is set and it's not the same, then we skip
-                continue; // @codeCoverageIgnore
+                continue;
             }
 
             $match_res = preg_match('/' . $override_item['match'] . '/s', $script_content, $match);
@@ -145,8 +145,8 @@ class FragmentOverrideHandler extends FragmentBase
                 $merged_key = strpos($decoded_key, '[') === 0 ? '$' . $decoded_key : '$.' . $decoded_key;
                 try {
                     $json_data->set($merged_key, $fragment['value']);
-                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) { // @codeCoverageIgnore
-                    Debug::log('Failed to set key in override: ' . $merged_key . ' -> ' . $e->getMessage()); // @codeCoverageIgnore
+                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
+                    Debug::log('Failed to set key in override: ' . $merged_key . ' -> ' . $e->getMessage());
                 }
             }
 
@@ -180,8 +180,8 @@ class FragmentOverrideHandler extends FragmentBase
                 $merged_key = strpos($decoded_key, '[') === 0 ? '$' . $decoded_key : '$.' . $decoded_key;
                 try {
                     $json_data->set($merged_key, $fragment['value']);
-                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) { // @codeCoverageIgnore
-                    Debug::log('Failed to set key in override: ' . $merged_key . ' -> ' . $e->getMessage()); // @codeCoverageIgnore
+                } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
+                    Debug::log('Failed to set key in override: ' . $merged_key . ' -> ' . $e->getMessage());
                 }
             }
 

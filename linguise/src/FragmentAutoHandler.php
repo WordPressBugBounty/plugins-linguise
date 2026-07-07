@@ -38,8 +38,8 @@ class FragmentAutoHandler extends FragmentBase
             $decoded_key = self::unwrapKey($fragment['key']);
             try {
                 $json_path->set('$.' . $decoded_key, $fragment['value']);
-            } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) { // @codeCoverageIgnore
-                Debug::log('Failed to set key in auto: ' . $decoded_key . ' -> ' . $e->getMessage()); // @codeCoverageIgnore
+            } catch (\Linguise\Vendor\JsonPath\InvalidJsonPathException $e) {
+                Debug::log('Failed to set key in auto: ' . $decoded_key . ' -> ' . $e->getMessage());
             }
         }
 

@@ -141,14 +141,14 @@ class FragmentBase
      */
     protected static function isTranslatableString($value)
     {
-        $value = trim($value);
-
-        if (empty($value) || !is_string($value)) {
+        if (!is_string($value)) {
             return false;
         }
 
-        if (is_string($value) && empty($value)) {
-            return false; // @codeCoverageIgnore
+        $value = trim($value);
+
+        if (empty($value)) {
+            return false;
         }
 
         // Check if it's a JSON, if yes, do not translate
@@ -203,10 +203,7 @@ class FragmentBase
         }
 
         if (substr($value, 0, 1) === '/' && !Helper::hasSpace($value)) {
-            $as_url = parse_url($value);
-            if (empty($as_url)) {
-                return false; // @codeCoverageIgnore
-            }
+            $as_url = parse_url($value); // this should not fails
 
             // Check if it only have "path" and not other keys
             $array_keys = array_keys($as_url);

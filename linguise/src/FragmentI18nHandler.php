@@ -98,7 +98,7 @@ class FragmentI18nHandler extends FragmentBase
         $code_contents = $html_matches[0];
         $match_res = preg_match('/\(\s*\"([\w\-_]+)\",\s*(\{.*?\})\s*\);/si', $code_contents, $json_match);
         if ($match_res === false || $match_res === 0) {
-            return $html_data; // @codeCoverageIgnore
+            return $html_data;
         }
 
         $json_data = json_decode($json_match[2], true);

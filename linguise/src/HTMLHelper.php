@@ -157,6 +157,9 @@ class HTMLHelper
         if (!class_exists('\\DOMDocument') || !extension_loaded('xml')) {
             return null;
         }
+        if (empty($html_data)) {
+            return null;
+        }
 
         // Load HTML
         $html_dom = new \DOMDocument();
