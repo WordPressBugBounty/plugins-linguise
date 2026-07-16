@@ -177,11 +177,11 @@ function linguise_intercept_ajax_request($response, $handler, $request)
     }
 
     register_shutdown_function(function () use ($db_updated) {
-         // @codeCoverageIgnoreStart
+        // @codeCoverageIgnoreStart
         if ($db_updated) {
             Database::getInstance()->close();
         }
-         // @codeCoverageIgnoreEnd
+        // @codeCoverageIgnoreEnd
     });
 
     // Revert the language back
@@ -208,12 +208,16 @@ function linguise_intercept_ajax_request($response, $handler, $request)
 
     $tl_json_frag = $translated_fragments['wp-ajax-json'][$woo_prefix];
     if (empty($tl_json_frag)) {
-        return $response; // @codeCoverageIgnore
+        // @codeCoverageIgnoreStart
+        return $response;
+        // @codeCoverageIgnoreEnd
     }
 
     $tl_json_frag_list = $tl_json_frag['fragments'];
     if (empty($tl_json_frag_list)) {
-        return $response; // @codeCoverageIgnore
+        // @codeCoverageIgnoreStart
+        return $response;
+        // @codeCoverageIgnoreEnd
     }
 
     $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($raw_data, $tl_json_frag_list);

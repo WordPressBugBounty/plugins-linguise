@@ -74,8 +74,8 @@ function linguise_synchronize_update_config($request)
     try {
         $config = $synchronization->convertparamsToWPOptions($params);
         $merged_config = array_merge($options, $config);
-    } catch (Exception $e) { // @codeCoverageIgnore
-        return new WP_Error('error', $e->getMessage(), array( 'status' => 500 )); // @codeCoverageIgnore
+    } catch (Exception $e) {
+        return new WP_Error('error', $e->getMessage(), array( 'status' => 500 ));
     }
 
     update_option('linguise_options', $merged_config);
@@ -83,7 +83,6 @@ function linguise_synchronize_update_config($request)
     return rest_ensure_response(['message' => 'Config successfully updated']);
 }
 
-// @codeCoverageIgnoreStart
 add_action('rest_api_init', function () {
     register_rest_route('linguise/v1', '/sync', array(
         'methods' => 'POST',
@@ -91,4 +90,3 @@ add_action('rest_api_init', function () {
         'permission_callback' => '__return_true',
     ));
 });
-// @codeCoverageIgnoreEnd

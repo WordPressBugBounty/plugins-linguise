@@ -155,7 +155,9 @@ class HTMLHelper
     {
         // Check if DOMDocument is available or xml extension is loaded
         if (!class_exists('\\DOMDocument') || !extension_loaded('xml')) {
+            // @codeCoverageIgnoreStart
             return null;
+            // @codeCoverageIgnoreEnd
         }
         if (empty($html_data)) {
             return null;
@@ -213,7 +215,9 @@ class HTMLHelper
         // Save HTML
         $html_data = $dom->saveHTML();
         if ($html_data === false) {
-            return ''; // @codeCoverageIgnore
+            // @codeCoverageIgnoreStart
+            return '';
+            // @codeCoverageIgnoreEnd
         }
 
         // Unprotect HTML entities

@@ -3,7 +3,7 @@
         'name' => 'linguise/wordpress-plugin',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '099ef4252db959fdca93f8361d531dcdc6877230',
+        'reference' => 'd4b4672befab038e91ca79a34e40cd83cacfb53f',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'linguise/wordpress-plugin' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '099ef4252db959fdca93f8361d531dcdc6877230',
+            'reference' => 'd4b4672befab038e91ca79a34e40cd83cacfb53f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

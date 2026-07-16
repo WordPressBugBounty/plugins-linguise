@@ -462,12 +462,10 @@ class LinguiseConfiguration
             if (!empty($apiResponse) && is_object($apiResponse) && isset($apiResponse->data) && is_object($apiResponse->data)) {
                 return $apiResponse->data;
             } else {
-                // @codeCoverageIgnoreStart
                 $api_web_errors[] = [
                     'type' => 'error',
                     'message' => __('API returns empty data when querying configuration. Please try again later or contact our support team if the problem persist.', 'linguise'),
                 ];
-                // @codeCoverageIgnoreEnd
             }
         } else {
             if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {

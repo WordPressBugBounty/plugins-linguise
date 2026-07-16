@@ -77,9 +77,7 @@ class LinguiseSwitcher
         if (preg_match('@(\/+)$@', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), $matches) && !empty($matches[1])) {
             $trailing_slashes = $matches[1];
         } else {
-            // @codeCoverageIgnoreStart
             $trailing_slashes = '';
-            // @codeCoverageIgnoreEnd
         }
 
         linguiseSwitchMainSite();

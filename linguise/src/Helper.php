@@ -33,9 +33,11 @@ class Helper
                 return true;
             } else {
                 if (function_exists('wp_doing_ajax')) {
-                    return !wp_doing_ajax(); // @codeCoverageIgnore
+                    return !wp_doing_ajax();
                 } else {
+                    // @codeCoverageIgnoreStart
                     return !(defined('DOING_AJAX') && DOING_AJAX);
+                    // @codeCoverageIgnoreEnd
                 }
             }
         } else {
@@ -100,7 +102,7 @@ class Helper
         $site_path = parse_url(linguiseGetSite(), PHP_URL_PATH);
         if (!empty($site_path) && strpos($path, $site_path) === 0) {
             // Remove the site path from the URL
-            $path = substr($path, strlen($site_path)); // @codeCoverageIgnore
+            $path = substr($path, strlen($site_path));
         }
 
         $parts = explode('/', trim($path, '/'));
@@ -193,7 +195,9 @@ class Helper
         linguiseRestoreMultisite();
 
         if (!$linguise_options) {
-            return false; // @codeCoverageIgnore
+            // @codeCoverageIgnoreStart
+            return false;
+            // @codeCoverageIgnoreEnd
         }
 
         return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);
@@ -215,7 +219,7 @@ class Helper
             }
 
             if (self::localeCompare($lang_key, $locale)) {
-                return $lang_key; // @codeCoverageIgnore
+                return $lang_key;
             }
         }
         return null;
@@ -289,7 +293,9 @@ class Helper
 
         // Check if LINGUISE_PLUGIN_URL has / at the end
         if (substr(LINGUISE_PLUGIN_URL, -1) === '/') {
-            return LINGUISE_PLUGIN_URL . $path; // @codeCoverageIgnore
+            // @codeCoverageIgnoreStart
+            return LINGUISE_PLUGIN_URL . $path;
+            // @codeCoverageIgnoreEnd
         }
 
         return LINGUISE_PLUGIN_URL . '/' . $path;
