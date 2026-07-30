@@ -306,12 +306,11 @@ class AttributeHandler extends FragmentHandler
 
         Debug::log('AttributeHandler -> Injecting: ' . json_encode($fragments, JSON_PRETTY_PRINT));
 
-        $queued_deletions = [];
         $fragment_matchers = self::getMatcher($html_data);
         foreach ($fragments as $fragment_name => $fragment_jsons) {
             $matched = self::findMatcher($fragment_name, $fragment_matchers);
             foreach ($fragment_jsons as $fragment_param => $fragment_list) {
-                $queued_deletions[] = $fragment_list['fragments'];
+                self::removeFragmentMarkers($html_dom, $fragment_name, $fragment_param);
 
                 if (!isset($fragment_list['attribute'])) {
                     continue;
@@ -415,23 +414,6 @@ class AttributeHandler extends FragmentHandler
         }
 
         $html_data = HTMLHelper::saveHTML($html_dom);
-        foreach ($queued_deletions as $deletion) {
-            foreach ($deletion as $fragment) {
-                if (!isset($fragment['match'])) {
-                    continue;
-                }
-
-                $decoded_match = html_entity_decode($fragment['match'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                $html_data = str_replace($fragment['match'], '', $html_data);
-                $html_data = str_replace($decoded_match, '', $html_data);
-
-                // Replace single & to &amp;
-                $simple_sub = preg_replace('/&(?!(?:amp|lt|gt|quot|apos);)/', '&amp;', $decoded_match);
-                if (!empty($simple_sub)) {
-                    $html_data = str_replace($simple_sub, '', $html_data);
-                }
-            }
-        }
 
         // Unmangle stuff like &amp;#xE5;
         $html_data = preg_replace('/&amp;#x([0-9A-Fa-f]+);/', '&#x$1;', $html_data);

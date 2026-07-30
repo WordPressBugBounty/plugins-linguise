@@ -512,6 +512,31 @@ class FragmentHandler extends FragmentBase
     {
         Debug::log('FragmentHandler -> Injecting: ' . json_encode($fragments, JSON_PRETTY_PRINT));
 
+        // Remove the `linguise-fragment` marker elements for every group we're about to process here,
+        // directly in the DOM. This is done once, up front, so it's unaffected by the string-based
+        // substitutions below (see FragmentBase::removeFragmentMarkers() for why this can't be a
+        // literal str_replace() against the raw captured HTML).
+        $html_dom = null;
+        foreach ($fragments as $fragment_name => $fragment_jsons) {
+            foreach ($fragment_jsons as $fragment_param => $fragment_list) {
+                if (!in_array($fragment_list['mode'], ['auto', 'override', 'skip', 'i18n'])) {
+                    continue;
+                }
+
+                if ($html_dom === null) {
+                    $html_dom = HTMLHelper::loadHTML($html_data);
+                    if (empty($html_dom)) {
+                        break 2;
+                    }
+                }
+
+                self::removeFragmentMarkers($html_dom, $fragment_name, $fragment_param);
+            }
+        }
+        if (!empty($html_dom)) {
+            $html_data = HTMLHelper::saveHTML($html_dom);
+        }
+
         foreach ($fragments as $fragment_name => $fragment_jsons) {
             foreach ($fragment_jsons as $fragment_param => $fragment_list) {
                 $mode = $fragment_list['mode'];
@@ -521,20 +546,17 @@ class FragmentHandler extends FragmentBase
                 }
 
                 if ($mode === 'skip') {
-                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
 
                 if ($mode === 'override') {
                     $html_data = self::applyTranslatedFragmentsForOverride($html_data, $fragment_param, $fragment_name, $fragment_list);
-                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
 
                 if ($mode === 'i18n') {
                     // i18n mode for translation blocks
                     $html_data = self::applyTranslatedFragmentsForI18n($html_data, $fragment_name, $fragment_param, $fragment_list['fragments']);
-                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
 
@@ -545,7 +567,6 @@ class FragmentHandler extends FragmentBase
 
                 preg_match($match_ptrn, $html_data, $html_matches);
                 if (empty($html_matches)) {
-                    $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                     continue;
                 }
 
@@ -557,7 +578,6 @@ class FragmentHandler extends FragmentBase
                     throw new \LogicException('FragmentHandler -> Injection -> ' . $fragment_name . '/' . $fragment_param . ' -> JSON data is empty!');
                 }
 
-                $html_data = self::cleanupFragments($html_data, $fragment_list['fragments']);
                 $subst_ptrn = '<script $1id="' . $fragment_name . '-js-extra">$2var ' .  $fragment_param . '_params = ' . json_encode($replaced_json) . ';$4</script>';
 
                 $replacement = preg_replace($match_ptrn, $subst_ptrn, $html_data, 1, $count);

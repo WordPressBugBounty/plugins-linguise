@@ -37,9 +37,6 @@ function formValidator(form) {
      * @returns {HTMLElement} the warning element for the field
      */
     const highlightInputWarning = (field, isInvalid) => {
-        if (!field) {
-            return;
-        }
         if (isInvalid) {
             // This will show some kind of error glow at the field
             field.classList.add('is-invalid');
@@ -151,7 +148,7 @@ function formValidator(form) {
                 highlightInputWarning(field, false);
             } else {
                 allValid = false;
-                prefillWarning(warningField, field.validationMessage || 'This field is invalid.');
+                prefillWarning(warningField, field.validationMessage);
                 toggleWarning(warningField, true);
                 highlightInputWarning(field, true);
             }
@@ -173,10 +170,6 @@ function formValidator(form) {
      * @param {HTMLElement} field 
      */
     function highlightWarningField(field) {
-        if (!field) {
-            return;
-        }
-
         // Find whose parent is the fieldset
         const fieldset = field.closest('.linguise-config-form .tab-content');
         if (fieldset) {
@@ -185,7 +178,7 @@ function formValidator(form) {
             setTimeout(() => {
                 // scroll to field
                 field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            })
+            }, 10);
         }
     }
 
@@ -227,7 +220,7 @@ function formValidator(form) {
             highlightInputWarning(target, false);
         } else {
             // Show if invalid
-            prefillWarning(warningField, target.validationMessage || 'This field is invalid.');
+            prefillWarning(warningField, target.validationMessage);
             toggleWarning(warningField, true);
             highlightInputWarning(target, true);
         }

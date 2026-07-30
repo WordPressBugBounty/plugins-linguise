@@ -350,21 +350,43 @@ class FragmentBase
     }
 
     /**
-     * Clean up the fragments from the HTML data.
+     * Remove the `linguise-fragment` marker elements for a given fragment group directly from the DOM.
      *
-     * @param string $html_data The HTML data to be cleaned up
-     * @param array  $fragments The array of fragments to be cleaned up, from intoJSONFragments
+     * This must run against the DOM *before* it gets serialized back into a string. Doing the
+     * removal via `str_replace()` against the already-serialized HTML is unreliable, because the
+     * DOM serializer can normalize the marker's raw text (e.g. collapse duplicate whitespace between
+     * attributes) between the moment it was captured via regex and the moment it's saved back out,
+     * silently leaving the marker behind.
      *
-     * @return string
+     * @param \DOMDocument $html_dom       The HTML DOM object
+     * @param string       $fragment_name  The name of the fragment, e.g. 'wc-product-variations'
+     * @param string       $fragment_param The param of the fragment, e.g. the attribute marker id
+     *
+     * @return void
      */
-    protected static function cleanupFragments($html_data, $fragments)
+    protected static function removeFragmentMarkers($html_dom, $fragment_name, $fragment_param)
     {
-        foreach ($fragments as $fragment) {
-            // remove the html fragment from the translated page
-            $html_data = str_replace($fragment['match'], '', $html_data);
+        $wrapper_tags = ['div', 'a', 'linguise-main', 'img'];
+
+        $to_remove = [];
+        foreach ($wrapper_tags as $tag) {
+            $elements = $html_dom->getElementsByTagName($tag);
+            foreach ($elements as $element) {
+                if (!$element->hasAttribute('data-fragment-name') || $element->getAttribute('data-fragment-name') !== $fragment_name) {
+                    continue;
+                }
+                if (!$element->hasAttribute('data-fragment-param') || $element->getAttribute('data-fragment-param') !== $fragment_param) {
+                    continue;
+                }
+                $to_remove[] = $element;
+            }
         }
 
-        return $html_data;
+        foreach ($to_remove as $element) {
+            if ($element->parentNode) {
+                $element->parentNode->removeChild($element);
+            }
+        }
     }
 
     /**

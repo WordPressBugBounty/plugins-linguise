@@ -29,7 +29,14 @@ const config = {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  collectCoverageFrom: ['./src/**/*.js'],
+  collectCoverageFrom: [
+    './src/**/*.js',
+    './assets/js/*.js',
+    // Exclude webpack bundle outputs and vendor copies from coverage
+    '!./assets/js/*.bundle.js',
+    '!./assets/js/*.bundle.js.map',
+    '!./assets/js/vendor/**',
+  ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: currentFileDir,
@@ -151,7 +158,9 @@ const config = {
   ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  // setupFilesAfterEnv: [],
+  setupFilesAfterEnv: [
+    '<rootDir>/tests/__setups__/03-location-mock.js',
+  ],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,

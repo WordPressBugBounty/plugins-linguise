@@ -127,21 +127,11 @@ jQuery(document).ready(($) => {
     tabs.each((_, tab) => {
         const { target, saveHide } = tab.dataset;
         globalState.tabs.push(target);
-        if (tab.classList.contains('active') && !globalState.activeTab) {
+        if (!globalState.activeTab && tab.classList.contains('active')) {
             globalState.activeTab = target;
-            const $target = document.querySelector(`#${target}`);
-            if ($target) {
-                $target.classList.add('active');
-                $target.setAttribute('data-linguise-fieldset', target);
-            }
-        } else if (tab.classList.contains('active') && globalState.activeTab && globalState.activeTab !== target) {
-            // Remove active class from other tabs
+            tab.classList.add('active');
+        } else {
             tab.classList.remove('active');
-            const $target = document.querySelector(`#${target}`);
-            if ($target) {
-                $target.classList.remove('active');
-                $target.setAttribute('data-linguise-fieldset', target);
-            }
         }
 
         if (saveHide && saveHide === '1') {
