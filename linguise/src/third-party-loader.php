@@ -79,6 +79,7 @@ class ThirdPartyLoader
         'wc/wcpbc' => 'WCPBCIntegration',
         'woodmart' => 'WoodmartThemeIntegration',
         'wp-rocket' => 'WPRocketIntegration',
+        'wp-grid-builder' => 'WPGridBuilderIntegration',
         'wp-forms' => 'WPFormsIntegration',
         'add-search-to-menu' => 'AddSearchToMenuIntegration',
         'elementor-pro-search' => 'ElementorProSearchIntegration',

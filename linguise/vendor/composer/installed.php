@@ -3,7 +3,7 @@
         'name' => 'linguise/wordpress-plugin',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '31a203dff3dca9c242c55d69882501adbaa8eb84',
+        'reference' => 'e61fd648380cfce488dd5195b430962adb35fd39',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -31,7 +31,7 @@
         'linguise/wordpress-plugin' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '31a203dff3dca9c242c55d69882501adbaa8eb84',
+            'reference' => 'e61fd648380cfce488dd5195b430962adb35fd39',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -49,7 +49,7 @@
         'symfony/polyfill-intl-normalizer' => array(
             'pretty_version' => '1.x-dev',
             'version' => '1.9999999.9999999.9999999-dev',
-            'reference' => '2d446c214bdbe5b71bde5011b060a05fece3ae6b',
+            'reference' => 'aa20edea75bd9c48cfecc8360922e5a6e5c44502',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-intl-normalizer',
             'aliases' => array(),

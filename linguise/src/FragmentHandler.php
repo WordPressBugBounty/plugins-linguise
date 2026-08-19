@@ -23,7 +23,7 @@ class FragmentHandler extends FragmentBase
      *
      * @var string
      */
-    protected static $frag_html_match = '/<(div|a|linguise-main|img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="((?:link|html|html-main|text|media-img|media-imgset)(?:-skip)?)" data-fragment-mode="(auto|override|skip|i18n|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?>(.*?)<\/\1>/si';
+    protected static $frag_html_match = '/<(div|a|linguise-main|img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="((?:link|html|html-main|text|media-img|media-imgset)(?:-skip)?)" data-fragment-mode="(auto|override|skip|i18n|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?(?: linguise-ignore="1")?>(.*?)<\/\1>/si';
     /**
      * Regex/matcher for our custom HTML fragment
      *
@@ -31,7 +31,7 @@ class FragmentHandler extends FragmentBase
      *
      * @var string
      */
-    protected static $frag_html_match_self_close = '/<(img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="((?:link|html|html-main|text|media-img|media-imgset)(?:-skip)?)" data-fragment-mode="(auto|override|skip|i18n|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?\s*\/?>/si';
+    protected static $frag_html_match_self_close = '/<(img) class="linguise-fragment" data-fragment-name="([^"]*)" data-fragment-param="([^"]*)" data-fragment-key="([^"]*)" data-fragment-format="((?:link|html|html-main|text|media-img|media-imgset)(?:-skip)?)" data-fragment-mode="(auto|override|skip|i18n|attribute)"(?: data-fragment-extra-id="([^"]*)")?(?: (?:href|src|srcset)="([^"]*)")?(?: linguise-ignore="1")?\s*\/?>/si';
 
     /**
      * Collect the fragment from the JSON data.

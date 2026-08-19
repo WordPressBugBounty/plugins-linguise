@@ -3,7 +3,7 @@ Contributors: Linguise
 Tags: translate, AI translation, multilingual, automatic translation, WooCommerce translation
 Requires at least: 4.0
 Tested up to: 7.0
-Stable tag: 2.2.59
+Stable tag: 2.2.60
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -107,6 +107,9 @@ Linguise plugin uses an API connection to execute and store the translation and 
 
 
 == Changelog ==
+= 2.2.60 =
+- Feature: Translation support for WP Grid Builder plugin
+
 = 2.2.59 =
 - Fix: Issue with some fragment HTML leaking to DOM
 
