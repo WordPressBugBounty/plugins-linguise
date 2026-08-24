@@ -45,9 +45,11 @@ $latest_linguise_errors = \Linguise\WordPress\Admin\Helper::getLastErrors();
  *
  * @return string the full link to the error code
  */
-function make_error_link($error_code)
-{
-    return 'https://www.linguise.com/documentation/debug-support/wordpress-plugin-error-codes/#' . $error_code;
+if (!function_exists('make_error_link')) {
+    function make_error_link($error_code)
+    {
+        return 'https://www.linguise.com/documentation/debug-support/wordpress-plugin-error-codes/#' . $error_code;
+    }
 }
 
 /**
@@ -57,13 +59,15 @@ function make_error_link($error_code)
  *
  * @return string the formatted HTML data
  */
-function make_error_message($error)
-{
-    $base = '<span class="timestamp">' . esc_html($error['time']) . '</span>';
-    if (empty($error['code'])) {
-        return $base . '<span class="line">' . esc_html($error['message']) . '</span>';
-    } else {
-        return $base . '<a href="' . esc_url(make_error_link($error['code'])) . '" class="linguise-link line" target="_blank" rel="noreferrer noopener">' . esc_html($error['message']) . '</a>';
+if (!function_exists('make_error_message')) {
+    function make_error_message($error)
+    {
+        $base = '<span class="timestamp">' . esc_html($error['time']) . '</span>';
+        if (empty($error['code'])) {
+            return $base . '<span class="line">' . esc_html($error['message']) . '</span>';
+        } else {
+            return $base . '<a href="' . esc_url(make_error_link($error['code'])) . '" class="linguise-link line" target="_blank" rel="noreferrer noopener">' . esc_html($error['message']) . '</a>';
+        }
     }
 }
 

@@ -144,6 +144,13 @@ jQuery(document).ready(($) => {
         tabs.each((index, tab) => {
             const tabTarget = $(tab).data('target');
             const $target = document.querySelector(`[data-id="${tabTarget}"]`);
+
+            // Check if $target has display: none somehow got set by other plugins
+            if ($target && $target.style.display === 'none') {
+                // remove it
+                $target.style.display = '';
+            }
+
             if (targetTab === tabTarget) {
                 tab.classList.add('active');
                 $target?.classList.add('active');

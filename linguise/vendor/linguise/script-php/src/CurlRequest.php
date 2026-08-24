@@ -183,7 +183,7 @@ class CurlRequest
 
         Hook::trigger('onAfterRequestHeaders', $input_headers); // allow user to modify headers
 
-        $input_headers[] = 'Linguise-Original-Language: ' . preg_replace('[^a-zA-Z-]', '', Request::getInstance()->getLanguage());
+        $input_headers[] = 'Linguise-Original-Language: ' . preg_replace('/[^a-zA-Z-]/', '', Request::getInstance()->getLanguage());
 
         // Add real user IP
         $input_headers[] = 'X-Forwarded-For: ' . Helper::getIpAddress();
@@ -248,6 +248,20 @@ class CurlRequest
 
             $response->addHeader($header_parts[0], ltrim($header_parts[1]));
         }
+
+        // Decode the response body if the origin sent it compressed (gzip, br, ...).
+        // This must happen before content-type detection so a compressed HTML, XML
+        // or JSON payload can still be recognised and translated. The encoding is
+        // remembered so the response can be re-compressed before being sent.
+        $content_encoding = $response->getHeader('Content-Encoding');
+        if (!empty($content_encoding)) {
+            $decoded_body = $this->decodeContentEncoding($body, $content_encoding);
+            if ($decoded_body !== null) {
+                $body = $decoded_body;
+                $response->setContentEncoding($content_encoding);
+            }
+        }
+        Debug::log('Content encoding: ' . $content_encoding);
 
         $content_type = $response->getHeader('Content-Type');
         if (empty($content_type)) {
@@ -317,6 +331,100 @@ class CurlRequest
             $response->setRedirect($redirected_url);
             Hook::trigger('onBeforeRedirect');
             $response->end();
+        }
+    }
+
+    /**
+     * Decode a response body based on the value of the Content-Encoding header.
+     *
+     * Content-Encoding may list several encodings (e.g. "gzip, br"), applied in
+     * order, so they are decoded in reverse. The body is left untouched when the
+     * encoding is unknown, unsupported by PHP, or the payload cannot be
+     * decompressed.
+     *
+     * @param string $body     Raw (possibly compressed) response body
+     * @param string $encoding Content-Encoding header value
+     * @return string|null Decoded body, or null if nothing could be decoded
+     */
+    protected function decodeContentEncoding($body, $encoding)
+    {
+        $encodings = array_reverse(array_map('trim', explode(',', $encoding)));
+
+        foreach ($encodings as $current_encoding) {
+            $current_encoding = strtolower($current_encoding);
+
+            if ($current_encoding === 'identity') {
+                continue;
+            }
+
+            $decoded = $this->decodeSingleContentEncoding($body, $current_encoding);
+            if ($decoded === null) {
+                return null;
+            }
+
+            $body = $decoded;
+        }
+
+        return $body;
+    }
+
+    /**
+     * Decode a body encoded with a single Content-Encoding token.
+     *
+     * @param string $body     Encoded response body
+     * @param string $encoding Single lowercase encoding token
+     * @return string|null Decoded body, or null when decoding is not possible
+     */
+    protected function decodeSingleContentEncoding($body, $encoding)
+    {
+        switch ($encoding) {
+            case 'gzip':
+            case 'x-gzip':
+                if (function_exists('gzdecode')) {
+                    $decoded = @gzdecode($body);
+                    if ($decoded !== false) {
+                        return $decoded;
+                    }
+                }
+
+                return null;
+
+            case 'deflate':
+                // RFC 2616 defines "deflate" as a zlib-wrapped stream, but some
+                // servers send a raw deflate stream; try both.
+                $decoded = @gzuncompress($body);
+                if ($decoded === false) {
+                    $decoded = @gzinflate($body);
+                }
+
+                return $decoded === false ? null : $decoded;
+
+            case 'br':
+                if (function_exists('brotli_uncompress')) {
+                    // call_user_func avoids a static-analysis "undefined function"
+                    // warning when the optional brotli extension is not installed.
+                    $decoded = @call_user_func('brotli_uncompress', $body);
+                    if ($decoded !== false) {
+                        return $decoded;
+                    }
+                }
+
+                return null;
+
+            case 'zstd':
+                if (function_exists('zstd_uncompress')) {
+                    // call_user_func avoids a static-analysis "undefined function"
+                    // warning when the optional zstd extension is not installed.
+                    $decoded = @call_user_func('zstd_uncompress', $body);
+                    if ($decoded !== false) {
+                        return $decoded;
+                    }
+                }
+
+                return null;
+
+            default:
+                return null;
         }
     }
 

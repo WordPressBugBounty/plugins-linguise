@@ -85,9 +85,11 @@ $multisite_data = AdminHelper::getMultisiteInfo('expert');
  *
  * @return string Converted key
  */
-function keyToWord($key)
-{
-    return ucwords(str_replace('_', ' ', $key));
+if (!function_exists('keyToWord')) {
+    function keyToWord($key)
+    {
+        return ucwords(str_replace('_', ' ', $key));
+    }
 }
 
 $main_root = admin_url('admin.php?page=linguise');

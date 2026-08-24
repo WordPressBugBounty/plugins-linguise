@@ -118,7 +118,10 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
     if (count($log_lines) >= 1) {
         array_shift($log_lines); // Remove the first line which is a header
     } else {
+        // @codeCoverageIgnoreStart
+        // explode() always returns at least one element, so this branch is unreachable
         $log_lines = [];
+        // @codeCoverageIgnoreEnd
     }
     if (empty($log_lines)) {
         $last_errors = null;
@@ -126,6 +129,8 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
         $last_errors = implode("\n", $log_lines);
     }
 } else {
+    // @codeCoverageIgnoreStart
+    // Non-testing branch: requires real filesystem debug/errors files
     $debug_file = $log_path . 'debug.php';
     $errors_file = $log_path . 'errors.php';
 
@@ -140,6 +145,7 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
         }
         $last_errors = implode("\n", $log_lines);
     }
+    // @codeCoverageIgnoreEnd
 }
 
 /**
@@ -148,12 +154,15 @@ if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
  * @disregard P1011
  */
 if (defined('LINGUISE_IS_TESTING') && LINGUISE_IS_TESTING) {
-    $loaded_integrations = [];
-    $active_integrations = [];
+    $loaded_integrations = defined('LINGUISE_TESTING_LOADED_INTEGRATIONS') ? LINGUISE_TESTING_LOADED_INTEGRATIONS : [];
+    $active_integrations = defined('LINGUISE_TESTING_ACTIVE_INTEGRATIONS') ? LINGUISE_TESTING_ACTIVE_INTEGRATIONS : [];
 } else {
+    // @codeCoverageIgnoreStart
+    // Non-testing branch: requires a live ThirdPartyLoader instance
     $integrations = \Linguise\WordPress\ThirdPartyLoader::getInstance();
     $loaded_integrations = $integrations->getLoadedIntegrationsNames();
     $active_integrations = $integrations->getActiveIntegrations();
+    // @codeCoverageIgnoreEnd
 }
 
 ?>

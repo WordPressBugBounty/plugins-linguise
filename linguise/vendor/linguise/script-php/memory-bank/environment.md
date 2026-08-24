@@ -36,6 +36,7 @@ This is the only file site owners should edit. It declares a class `\Linguise\Sc
 | `$debug_ip` | `string` | `''` | Restrict debug logging to this IP (empty = all IPs) |
 | `$server_ip` | `string` | `''` | Override translation server IP |
 | `$server_port` | `int` | `443` | Override translation server port |
+| `$compress_response` | `bool` | `true` | Re-compress translated responses with the origin's `Content-Encoding` (gzip/deflate/br/zstd) before sending |
 
 ### Hook Methods (on* prefix)
 

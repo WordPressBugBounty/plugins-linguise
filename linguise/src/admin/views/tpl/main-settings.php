@@ -321,30 +321,32 @@ $flag_es_mode = [
  *
  * @return string The rendered color toggle
  */
-function renderColorToggle($attr, $current, $title, $help, $fallback = '#ffffff')
-{
-    $color = $current ? $current : $fallback;
-    return (
-        '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
-            . esc_html($title) .
-            '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
-        '</div>' .
-        '<div class="flex flex-row gap-2 items-center">'.
-            '<div class="flex flex-row gap-0 linguise-color-group">' .
-                '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
-                '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-validate-target="' . esc_attr($attr) . '" />' .
-            '</div>' .
-            '<div class="m-0 text-base text-neutral large-only">'
+if (!function_exists('renderColorToggle')) {
+    function renderColorToggle($attr, $current, $title, $help, $fallback = '#ffffff')
+    {
+        $color = $current ? $current : $fallback;
+        return (
+            '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
                 . esc_html($title) .
                 '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
             '</div>' .
-        '</div>' .
-        '<label ' .
-            'data-validate-warn="' . esc_attr($attr) . '"' .
-            'data-prefix="[' . esc_attr($title) . ']">' .
-        '</label>'
-    );
-};
+            '<div class="flex flex-row gap-2 items-center">'.
+                '<div class="flex flex-row gap-0 linguise-color-group">' .
+                    '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
+                    '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-validate-target="' . esc_attr($attr) . '" />' .
+                '</div>' .
+                '<div class="m-0 text-base text-neutral large-only">'
+                    . esc_html($title) .
+                    '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+                '</div>' .
+            '</div>' .
+            '<label ' .
+                'data-validate-warn="' . esc_attr($attr) . '"' .
+                'data-prefix="[' . esc_attr($title) . ']">' .
+            '</label>'
+        );
+    }
+}
 
 /**
  * Render or create HTML for a color toggles with alpha input
@@ -358,39 +360,41 @@ function renderColorToggle($attr, $current, $title, $help, $fallback = '#ffffff'
  *
  * @return string The rendered color toggle with alpha input
  */
-function renderColorTranslucentToggle($attr, $current, $alpha, $title, $help, $fallback = '#ffffff')
-{
-    $color = $current ? $current : $fallback;
-    $attr_alpha = $attr . '_alpha';
-    return (
-        '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
-            . esc_html($title) .
-            '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
-        '</div>' .
-        '<div class="flex flex-row gap-2 items-center">'.
-            '<div class="flex flex-row gap-0 linguise-color-group with-transparency">' .
-                '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
-                '<span class="color-block alpha-block" data-alpharama-target="' . esc_attr($attr_alpha) . '"></span>' .
-                '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-validate-target="' . esc_attr($attr) . '" />' .
-                '<input type="number" min="0.0" max="1.0" step="0.1" value="' . esc_attr($alpha) . '" class="linguise-input rounder alpha-input" name="linguise_options[' . esc_attr($attr_alpha) . ']" data-alpharama="' . esc_attr($attr_alpha) . '" data-validate-target="' . esc_attr($attr_alpha) . '" />' .
-            '</div>' .
-            '<div class="m-0 text-base text-neutral large-only">'
+if (!function_exists('renderColorTranslucentToggle')) {
+    function renderColorTranslucentToggle($attr, $current, $alpha, $title, $help, $fallback = '#ffffff')
+    {
+        $color = $current ? $current : $fallback;
+        $attr_alpha = $attr . '_alpha';
+        return (
+            '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
                 . esc_html($title) .
                 '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
             '</div>' .
-        '</div>' .
-        '<div class="flex flex-col">' .
-            '<label ' .
-                'data-validate-warn="' . esc_attr($attr) . '"' .
-                'data-prefix="[' . esc_attr($title) . ']">' .
-            '</label>' .
-            '<label ' .
-                'data-validate-warn="' . esc_attr($attr_alpha) . '"' .
-                'data-prefix="[' . esc_attr($title) . ' alpha]">' .
-            '</label>' .
-        '</div>'
-    );
-};
+            '<div class="flex flex-row gap-2 items-center">'.
+                '<div class="flex flex-row gap-0 linguise-color-group with-transparency">' .
+                    '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
+                    '<span class="color-block alpha-block" data-alpharama-target="' . esc_attr($attr_alpha) . '"></span>' .
+                    '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-validate-target="' . esc_attr($attr) . '" />' .
+                    '<input type="number" min="0.0" max="1.0" step="0.1" value="' . esc_attr($alpha) . '" class="linguise-input rounder alpha-input" name="linguise_options[' . esc_attr($attr_alpha) . ']" data-alpharama="' . esc_attr($attr_alpha) . '" data-validate-target="' . esc_attr($attr_alpha) . '" />' .
+                '</div>' .
+                '<div class="m-0 text-base text-neutral large-only">'
+                    . esc_html($title) .
+                    '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+                '</div>' .
+            '</div>' .
+            '<div class="flex flex-col">' .
+                '<label ' .
+                    'data-validate-warn="' . esc_attr($attr) . '"' .
+                    'data-prefix="[' . esc_attr($title) . ']">' .
+                '</label>' .
+                '<label ' .
+                    'data-validate-warn="' . esc_attr($attr_alpha) . '"' .
+                    'data-prefix="[' . esc_attr($title) . ' alpha]">' .
+                '</label>' .
+            '</div>'
+        );
+    }
+}
 
 $website_locale = get_locale();
 $website_lang_name = '';

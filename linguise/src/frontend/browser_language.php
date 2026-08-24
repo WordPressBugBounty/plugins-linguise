@@ -54,7 +54,7 @@ class LinguiseBrowserLanguage extends LinguiseRedirector
             $accept_language = sanitize_text_field($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             $accept_languages = self::splitAcceptLanguage($accept_language);
             if (empty($accept_languages)) {
-                return null; // @codeCoverageIgnore
+                return null;
             }
 
             // If one preferred lang and it's `*`, return null
@@ -117,6 +117,10 @@ class LinguiseBrowserLanguage extends LinguiseRedirector
             $weight = 1.0;
             if (count($language_with_weight) > 1) {
                 $weight = floatval($language_with_weight[1]);
+            }
+            if ($language_with_weight[0] === '') {
+                // Skip empty language entries (e.g. header sanitized to empty)
+                continue;
             }
             $languages_weighted[] = [
                 'lang' => $language_with_weight[0],

@@ -111,6 +111,8 @@ DB_HOST=my-host DB_USER=myuser ./vendor/bin/phpunit
 
 Script-PHP uses a namespace-function-override pattern. `CurlStub.php` defines replacements for `curl_init`, `curl_setopt`, `curl_exec`, `curl_getinfo`, `curl_close`, etc. in the `Linguise\Script\Core` namespace. This means tests can control exactly what curl returns without any real HTTP traffic.
 
+The stub keeps **request headers** (set via `CURLOPT_HTTPHEADER`, exposed through `getHeaders()`/`getLastClosedHeaders()`) separate from **response headers** (set via `setNextResponse(..., $headers)`, used to build the simulated `curl_exec` output). The simulated response includes an `HTTP/1.1 <code> OK` status line as the first line, matching real curl output (CurlRequest skips that first line when parsing headers).
+
 ```php
 // Example: make CurlRequest return a specific HTTP response
 CurlStub::setResponse(200, 'HTTP/1.1 200 OK', '<html>...</html>');

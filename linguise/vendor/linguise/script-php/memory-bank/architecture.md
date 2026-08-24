@@ -25,12 +25,14 @@ linguise.php  (public entry point)
                     ├── ob_start()
                     ├── CurlRequest::makeRequest()      ← proxies origin server
                     │       └── Response   ← accumulates status, headers, body, cookies
+                    │                        (decodes Content-Encoding if compressed)
+
                     ├── Cache::serve()                  ← short-circuit if hit
                     ├── Translation::translate()        ← POST to translate.linguise.com
                     │       ├── Boundary   ← builds multipart/form-data payload
                     │       └── Response   ← overwritten with translated HTML
                     ├── Defer::add(fn → Cache::save())  ← write cache after response sent
-                    └── Response::end()                 ← flush headers + body to client
+                    └── Response::end()                 ← re-compress (if tracked) + flush to client
 ```
 
 ## WP / Joomla Plugin Entry Point
@@ -55,6 +57,10 @@ Orchestrator for all translation requests. Sequences: open output buffer → `Cu
 
 Performs the proxy curl to the origin server, forwarding all incoming headers, cookies, POST fields (including JSON multipart bodies and file uploads). Correctly re-streams `php://input` for JSON POST bodies (PHP bug #9441 workaround). Response headers and body are written into the `Response` singleton.
 
+If the origin response is compressed (`Content-Encoding: gzip/deflate/br/zstd`), the body is decoded before content-type detection/translation, and the encoding is recorded on the `Response` singleton so it can be re-applied before sending.
+
+Response headers and body are written into the `Response` singleton.
+
 ### src/Translation.php
 
 Sends the buffered HTML to `translate.linguise.com` using a `Boundary` (multipart/form-data) POST that includes the token, URL, requested language, client IP, user-agent, and optional editor/AI tokens. On success, decodes the JSON response, persists translated URL mappings (via `Defer`), and updates `Response`. On failure, issues a 307 redirect back to the non-translated page.
@@ -73,7 +79,7 @@ Singleton that parses the inbound request: protocol, hostname, path, query strin
 
 ### src/Response.php
 
-Singleton that accumulates page content, HTTP status code, headers, redirect URL, content type, and cookies from the origin or translation server. `end()` flushes everything to the client.
+Singleton that accumulates page content, HTTP status code, headers, redirect URL, content type, and cookies from the origin or translation server. `end()` flushes everything to the client. On PHP 7.3+, emitted cookies preserve the `SameSite` attribute parsed from origin `Set-Cookie` headers. When a content encoding was tracked from the origin, `end()` re-compresses the (translated) content with that encoding and emits the `Content-Encoding` header (unless `compress_response` is `false`).
 
 ### src/Cache.php
 

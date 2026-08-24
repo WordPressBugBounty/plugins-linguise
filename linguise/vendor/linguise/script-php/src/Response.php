@@ -32,6 +32,11 @@ class Response {
     protected $content_type = null;
 
     /**
+     * @var null|string Content encoding received from the origin (gzip, deflate, br, ...)
+     */
+    protected $content_encoding = null;
+
+    /**
      * @var array Headers
      */
     protected $headers = [];
@@ -101,6 +106,27 @@ class Response {
     public function setContentType($content_type)
     {
         $this->content_type = $content_type;
+    }
+
+    /**
+     * Set the content encoding received from the origin (e.g. gzip, deflate, br).
+     * When set, the response is re-compressed with this encoding before being sent.
+     *
+     * @param string|null $content_encoding
+     */
+    public function setContentEncoding($content_encoding)
+    {
+        $this->content_encoding = $content_encoding;
+    }
+
+    /**
+     * Get the content encoding received from the origin
+     *
+     * @return string|null
+     */
+    public function getContentEncoding()
+    {
+        return $this->content_encoding;
     }
 
     /**
@@ -229,6 +255,99 @@ class Response {
         return false;
     }
 
+    /**
+     * Encode a response body using the Content-Encoding the origin response used.
+     *
+     * Encodings are applied in the order they appear in the header (e.g. "gzip, br").
+     * Returns null when the encoding is unknown, unsupported by PHP, or the payload
+     * could not be compressed, in which case the caller should send the body as-is.
+     *
+     * @param string $content  Content to compress
+     * @param string $encoding Content-Encoding header value
+     * @return string|null Compressed body, or null if it could not be compressed
+     */
+    protected function encodeContentEncoding($content, $encoding)
+    {
+        $encodings = array_map('trim', explode(',', $encoding));
+
+        foreach ($encodings as $current_encoding) {
+            $current_encoding = strtolower($current_encoding);
+
+            if ($current_encoding === 'identity') {
+                continue;
+            }
+
+            $encoded = $this->encodeSingleContentEncoding($content, $current_encoding);
+            if ($encoded === null) {
+                return null;
+            }
+
+            $content = $encoded;
+        }
+
+        return $content;
+    }
+
+    /**
+     * Compress content with a single Content-Encoding token.
+     *
+     * @param string $content  Content to compress
+     * @param string $encoding Single lowercase encoding token
+     * @return string|null Compressed body, or null when compression is not possible
+     */
+    protected function encodeSingleContentEncoding($content, $encoding)
+    {
+        switch ($encoding) {
+            case 'gzip':
+            case 'x-gzip':
+                if (function_exists('gzencode')) {
+                    $encoded = gzencode($content);
+                    if ($encoded !== false) {
+                        return $encoded;
+                    }
+                }
+
+                return null;
+
+            case 'deflate':
+                if (function_exists('gzdeflate')) {
+                    $encoded = gzdeflate($content);
+                    if ($encoded !== false) {
+                        return $encoded;
+                    }
+                }
+
+                return null;
+
+            case 'br':
+                if (function_exists('brotli_compress')) {
+                    // call_user_func avoids a static-analysis "undefined function"
+                    // warning when the optional brotli extension is not installed.
+                    $encoded = @call_user_func('brotli_compress', $content);
+                    if ($encoded !== false) {
+                        return $encoded;
+                    }
+                }
+
+                return null;
+
+            case 'zstd':
+                if (function_exists('zstd_compress')) {
+                    // call_user_func avoids a static-analysis "undefined function"
+                    // warning when the optional zstd extension is not installed.
+                    $encoded = @call_user_func('zstd_compress', $content);
+                    if ($encoded !== false) {
+                        return $encoded;
+                    }
+                }
+
+                return null;
+
+            default:
+                return null;
+        }
+    }
+
     public function end()
     {
         ignore_user_abort(true);
@@ -243,8 +362,17 @@ class Response {
         ob_start();
 
         if ($this->content) {
-            //fixme: handle gzip
-            echo $this->content;
+            $content = $this->content;
+            // Re-compress the (translated) content with the encoding the origin
+            // response used, so the client still receives a compressed response.
+            if ($this->content_encoding !== null && Configuration::getInstance()->get('compress_response') !== false) {
+                $compressed = $this->encodeContentEncoding($content, $this->content_encoding);
+                if ($compressed !== null) {
+                    $content = $compressed;
+                    header('Content-Encoding: ' . $this->content_encoding);
+                }
+            }
+            echo $content;
         }
 
         // Set redirection if any

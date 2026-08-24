@@ -46,6 +46,8 @@ class Configuration {
     private $base_dir = null;
     /** Download certificates */
     private $dl_certificates = false;
+    /** Re-compress the response with the origin Content-Encoding before sending it */
+    private $compress_response = false;
 
     /** Advanced database configuration **/
     /** The database host */
