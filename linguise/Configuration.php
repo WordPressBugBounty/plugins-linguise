@@ -149,7 +149,12 @@ class Configuration
                 if (isset($parts['path'])) {
                     $has_trailing_slash = (substr($parts['path'], -1) === '/');
 
-                    $segments = array_map('rawurlencode', explode('/', trim($parts['path'], '/')));
+                    $segments = array_map(
+                        function ($segment) {
+                            return rawurlencode(rawurldecode($segment));
+                        },
+                        explode('/', trim($parts['path'], '/'))
+                    );
                     $joined_path = implode('/', $segments);
 
                     if (empty($joined_path)) {
