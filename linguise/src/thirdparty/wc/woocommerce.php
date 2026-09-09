@@ -251,8 +251,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     /**
      * Determines if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -262,8 +260,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -304,8 +300,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     /**
      * Unload the integration
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function destroy()
@@ -338,8 +332,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     /**
      * Reload the integration
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function reload()
@@ -352,8 +344,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
 
     /**
      * Initializes the common hooks required for this integration to work
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -417,7 +407,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         $url_path = $parsed_url['path'] ?? '';
 
         if (!empty($site_path) && $site_path !== '/') {
-            // @codeCoverageIgnoreStart
             $site_path_slug = ltrim($site_path, '/'); // e.g. 'uk'
 
             $url_path = ltrim($url_path, '/');
@@ -435,7 +424,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             }
 
             $url_path = $language . '/' . $site_path_slug . '/' . $url_path;
-            // @codeCoverageIgnoreEnd
         } else {
             // No multisite path — just ensure language prefix, no duplicates
             $url_path = ltrim($url_path, '/');
@@ -460,7 +448,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
     public function hookWCNewOrder($order_id, $order)
     {
         if (WPHelper::isAdminRequest()) {
-            return; // @codeCoverageIgnore
+            return;
         }
 
         $language_meta = $this->getWooLanguage();
@@ -558,7 +546,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
              * @see https://wordpress.org/plugins/funnel-builder/
              */
             if (is_plugin_active('funnel-builder/funnel-builder.php')) {
-                return add_query_arg('linguise_language', $language_meta, $endpoint); // @codeCoverageIgnore
+                return add_query_arg('linguise_language', $language_meta, $endpoint);
             }
 
             return str_replace('checkout', 'checkout&linguise_language=' . $language_meta, $endpoint);
@@ -634,8 +622,6 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
      * Hook WC reset password, this function will flush the reset password cookie from user browser
      * when reset password is successful and it's in translated pages
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function hookWCCustomerResetPassword()
@@ -677,7 +663,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
             foreach ($data as $class => $fragment) {
                 if (!is_string($fragment)) {
                     // Ignore non-string fragments
-                    continue; // @codeCoverageIgnore
+                    continue;
                 }
 
                 $html_content .= '<divlinguise data-wp-linguise-class="' . $class . '">' . $fragment . '</divlinguise>';
@@ -772,7 +758,7 @@ class WooCommerceIntegration extends LinguiseBaseIntegrations
         if (!empty($replaced)) {
             return $replaced;
         }
-        return $html; // @codeCoverageIgnore
+        return $html;
     }
 
     /**

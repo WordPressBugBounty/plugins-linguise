@@ -45,8 +45,6 @@ class WPGridBuilderIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the WPGB integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -56,8 +54,6 @@ class WPGridBuilderIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -77,8 +73,6 @@ class WPGridBuilderIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -181,44 +175,21 @@ class WPGridBuilderIntegration extends LinguiseBaseIntegrations
 
         $translated_result = $this->translateFragments($html_content, $language, '/');
 
-        if ($translated_result === false) {
-            return $output;
-        }
-
-        if (isset($translated_result->redirect)) {
-            // Somehow we got this...?
+        if ($translated_result === false || isset($translated_result->redirect)) {
+            // Failed to translate, or we somehow got a redirect
             return $output;
         }
 
         $translated_fragments = FragmentHandler::intoJSONFragments($translated_result->content);
-        if (empty($translated_fragments)) {
-            return $output;
-        }
 
-        // Get $translated_fragments['wpgb-filters']['render-output']
-        if (!isset($translated_fragments['wpgb-filters'])) {
-            return $output;
-        }
-
-        if (!isset($translated_fragments['wpgb-filters']['render-output'])) {
-            return $output;
-        }
-
-        $tl_json_frag = $translated_fragments['wpgb-filters']['render-output'];
-        if (empty($tl_json_frag)) {
-            return $output;
-        }
-
-        $tl_json_frag_list = $tl_json_frag['fragments'];
+        // Get the translated fragments for this fragment name/param
+        $tl_json_frag_list = $translated_fragments['wpgb-filters']['render-output']['fragments'] ?? [];
         if (empty($tl_json_frag_list)) {
             return $output;
         }
 
         $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($output, $tl_json_frag_list);
-        if ($replaced_content !== false) {
-            return $replaced_content;
-        }
 
-        return $output;
+        return $replaced_content !== false ? $replaced_content : $output;
     }
 }

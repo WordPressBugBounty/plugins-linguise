@@ -157,7 +157,7 @@ class LinguiseConfiguration
         // Save htaccess content
         $htaccess_path = ABSPATH . DIRECTORY_SEPARATOR . '.htaccess';
         if (!$wp_filesystem->exists($htaccess_path)) {
-            throw new Exception(__('Htaccess file doesn\'t exist. This may be a problem is you are under an Apache server. Please check the documentation to finish the installation manually: <a href="https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/" target="_blank">how to configure Linguise</a>', 'linguise'), 0); // @codeCoverageIgnore
+            throw new Exception(__('Htaccess file doesn\'t exist. This may be a problem is you are under an Apache server. Please check the documentation to finish the installation manually: <a href="https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/" target="_blank">how to configure Linguise</a>', 'linguise'), 0);
         }
 
         $script_path = LINGUISE_PLUGIN_PATH . 'script.php';
@@ -195,7 +195,7 @@ class LinguiseConfiguration
         }
 
         if (!is_writable($htaccess_path)) {
-            throw new Exception(__('Htaccess file is not writable, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href="https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/" target="_blank">how to configure Linguise</a>.', 'linguise'), 1); // @codeCoverageIgnore
+            throw new Exception(__('Htaccess file is not writable, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href="https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/" target="_blank">how to configure Linguise</a>.', 'linguise'), 1);
         }
 
         // Only write if necessary

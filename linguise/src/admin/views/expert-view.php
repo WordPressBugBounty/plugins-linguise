@@ -78,14 +78,14 @@ $validConfiguration['dashboard_port'] = [
 
 $multisite_data = AdminHelper::getMultisiteInfo('expert');
 
-/**
- * Convert key to "word"-like
- *
- * @param string $key Key to convert
- *
- * @return string Converted key
- */
 if (!function_exists('keyToWord')) {
+    /**
+     * Convert key to "word"-like
+     *
+     * @param string $key Key to convert
+     *
+     * @return string Converted key
+     */
     function keyToWord($key)
     {
         return ucwords(str_replace('_', ' ', $key));

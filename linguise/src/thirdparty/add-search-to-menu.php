@@ -120,7 +120,10 @@ class AddSearchToMenuIntegration extends LinguiseBaseIntegrations
         $translated = $this->translateSearchResult($search_result);
 
         echo wp_kses_post($translated);
-        exit;
+        if (defined('LINGUISE_WP_PLUGIN_TEST_MODE') && LINGUISE_WP_PLUGIN_TEST_MODE) {
+            return;
+        }
+        exit; // @codeCoverageIgnore
     }
 
     /**

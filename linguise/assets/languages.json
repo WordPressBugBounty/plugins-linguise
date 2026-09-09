@@ -436,6 +436,13 @@
     "rtl": false,
     "wp_code": "sl_SL"
   },
+  "so": {
+    "name": "Somali",
+    "original_name": "Soomaaliga",
+    "code": "so",
+    "rtl": false,
+    "wp_code": "so_SO"
+  },
   "es": {
     "name": "Spanish",
     "original_name": "Español",

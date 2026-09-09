@@ -310,18 +310,18 @@ $flag_es_mode = [
     ],
 ];
 
-/**
- * Render or create HTML for a color toggles
- *
- * @param string $attr     The attribute name
- * @param string $current  The current color
- * @param string $title    The color title or what it is for (label)
- * @param string $help     The help tooltip messages
- * @param string $fallback The default color format
- *
- * @return string The rendered color toggle
- */
 if (!function_exists('renderColorToggle')) {
+    /**
+     * Render or create HTML for a color toggles
+     *
+     * @param string $attr     The attribute name
+     * @param string $current  The current color
+     * @param string $title    The color title or what it is for (label)
+     * @param string $help     The help tooltip messages
+     * @param string $fallback The default color format
+     *
+     * @return string The rendered color toggle
+     */
     function renderColorToggle($attr, $current, $title, $help, $fallback = '#ffffff')
     {
         $color = $current ? $current : $fallback;
@@ -348,19 +348,19 @@ if (!function_exists('renderColorToggle')) {
     }
 }
 
-/**
- * Render or create HTML for a color toggles with alpha input
- *
- * @param string $attr     The attribute name
- * @param string $current  The current color
- * @param float  $alpha    The alpha number
- * @param string $title    The color title or what it is for (label)
- * @param string $help     The help tooltip messages
- * @param string $fallback The default color format
- *
- * @return string The rendered color toggle with alpha input
- */
 if (!function_exists('renderColorTranslucentToggle')) {
+    /**
+     * Render or create HTML for a color toggles with alpha input
+     *
+     * @param string $attr     The attribute name
+     * @param string $current  The current color
+     * @param float  $alpha    The alpha number
+     * @param string $title    The color title or what it is for (label)
+     * @param string $help     The help tooltip messages
+     * @param string $fallback The default color format
+     *
+     * @return string The rendered color toggle with alpha input
+     */
     function renderColorTranslucentToggle($attr, $current, $alpha, $title, $help, $fallback = '#ffffff')
     {
         $color = $current ? $current : $fallback;

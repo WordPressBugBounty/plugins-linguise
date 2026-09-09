@@ -192,21 +192,21 @@ class FacetWPIntegration extends LinguiseBaseIntegrations
         }
 
         $tl_json_frag = $translated_fragments['facetwp-filters']['render-output'];
-        if (empty($tl_json_frag)) {
+        if (empty($tl_json_frag)) { // @codeCoverageIgnoreStart
             return $output;
-        }
+        } // @codeCoverageIgnoreEnd
 
         $tl_json_frag_list = $tl_json_frag['fragments'];
-        if (empty($tl_json_frag_list)) {
+        if (empty($tl_json_frag_list)) { // @codeCoverageIgnoreStart
             return $output;
-        }
+        } // @codeCoverageIgnoreEnd
 
         $replaced_content = FragmentHandler::applyTranslatedFragmentsForAuto($output, $tl_json_frag_list);
         if ($replaced_content !== false) {
             return $replaced_content;
         }
 
-        return $output;
+        return $output; // @codeCoverageIgnore
     }
 
     /**

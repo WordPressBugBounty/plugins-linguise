@@ -195,9 +195,7 @@ class Helper
         linguiseRestoreMultisite();
 
         if (!$linguise_options) {
-            // @codeCoverageIgnoreStart
             return false;
-            // @codeCoverageIgnoreEnd
         }
 
         return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);

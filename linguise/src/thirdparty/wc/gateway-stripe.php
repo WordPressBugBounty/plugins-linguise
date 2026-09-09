@@ -71,8 +71,6 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -82,8 +80,6 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
 
     /**
      * Initializes the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -100,8 +96,6 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -201,7 +195,7 @@ class WCGatewayStripeIntegration extends LinguiseBaseIntegrations
         $stripe_code = $this->mapStripeLanguage($linguise_lang);
     
         if (!$stripe_code) {
-            return $params; // @codeCoverageIgnore
+            return $params;
         }
 
         $params['locale'] = $stripe_code;

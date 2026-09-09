@@ -21,8 +21,6 @@ class WCPDFIPSProIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -33,8 +31,6 @@ class WCPDFIPSProIntegration extends LinguiseBaseIntegrations
 
     /**
      * Registers filters for the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -50,8 +46,6 @@ class WCPDFIPSProIntegration extends LinguiseBaseIntegrations
 
     /**
      * Cleans up filters for the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

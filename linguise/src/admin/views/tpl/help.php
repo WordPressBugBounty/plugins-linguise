@@ -38,28 +38,28 @@ $translation_strings = [
 
 $latest_linguise_errors = \Linguise\WordPress\Admin\Helper::getLastErrors();
 
-/**
- * Create a link to the error page
- *
- * @param string|integer $error_code The error code extracted
- *
- * @return string the full link to the error code
- */
 if (!function_exists('make_error_link')) {
+    /**
+     * Create a link to the error page
+     *
+     * @param string|integer $error_code The error code extracted
+     *
+     * @return string the full link to the error code
+     */
     function make_error_link($error_code)
     {
         return 'https://www.linguise.com/documentation/debug-support/wordpress-plugin-error-codes/#' . $error_code;
     }
 }
 
-/**
- * Make and generate an error message HTML
- *
- * @param array $error The error extracted from the debug/errors file
- *
- * @return string the formatted HTML data
- */
 if (!function_exists('make_error_message')) {
+    /**
+     * Make and generate an error message HTML
+     *
+     * @param array $error The error extracted from the debug/errors file
+     *
+     * @return string the formatted HTML data
+     */
     function make_error_message($error)
     {
         $base = '<span class="timestamp">' . esc_html($error['time']) . '</span>';

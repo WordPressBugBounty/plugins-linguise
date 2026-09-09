@@ -114,7 +114,7 @@ class WPFormsIntegration extends LinguiseBaseIntegrations
      */
     public function translateEmails($args)
     {
-        // Check if headers has X-Linguise-Language
+        // Check if headers has X-Linguise-Language - this already check for unsupported language
         $linguise_lang = WPHelper::getLanguageFromReferer();
         if (empty($linguise_lang)) {
             // Skip
@@ -125,12 +125,6 @@ class WPFormsIntegration extends LinguiseBaseIntegrations
         if (!$options['woocommerce_emails_translation']) {
             // Skip, email translation is disabled
             return $args;
-        }
-
-        // Ensure the language is supported
-        if (!WPHelper::isTranslatableLanguage($linguise_lang)) {
-            // Skip, language unsupported
-            return $args; // @codeCoverageIgnore
         }
 
         $html_content = '';

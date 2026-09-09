@@ -187,7 +187,7 @@ class ThirdPartyLoader
         }
 
         if (!function_exists('is_plugin_active')) {
-            // Load plugin handler so we can use is_plugin_active
+            // Load plugin handler so we can use is_plugin_active -- required ignore as we can just do that...
             // @codeCoverageIgnoreStart
             require_once ABSPATH . 'wp-admin/includes/plugin.php';
             // @codeCoverageIgnoreEnd
