@@ -161,7 +161,7 @@ class Sqlite
             return false;
         }
 
-        return $result[0]['translation'];
+        return $result['translation'];
     }
 
     public function saveUrls($urls)

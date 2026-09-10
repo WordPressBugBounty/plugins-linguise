@@ -41,7 +41,7 @@ class CurlRequest
                 $success = fseek($stream, 0);
                 if ($success !== 0) {
                     // fail to seek
-                    return false; // @codeCoverageIgnore
+                    return false;
                 }
 
                 $memory = stream_get_contents($stream);
@@ -105,7 +105,7 @@ class CurlRequest
             $content_type = isset($_SERVER['HTTP_CONTENT_TYPE']) ? $_SERVER['HTTP_CONTENT_TYPE'] : (isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : '');
             if (isset($_SERVER['CONTENT_TYPE']) && !isset($_SERVER['HTTP_CONTENT_TYPE']) && !empty($content_type)) {
                 // Set HTTP_CONTENT_TYPE
-                $_SERVER['HTTP_CONTENT_TYPE'] = $content_type; // @codeCoverageIgnore
+                $_SERVER['HTTP_CONTENT_TYPE'] = $content_type;
             }
 
             if (count($post_fields) && !empty($content_type)) {
@@ -205,7 +205,7 @@ class CurlRequest
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         if (Configuration::getInstance()->get('dl_certificates') === true) {
-            curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath()); // @codeCoverageIgnore
+            curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath());
         }
 
         $curl_multi = CurlMulti::getInstance();
@@ -243,7 +243,7 @@ class CurlRequest
             $header_parts = explode(':', $header, 2);
 
             if (count($header_parts) !== 2) {
-                continue; // @codeCoverageIgnore
+                continue;
             }
 
             $response->addHeader($header_parts[0], ltrim($header_parts[1]));

@@ -70,6 +70,7 @@ class ThirdPartyLoader
         'wc/emails' => 'WooCommerceEmailsIntegration',
         'wc/admin-emails' => 'WooCommerceAdminEmailsIntegration',
         'wc/fibosearch' => 'WCFiboSearchIntegration',
+        'wc/searchanise' => 'WCSearchaniseIntegration',
         'wc/gateway-stripe' => 'WCGatewayStripeIntegration',
         'wc/payment-plugin-stripe' => 'WCPaymentPluginStripeIntegration',
         'wc/payment-plugin-paypal' => 'WCPaymentPluginPaypalIntegration',
