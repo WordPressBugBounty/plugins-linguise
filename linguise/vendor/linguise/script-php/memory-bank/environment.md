@@ -37,6 +37,7 @@ This is the only file site owners should edit. It declares a class `\Linguise\Sc
 | `$server_ip` | `string` | `''` | Override translation server IP |
 | `$server_port` | `int` | `443` | Override translation server port |
 | `$compress_response` | `bool` | `true` | Re-compress translated responses with the origin's `Content-Encoding` (gzip/deflate/br/zstd) before sending |
+| `$force_ipv4` | `bool` | `false` | Force IPv4 name resolution for curl requests (`CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4`). Enable when the origin resolves to an unreachable IPv6 address |
 
 ### Hook Methods (on* prefix)
 

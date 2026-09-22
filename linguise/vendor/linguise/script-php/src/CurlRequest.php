@@ -207,6 +207,11 @@ class CurlRequest
         if (Configuration::getInstance()->get('dl_certificates') === true) {
             curl_setopt($ch, CURLOPT_CAINFO, Certificates::getInstance()->getPath());
         }
+        if (Configuration::getInstance()->get('force_ipv4') === true
+            && defined('CURLOPT_IPRESOLVE')
+            && defined('CURL_IPRESOLVE_V4')) {
+            curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+        }
 
         $curl_multi = CurlMulti::getInstance();
         $curl_multi->addRequest(Cache::getInstance());

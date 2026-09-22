@@ -48,6 +48,8 @@ class Configuration {
     private $dl_certificates = false;
     /** Re-compress the response with the origin Content-Encoding before sending it */
     private $compress_response = false;
+    /** Force IPv4 name resolution for original site cURL requests (CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4) */
+    private $force_ipv4 = false;
 
     /** Advanced database configuration **/
     /** The database host */

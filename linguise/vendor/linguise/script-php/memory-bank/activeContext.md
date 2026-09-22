@@ -1,9 +1,11 @@
 # Script-PHP — Active Context
 
 ## Last Updated
-2026-08-10
+2026-09-14
 
 ## What Was Done
+- Added `force_ipv4` config option (Plan Mode approved): root `Configuration.php` + `src/Configuration.php` default `false`; `CurlRequest::makeRequest()` sets `CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4` only when enabled and the constants exist (PHP 5.5+/curl 7.10.8+)
+- Added `ConfigurationTest` cases (default disabled, set/get, `toArray`, loaded from config file) and `CurlRequestTest` cases (option applied when enabled, absent by default)
 - Fixed Moodle session/`sesskey` failures in the translation proxy (Plan Mode approved)
 - Added `SameSite` cookie preservation in `src/SetCookie.php` and `src/Response.php`
 - Guarded `session_write_close()` in `src/CurlRequest.php` to only close the Linguise admin session (`LINGSESSION`)
@@ -14,7 +16,7 @@
 - Fixed `CurlHandleStub` to separate request headers from response headers and emit a simulated HTTP status line
 
 ## Current State
-All root tests pass (585 tests, 1 skipped due to mbstring requirement). All platform tests pass (41). No public API signatures changed. Compressed origin responses are decoded for translation and re-compressed with the same `Content-Encoding` before being sent to the browser (configurable via `compress_response`).
+Root suite: 613 tests, 5 pre-existing failures/errors unrelated to this change (`compress_response` default/expectation mismatch in `ConfigurationTest` + 3 `ResponseTest` cases, `SqliteTest` file-lock error) and 1 skipped (mbstring). All platform tests pass (41). No public API signatures changed. Compressed origin responses are decoded for translation and re-compressed with the same `Content-Encoding` before being sent to the browser (configurable via `compress_response`). Curl requests can optionally be pinned to IPv4 via `force_ipv4` (default `false` = current behaviour).
 
 ## Key Things to Know
 - The WordPress and Joomla plugins call `Processor::run()` directly — it is a shared public API

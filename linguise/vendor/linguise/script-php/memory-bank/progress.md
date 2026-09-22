@@ -11,6 +11,7 @@ _(none)_
 | 2026-04-06 | Initial memory bank and AGENTS.md created | Bootstrapped from codebase exploration |
 | 2026-07-20 | Moodle session/`sesskey` fix (Plan Mode) | Updated CurlRequest, Response, SetCookie; added tests; all root tests pass |
 | 2026-08-10 | Compressed response decoding + re-compression (Plan Mode) | CurlRequest decodes gzip/deflate/br/zstd and tracks encoding; Response::end() re-compresses (compress_response config); CurlStub request/response header separation |
+| 2026-09-14 | `force_ipv4` config option (Plan Mode) | New `force_ipv4` bool (default `false`) in root + src `Configuration.php`; `CurlRequest::makeRequest()` sets `CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4` behind a `defined()` guard; tests added to `ConfigurationTest` + `CurlRequestTest` |
 
 ## Backlog
 
