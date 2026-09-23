@@ -198,7 +198,16 @@ class Helper
             return false;
         }
 
-        return $language !== $linguise_options['default_language'] && in_array($language, $linguise_options['enabled_languages']);
+        $default_language = isset($linguise_options['default_language']) ? $linguise_options['default_language'] : null;
+        $enabled_languages = isset($linguise_options['enabled_languages']) && is_array($linguise_options['enabled_languages'])
+            ? $linguise_options['enabled_languages']
+            : [];
+
+        if ($default_language === null || $default_language === '') {
+            return false;
+        }
+
+        return $language !== $default_language && in_array($language, $enabled_languages, true);
     }
 
     /**
