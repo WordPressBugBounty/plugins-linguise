@@ -72,7 +72,10 @@ function linguise_synchronize_update_config($request)
     }
 
     try {
-        $config = $synchronization->convertparamsToWPOptions($params);
+        $config = $synchronization->convertparamsToWPOptions(
+            $params,
+            isset($options['dynamic_translations']) ? $options['dynamic_translations'] : null
+        );
         $merged_config = array_merge($options, $config);
     } catch (Exception $e) {
         return new WP_Error('error', $e->getMessage(), array( 'status' => 500 ));

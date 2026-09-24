@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'PublicKeyRepair.php');
+
 add_action('wp_ajax_linguise_update_config_iframe', function () {
     // nonce
     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'linguise_update_config_iframe')) {
@@ -60,16 +62,26 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         }
     }
 
-    $options['token'] = $data['token'];
+    $old_token = isset($options['token']) ? trim((string)$options['token']) : '';
+    $options['token'] = trim((string)$data['token']);
     $options['default_language'] = $data['language'];
     $options['enabled_languages'] = $data['allowed_languages'];
 
-    $dynamic_translations = $options['dynamic_translations'];
+    $dynamic_translations = \Linguise\WordPress\PublicKeyRepair::normalizeDynamicTranslations(
+        isset($options['dynamic_translations']) ? $options['dynamic_translations'] : null
+    );
     if (isset($data['dynamic_translations'])) {
-        $dynamic_translations['enabled'] = $data['dynamic_translations'] === true ? 1 : 0;
+        $dynamic_value = $data['dynamic_translations'];
+        $dynamic_translations['enabled'] = in_array($dynamic_value, [true, 1, '1', 'true'], true) ? 1 : 0;
     }
-    if (isset($data['public_key'])) {
-        $dynamic_translations['public_key'] = $data['public_key'];
+    if ($old_token !== $options['token']) {
+        // A key is valid only for token that produced it.
+        $dynamic_translations['public_key'] = '';
+    }
+    if (isset($data['public_key'])
+        && \Linguise\WordPress\PublicKeyRepair::hasPublicKey($data['public_key'])
+    ) {
+        $dynamic_translations['public_key'] = trim((string)$data['public_key']);
     }
     $expert_mode = isset($data['expert_mode']) ? $data['expert_mode'] : [];
     if (isset($data['api_host'])) {
@@ -91,8 +103,12 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
 
     // save the options
     linguiseSwitchMainSite();
-    update_option('linguise_options', $options);
-    linguiseRestoreMultisite();
+    try {
+        update_option('linguise_options', $options);
+    } finally {
+        linguiseRestoreMultisite();
+    }
+    \Linguise\WordPress\PublicKeyRepair::scheduleForOptions($options);
     wp_send_json_success(array(
         'message' => __('Linguise settings saved!', 'linguise')
     ));

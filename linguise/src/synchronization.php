@@ -5,6 +5,8 @@ use Linguise\Vendor\Linguise\Script\Core\Configuration;
 
 defined('ABSPATH') || die('');
 
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'PublicKeyRepair.php');
+
 /**
  * Syncronization class
 */
@@ -59,15 +61,15 @@ class Synchronization
      *
      * @return array The converted params as an associative array.
      */
-    public function convertparamsToWPOptions($params)
+    public function convertparamsToWPOptions($params, $current_dynamic_translations = null)
     {
         $options = [
             'default_language' => $params['language'],
             'enabled_languages' => $params['allowed_languages'],
-            'dynamic_translations' => [
-                'enabled' => $this->intBool($params['dynamic_translations']),
-            ]
+            'dynamic_translations' => PublicKeyRepair::normalizeDynamicTranslations($current_dynamic_translations),
         ];
+
+        $options['dynamic_translations']['enabled'] = $this->intBool($params['dynamic_translations']);
 
         return $options;
     }

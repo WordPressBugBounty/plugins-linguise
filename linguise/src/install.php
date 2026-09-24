@@ -1,5 +1,9 @@
 <?php
 
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'PublicKeyRepair.php');
+
+\Linguise\WordPress\PublicKeyRepair::registerHooks();
+
 add_action('admin_init', function () {
     $installed_version = get_option('linguise_version', null);
 

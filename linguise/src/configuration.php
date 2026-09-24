@@ -1,9 +1,13 @@
 <?php
 
+use Linguise\WordPress\APIHelper;
 use Linguise\WordPress\Helper;
+use Linguise\WordPress\PublicKeyRepair;
 use Linguise\WordPress\ThirdPartyLoader;
 
 defined('ABSPATH') || die('');
+
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'PublicKeyRepair.php');
 
 /**
  * Class Linguise Configuration
@@ -228,21 +232,24 @@ class LinguiseConfiguration
 
         $expert_mode_conf = isset($old_options['expert_mode']) ? $old_options['expert_mode'] : [];
 
-        $api_host = isset($expert_mode_conf['api_host']) ? $expert_mode_conf['api_host'] : 'api.linguise.com';
-        $api_port = isset($expert_mode_conf['api_port']) ? $expert_mode_conf['api_port'] : '443';
-        $api_portless = ['80', '443'];
-
-        $api_base_url = 'http' . ($api_port === '443' ? 's' : '') . '://' . $api_host . (!in_array($api_port, $api_portless) ? ':' . $api_port : '');
+        $api_base_url = preg_replace('/\/api\/config$/', '', APIHelper::getConfigApiUrl([
+            'expert_mode' => $expert_mode_conf,
+        ]));
 
         $translate_languages = [];
 
         $token = sanitize_text_field($_POST['linguise_options']['token']);
-        $dynamic_translations = [
-            'enabled' => isset($_POST['linguise_options']['dynamic_translations']) && $_POST['linguise_options']['dynamic_translations'] === '1' ? 1 : 0,
-            'public_key' => '',
-        ];
+        $dynamic_translations = PublicKeyRepair::normalizeDynamicTranslations(
+            isset($old_options['dynamic_translations']) ? $old_options['dynamic_translations'] : null
+        );
+        $dynamic_translations['enabled'] = isset($_POST['linguise_options']['dynamic_translations'])
+            && $_POST['linguise_options']['dynamic_translations'] === '1' ? 1 : 0;
 
-        $token_changed = false;
+        $token_changed = $old_options['token'] !== $token;
+        if ($token_changed) {
+            // A key is valid only for token that produced it.
+            $dynamic_translations['public_key'] = '';
+        }
         $config_api_url = $api_base_url . '/api/config';
         if ($old_options['token'] !== $token && $token !== '') {
             $result = $this->verifyRemoteToken($token, $config_api_url, $api_web_errors);
@@ -254,7 +261,9 @@ class LinguiseConfiguration
                         $translate_languages[] = sanitize_key($translation_language->code);
                     }
                 }
-                $dynamic_translations['public_key'] = $result->public_key;
+                if (isset($result->public_key) && PublicKeyRepair::hasPublicKey($result->public_key)) {
+                    $dynamic_translations['public_key'] = trim((string)$result->public_key);
+                }
 
                 if (isset($result->dynamic_translations) &&
                     isset($result->dynamic_translations->enabled)
@@ -262,7 +271,6 @@ class LinguiseConfiguration
                     $dynamic_translations['enabled'] = (int)$result->dynamic_translations->enabled;
                 }
 
-                $token_changed = true;
             } else {
                 if (!empty($old_options['enabled_languages'])) {
                     $translate_languages = $old_options['enabled_languages'];
@@ -282,10 +290,12 @@ class LinguiseConfiguration
             }
         }
 
-        if ($dynamic_translations['enabled'] === 1 && empty($dynamic_translations['public_key']) && $token !== '') {
+        if (empty($dynamic_translations['public_key']) && $token !== '') {
             $result = $this->verifyRemoteToken($token, $config_api_url, $api_web_errors);
             if ($result !== false) {
-                $dynamic_translations['public_key'] = $result->public_key;
+                if (isset($result->public_key) && PublicKeyRepair::hasPublicKey($result->public_key)) {
+                    $dynamic_translations['public_key'] = trim((string)$result->public_key);
+                }
 
                 if (isset($result->dynamic_translations) &&
                     isset($result->dynamic_translations->enabled) &&
@@ -373,6 +383,7 @@ class LinguiseConfiguration
         linguiseSwitchMainSite();
         update_option('linguise_options', $linguise_options);
         linguiseRestoreMultisite();
+        PublicKeyRepair::scheduleForOptions($linguise_options);
 
         // Reload the third party loader
         ThirdPartyLoader::getInstance()->reload();
@@ -449,40 +460,30 @@ class LinguiseConfiguration
      */
     protected function verifyRemoteToken($new_token, $api_url, &$api_web_errors)
     {
-        $args  = array(
-            'method' => 'GET',
-            'headers' => array('Referer' => linguiseGetSite(), 'authorization' => $new_token)
-        );
+        $response = APIHelper::requestRemoteConfig($new_token, $api_url);
+        if ($response['data'] !== false) {
+            return $response['data'];
+        }
 
-        $result = wp_remote_get($api_url, $args);
-        if (!is_wp_error($result) && isset($result['response']['code'])
-            && ($result['response']['code'] === 200) && !empty($result['body'])
-        ) {
-            $apiResponse = json_decode($result['body']);
-            if (!empty($apiResponse) && is_object($apiResponse) && isset($apiResponse->data) && is_object($apiResponse->data)) {
-                return $apiResponse->data;
-            } else {
-                $api_web_errors[] = [
-                    'type' => 'error',
-                    'message' => __('API returns empty data when querying configuration. Please try again later or contact our support team if the problem persist.', 'linguise'),
-                ];
-            }
+        if ($response['empty']) {
+            $api_web_errors[] = [
+                'type' => 'error',
+                'message' => __('API returns empty data when querying configuration. Please try again later or contact our support team if the problem persist.', 'linguise'),
+            ];
+        } elseif ($response['code'] === 404) {
+            $api_web_errors[] = [
+                'type' => 'error',
+                'message' => sprintf(
+                    /* translators: %s: Site domain name */
+                    __('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'),
+                    linguiseGetSite()
+                ),
+            ];
         } else {
-            if (!is_wp_error($result) && !empty($result['response']['code']) && $result['response']['code'] === 404) {
-                $api_web_errors[] = [
-                    'type' => 'error',
-                    'message' => sprintf(
-                        /* translators: %s: Site domain name */
-                        __('The API Key provided has been rejected, please make sure you use the right key associated with the domain %s', 'linguise'),
-                        linguiseGetSite()
-                    ),
-                ];
-            } else {
-                $api_web_errors[] = [
-                    'type' => 'error',
-                    'message' => __('Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist.', 'linguise'),
-                ];
-            }
+            $api_web_errors[] = [
+                'type' => 'error',
+                'message' => __('Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist.', 'linguise'),
+            ];
         }
 
         return false;
