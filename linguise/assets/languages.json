@@ -547,6 +547,13 @@
     "rtl": false,
     "wp_code": "zh_CN"
   },
+  "zh-hk": {
+    "name": "Cantonese",
+    "original_name": "廣東話",
+    "code": "zh-hk",
+    "rtl": false,
+    "wp_code": "zh_HK"
+  },
   "zh-tw": {
     "name": "Taiwanese",
     "original_name": "台語",

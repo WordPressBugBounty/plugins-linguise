@@ -206,6 +206,7 @@ The `.agents/skills/` directory contains reusable skill definitions that AI agen
 | **`scaffold-test`** | Target `src/` class name | Generates `tests/<ClassName>Test.php` with PHPUnit 9 structure, singleton resets, CurlStub/NamespaceStub imports auto-detected from the target class's dependencies |
 | **`scaffold-platform`** | CMS platform name | Generates `src/Platforms/<Name>.php` with Hook callback stubs + `tests/Platforms/<Name>Test.php` + placeholder section in `memory-bank/cmsSupport.md` + manual checklist (with ⚠ Plan Mode warning for `Processor.php`) |
 | **`scaffold-admin-action`** | Action name + description | Generates template partial, adds handler stub to `Management.php` (⚠ Plan Mode), adds switch case in `linguise.php`, writes test stub in `tests/ManagementTest.php`, and updates `memory-bank/managementFlow.md` |
+| **`scaffold-config-option`** | Option name + type + default + `--ui` flag | Adds the option to both `Configuration.php` layers (⚠ Plan Mode), test assertion, `environment.md` row, and — with `--ui` — `OobeManager.php`, `Management::updateConfig()` (⚠ Plan Mode), and `advanced.php` form control |
 | **`update-memory-bank`** | Change type + description of work done | Reads all 11 memory-bank files, identifies which are stale based on change type, updates `activeContext.md` and `progress.md` for every invocation, applies targeted edits to other relevant files (architecture, CMS support, management flow, etc.), and reports which files need manual review. ⚠ Never auto-modifies `planModeFiles.md` |
 | **`plan-mode-preflight`** | One or more file paths to check | Reads the Plan Mode file list from `memory-bank/planModeFiles.md`, checks each input file against the list, outputs `BLOCKED` status with category + reason + Plan Mode workflow reference if a match is found (and halts), or `CLEAR` status with all checked files if none match. Read-only — never modifies any file |
 | **`debug-translation`** | (none — run directly) | Diagnoses translation failures by reading `Configuration.php` for token and debug state, checking `certificates/cacert.pem`, reading debug log entries, and cross-referencing findings against the pipeline in `memory-bank/architecture.md` to identify the most likely failure stage (CurlRequest, Cache, or Translation). Read-only — never modifies any file |
@@ -217,6 +218,7 @@ Invoke a skill when the user asks to:
 - **"Add a test for class X"** → use `scaffold-test`
 - **"Add support for CMS Y"** → use `scaffold-platform`
 - **"Add an admin action for Z"** → use `scaffold-admin-action`
+- **"Add a config option for W"** → use `scaffold-config-option`
 - **"Update the memory bank after..."** or **"Sync the memory bank"** → use `update-memory-bank`
 - **"Check if these files need Plan Mode"** or **"Run Plan Mode preflight"** → use `plan-mode-preflight`
 - **"Debug a translation failure"** or **"Why is translation not working?"** → use `debug-translation`
@@ -235,6 +237,8 @@ Scaffolding skills produce a complete scaffold; the developer then fills in the 
 ├── plan-mode-preflight/
 │   └── SKILL.md
 ├── scaffold-admin-action/
+│   └── SKILL.md
+├── scaffold-config-option/
 │   └── SKILL.md
 ├── scaffold-platform/
 │   └── SKILL.md

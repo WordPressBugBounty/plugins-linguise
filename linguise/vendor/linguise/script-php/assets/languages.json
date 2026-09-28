@@ -410,6 +410,11 @@
     "original_name": "中文",
     "code": "zh-cn"
   },
+  "zh-hk": {
+    "name": "Cantonese",
+    "original_name": "廣東話",
+    "code": "zh-hk"
+  },
   "zh-tw": {
     "name": "Taiwanese",
     "original_name": "台語",

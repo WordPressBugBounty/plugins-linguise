@@ -20,7 +20,7 @@ add_action('updated_option', function ($option, $old_value, $value) {
     // If the config updated by Api-JS via REST API
     // We don't need to sync
     if (defined('REST_REQUEST') && REST_REQUEST) {
-        return $original_data; // @codeCoverageIgnore
+        return $original_data;
     }
 
     try {
@@ -35,11 +35,11 @@ add_action('updated_option', function ($option, $old_value, $value) {
             $result = $management->pushRemoteSync($configs, $token, $api_url);
     
             if (!$result) {
-                Debug::saveError('configuration synchronization to Linguise failed:'. $token); // @codeCoverageIgnore
+                Debug::saveError('configuration synchronization to Linguise failed:'. $token);
             }
         }
-    } catch (Exception $e) { // @codeCoverageIgnore
-        Debug::saveError('configuration synchronization to Linguise failed: ' . $e->getMessage()); // @codeCoverageIgnore
+    } catch (Exception $e) {
+        Debug::saveError('configuration synchronization to Linguise failed: ' . $e->getMessage());
     }
 
     return $original_data;

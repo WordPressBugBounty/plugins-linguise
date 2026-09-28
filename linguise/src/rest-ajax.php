@@ -34,7 +34,6 @@ function linguise_intercept_ajax_request($response, $handler, $request)
 
     $options = linguiseGetOptions();
 
-    // @codeCoverageIgnoreStart
     if (!empty(Configuration::getInstance()->get('debug')) && Configuration::getInstance()->get('debug')) {
         if (is_int(Configuration::getInstance()->get('debug'))) {
             $verbosity = Configuration::getInstance()->get('debug');
@@ -43,7 +42,6 @@ function linguise_intercept_ajax_request($response, $handler, $request)
         }
         Debug::enable($verbosity, Configuration::getInstance()->get('debug_ip'));
     }
-    // @codeCoverageIgnoreEnd
 
     $route = $request->get_route();
 
@@ -216,6 +214,8 @@ function linguise_intercept_ajax_request($response, $handler, $request)
     $tl_json_frag_list = $tl_json_frag['fragments'];
     if (empty($tl_json_frag_list)) {
         // @codeCoverageIgnoreStart
+        // intoJSONFragments() always appends at least one entry to 'fragments' when the key exists,
+        // so this defensive guard is unreachable
         return $response;
         // @codeCoverageIgnoreEnd
     }

@@ -183,13 +183,10 @@ class WCPaymentPluginStripeIntegration extends LinguiseBaseIntegrations
             'de' => 'de', // German (Germany)
             'el' => 'el', // Greek (Greece)
             'en' => 'en', // English
-            'en' => 'en-GB', // English (United Kingdom)
             'es' => 'es', // Spanish (Spain)
-            'es' => 'es-419', // Spanish (Latin America)
             'et' => 'et', // Estonian (Estonia)
             'fi' => 'fi', // Finnish (Finland)
             'fr' => 'fr', // French (France)
-            'fr' => 'fr-CA', // French (Canada)
             'he' => 'he', // Hebrew (Israel)
             'hr' => 'hr', // Croatian (Croatia)
             'hu' => 'hu', // Hungarian (Hungary)
@@ -204,7 +201,6 @@ class WCPaymentPluginStripeIntegration extends LinguiseBaseIntegrations
             'nl' => 'nl', // Dutch (Netherlands)
             'pl' => 'pl', // Polish (Poland)
             'pt' => 'pt-BR', // Portuguese (Brazil)
-            'pt' => 'pt', // Portuguese (Brazil)
             'ro' => 'ro', // Romanian (Romania)
             'ru' => 'ru', // Russian (Russia)
             'sk' => 'sk', // Slovak (Slovakia)
@@ -214,6 +210,7 @@ class WCPaymentPluginStripeIntegration extends LinguiseBaseIntegrations
             'tr' => 'tr', // Turkish (Turkey)
             'vi' => 'vi', // Vietnamese (Vietnam)
             'zh-cn' => 'zh', // Chinese Simplified (China)
+            'zh-hk' => 'zh-HK', // Chinese Traditional (Hong Kong/Cantonese)
             'zh-tw' => 'zh-TW', // Chinese Traditional (Taiwan)
         ];
 

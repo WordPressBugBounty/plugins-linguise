@@ -38,7 +38,7 @@ class Helper
 
         $errorsList = [];
         if (!preg_match_all('/^\[([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})\] (?:([0-9]{3}): )?(.*)$/m', $errors, $matches, PREG_SET_ORDER)) {
-            return $errorsList; // @codeCoverageIgnore
+            return $errorsList;
         }
 
         foreach ($matches as $error) {
@@ -172,8 +172,6 @@ class Helper
      * Get multisite data information
      *
      * @param string $mode The mode to check for multisite
-     *
-     * @codeCoverageIgnore
      *
      * @return array the multisite information
      */
