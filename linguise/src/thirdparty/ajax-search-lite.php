@@ -73,8 +73,6 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the Ajax Search Lite – Live Search & Filter integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -84,8 +82,6 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -241,7 +237,7 @@ class AjaxSearchLiteIntegration extends LinguiseBaseIntegrations
 
         if (!$matches) {
             // No body match
-            return $html_result; // @codeCoverageIgnore
+            return $html_result;
         }
 
         return $matches[1];

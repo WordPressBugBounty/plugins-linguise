@@ -60,8 +60,6 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
     /**
      * Load the integration.
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function init()
@@ -81,8 +79,6 @@ class ElementorProIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

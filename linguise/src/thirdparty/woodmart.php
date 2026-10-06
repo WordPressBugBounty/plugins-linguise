@@ -36,8 +36,6 @@ class WoodmartThemeIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -47,8 +45,6 @@ class WoodmartThemeIntegration extends LinguiseBaseIntegrations
 
     /**
      * Load the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -102,8 +98,6 @@ class WoodmartThemeIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

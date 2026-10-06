@@ -21,8 +21,6 @@ class WCPBCIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the WCPBC integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -34,8 +32,6 @@ class WCPBCIntegration extends LinguiseBaseIntegrations
     /**
      * Registers filters for the integration.
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function init()
@@ -45,8 +41,6 @@ class WCPBCIntegration extends LinguiseBaseIntegrations
 
     /**
      * Cleans up filters for the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

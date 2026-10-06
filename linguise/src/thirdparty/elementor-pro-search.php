@@ -53,8 +53,6 @@ class ElementorProSearchIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -66,8 +64,6 @@ class ElementorProSearchIntegration extends LinguiseBaseIntegrations
     /**
      * Load the integration.
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function init()
@@ -77,8 +73,6 @@ class ElementorProSearchIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

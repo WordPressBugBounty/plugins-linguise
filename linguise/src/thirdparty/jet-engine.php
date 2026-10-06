@@ -52,8 +52,6 @@ class JetEngineIntegration extends LinguiseBaseIntegrations
     /**
      * Load the integration
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function init()
@@ -63,8 +61,6 @@ class JetEngineIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

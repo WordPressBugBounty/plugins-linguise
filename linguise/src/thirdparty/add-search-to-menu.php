@@ -30,8 +30,6 @@ class AddSearchToMenuIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the Add Search To Menu integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -148,8 +146,6 @@ class AddSearchToMenuIntegration extends LinguiseBaseIntegrations
 
     /**
      * Unload the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

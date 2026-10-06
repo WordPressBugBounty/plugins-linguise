@@ -96,8 +96,6 @@ class LinguiseBaseIntegrations
     /**
      * Initialize the integration
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     public function init()
@@ -108,8 +106,6 @@ class LinguiseBaseIntegrations
 
     /**
      * Unhook the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -123,8 +119,6 @@ class LinguiseBaseIntegrations
      * Reload the integration
      *
      * This is a helper function to reload the integration. By default it calls the destroy and init functions.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -191,20 +185,26 @@ class LinguiseBaseIntegrations
      * We need to define the constant LINGUISE_SCRIPT_TRANSLATION to 1.
      * Then we load the configuration from the plugin's directory.
      *
-     * @codeCoverageIgnore
-     *
      * @return void
      */
     protected function initializeConfiguration()
     {
+        // @codeCoverageIgnoreStart
+        // tests/tests.php defines this constant to 1 before any test runs, and in
+        // production linguise.php does the same, so the define() can never be reached.
         if (!defined('LINGUISE_SCRIPT_TRANSLATION')) {
             define('LINGUISE_SCRIPT_TRANSLATION', 1);
         }
+        // @codeCoverageIgnoreEnd
 
         if ($this->initialized_config) {
             return;
         }
 
+        // @codeCoverageIgnoreStart
+        // LINGUISE_PLUGIN_PATH is always defined by linguise.php, and realpath() never
+        // returns a trailing slash, so the fallback branch and the strip below can never
+        // be reached in practice.
         if (defined('LINGUISE_PLUGIN_PATH')) {
             $plugin_dir = LINGUISE_PLUGIN_PATH;
         } else {
@@ -216,6 +216,7 @@ class LinguiseBaseIntegrations
         if (substr($plugin_dir, -1) === '/') {
             $plugin_dir = substr($plugin_dir, 0, -1);
         }
+        // @codeCoverageIgnoreEnd
     
         // We require instead of include so that the autoloader can find the plugin's directory
         require_once($plugin_dir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -233,8 +234,6 @@ class LinguiseBaseIntegrations
      * @param string $linguise_language Linguise language
      * @param string $url               The string URL
      *
-     * @codeCoverageIgnore
-     *
      * @return string
      */
     protected function translateUrl($linguise_language, $url)
@@ -251,22 +250,31 @@ class LinguiseBaseIntegrations
         $request = Request::getInstance();
         $language_reflection = new \ReflectionProperty(get_class($request), 'language');
         if (PHP_VERSION_ID < 80100) {
+            // @codeCoverageIgnoreStart
+            // Dead on PHP 8.1+, where setAccessible() became a no-op.
             // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
             $language_reflection->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+            // @codeCoverageIgnoreEnd
         }
         $language_reflection->setValue($request, $linguise_language);
     
         $hostname_reflection = new \ReflectionProperty(get_class($request), 'hostname');
         if (PHP_VERSION_ID < 80100) {
+            // @codeCoverageIgnoreStart
+            // Dead on PHP 8.1+, where setAccessible() became a no-op.
             // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
             $hostname_reflection->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+            // @codeCoverageIgnoreEnd
         }
         $hostname_reflection->setValue($request, $hostname);
     
         $protocol_reflection = new \ReflectionProperty(get_class($request), 'protocol');
         if (PHP_VERSION_ID < 80100) {
+            // @codeCoverageIgnoreStart
+            // Dead on PHP 8.1+, where setAccessible() became a no-op.
             // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
             $protocol_reflection->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+            // @codeCoverageIgnoreEnd
         }
         $protocol_reflection->setValue($request, $protocol);
     
@@ -279,8 +287,6 @@ class LinguiseBaseIntegrations
      *
      * @param array  $search_obj The search object to translate
      * @param string $language   The language to translate to
-     *
-     * @codeCoverageIgnore
      *
      * @return object|false The array object from Linguise API call. `false` if the translation failed or failed to decode JSON.
      */
@@ -312,8 +318,6 @@ class LinguiseBaseIntegrations
      * @param string $html_content   The HTML content
      * @param string $language       The language
      * @param string $requested_path The requested path
-     *
-     * @codeCoverageIgnore
      *
      * @return object|false The array object from Linguise API call. `false` if the translation failed or failed to decode JSON.
      */
@@ -349,8 +353,11 @@ class LinguiseBaseIntegrations
         $ch = curl_init();
         list($translated_content, $response_code) = Translation::getInstance()->_translate($ch, $boundary);
         if (PHP_VERSION_ID < 80000) {
+            // @codeCoverageIgnoreStart
+            // Dead on PHP 8.0+, where curl_close() stopped doing anything.
             // phpcs:ignore PHPCompatibility.FunctionUse.RemovedFunctions.curl_closeDeprecated,Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
             curl_close($ch); // Since, PHP 8+ this thing actually does not do anything (deprecated in PHP 8.5)
+            // @codeCoverageIgnoreEnd
         }
     
         if (!$translated_content || $response_code !== 200) {
@@ -375,8 +382,11 @@ class LinguiseBaseIntegrations
         $req_reflect = new \ReflectionClass($request);
         $reflect_lang = $req_reflect->getProperty('language');
         if (PHP_VERSION_ID < 80100) {
+            // @codeCoverageIgnoreStart
+            // Dead on PHP 8.1+, where setAccessible() became a no-op.
             // phpcs:ignore Generic.PHP.DeprecatedFunctions.Deprecated -- Since PHP 8.0+, we guard it here
             $reflect_lang->setAccessible(true); // Since PHP 8.1+, this does not do anything anymore
+            // @codeCoverageIgnoreEnd
         }
         // Get the old value first
         $req_language = $request->getLanguage();
@@ -398,9 +408,13 @@ class LinguiseBaseIntegrations
         }
     
         register_shutdown_function(function () use ($db_updated) {
+            // @codeCoverageIgnoreStart
+            // Shutdown handlers run after the test runner has already stopped the coverage
+            // driver, so this branch can never be recorded.
             if ($db_updated) {
                 Database::getInstance()->close();
             }
+            // @codeCoverageIgnoreEnd
         });
 
         // Revert the language back

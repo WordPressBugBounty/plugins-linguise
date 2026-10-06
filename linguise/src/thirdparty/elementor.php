@@ -24,8 +24,6 @@ class ElementorIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -35,8 +33,6 @@ class ElementorIntegration extends LinguiseBaseIntegrations
 
     /**
      * Registers the filter for the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -48,8 +44,6 @@ class ElementorIntegration extends LinguiseBaseIntegrations
 
     /**
      * Destroys the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */

@@ -367,7 +367,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         for ($index = 0; $index < $contexts_length; $index++) {
             $context = $contexts[$index];
             if (empty($context['data'])) {
-                continue; // @codeCoverageIgnore
+                continue;
             }
             $fragments = FragmentHandler::collectFragmentFromJson($context['data']);
 
@@ -461,7 +461,7 @@ class SurecartIntegration extends LinguiseBaseIntegrations
         if (is_string($repl_block_content) && !empty($repl_block_content)) {
             return $repl_block_content;
         }
-        return $block_content; // @codeCoverageIgnore
+        return $block_content;
     }
 
     /**

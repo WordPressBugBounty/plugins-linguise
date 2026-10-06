@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.69
+ * Version:2.2.70
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -607,7 +607,7 @@ function linguiseHookLanguage()
     if (!empty($lang_referer)) {
         $new_locale = WPHelper::mapLanguageToWordPressLocale($lang_referer);
         if (!empty($new_locale)) {
-            switch_to_locale($lang_referer);
+            switch_to_locale($new_locale);
         }
         return;
     }

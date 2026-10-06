@@ -40,8 +40,6 @@ class CookieLawInfoIntegration extends LinguiseBaseIntegrations
     /**
      * Decides if the integration should be loaded.
      *
-     * @codeCoverageIgnore
-     *
      * @return boolean
      */
     public function shouldLoad()
@@ -51,8 +49,6 @@ class CookieLawInfoIntegration extends LinguiseBaseIntegrations
 
     /**
      * Registers the filter for the integration.
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
@@ -65,8 +61,6 @@ class CookieLawInfoIntegration extends LinguiseBaseIntegrations
 
     /**
      * Destroys the integration
-     *
-     * @codeCoverageIgnore
      *
      * @return void
      */
