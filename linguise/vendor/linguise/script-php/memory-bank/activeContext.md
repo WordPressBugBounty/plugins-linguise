@@ -4,6 +4,8 @@
 2026-09-14
 
 ## What Was Done
+- **2026-06-16**: Migrated build system from Webpack 5 to Vite 8 (Rolldown). Upgraded Node from 18 to 24.14.1. Single multi-entry config (`vite.config.mjs`) for admin + login bundles. jQuery kept as external. CSSCodeSplit disabled for proper CSS extraction. Output stays in `assets/` (same as source).
+- **2026-04-06**: Created `memory-bank/` directory and `AGENTS.md` from codebase exploration.
 - Added `force_ipv4` config option (Plan Mode approved): root `Configuration.php` + `src/Configuration.php` default `false`; `CurlRequest::makeRequest()` sets `CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4` only when enabled and the constants exist (PHP 5.5+/curl 7.10.8+)
 - Added `ConfigurationTest` cases (default disabled, set/get, `toArray`, loaded from config file) and `CurlRequestTest` cases (option applied when enabled, absent by default)
 - Fixed Moodle session/`sesskey` failures in the translation proxy (Plan Mode approved)

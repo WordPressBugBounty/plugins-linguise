@@ -215,9 +215,7 @@ class HTMLHelper
         // Save HTML
         $html_data = $dom->saveHTML();
         if ($html_data === false) {
-            // @codeCoverageIgnoreStart
             return '';
-            // @codeCoverageIgnoreEnd
         }
 
         // Unprotect HTML entities

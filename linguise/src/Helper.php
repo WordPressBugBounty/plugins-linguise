@@ -298,14 +298,8 @@ class Helper
             $path = substr($path, 1);
         }
 
-        // Check if LINGUISE_PLUGIN_URL has / at the end
-        if (substr(LINGUISE_PLUGIN_URL, -1) === '/') {
-            // @codeCoverageIgnoreStart
-            return LINGUISE_PLUGIN_URL . $path;
-            // @codeCoverageIgnoreEnd
-        }
-
-        return LINGUISE_PLUGIN_URL . '/' . $path;
+        // LINGUISE_PLUGIN_URL ends with a slash when built from plugin_dir_url(), normalise it anyway
+        return rtrim(LINGUISE_PLUGIN_URL, '/') . '/' . $path;
     }
 
     /**

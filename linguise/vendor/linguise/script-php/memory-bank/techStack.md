@@ -37,12 +37,12 @@ The user-facing `Configuration.php` uses the `Linguise\Script` namespace (no `Co
 
 | Property | Value |
 |----------|-------|
-| Node version | 18.17.0 (pinned via Volta) |
-| Package manager | npm (Yarn 1.22.18 also pinned via Volta) |
-| Bundler | Webpack 5 |
-| Transpiler | Babel 7 (`@babel/core`, `@babel/preset-env`) |
-| CSS | SCSS → compiled with `sass-loader`, extracted with `mini-css-extract-plugin` |
-| Minification | `terser-webpack-plugin` (JS), `css-minimizer-webpack-plugin` (CSS) |
+| Node version | 24.14.1 (pinned via Volta) |
+| Package manager | npm |
+| Bundler | Vite 8 (Rolldown) |
+| Transpiler | Built-in (Rolldown/esbuild) |
+| CSS | SCSS → compiled by Vite's built-in SCSS support (`sass` package) |
+| Minification | Built-in (Rolldown for JS, cssnano for CSS) |
 
 ### Runtime Frontend Dependencies
 
@@ -57,7 +57,7 @@ The user-facing `Configuration.php` uses the `Linguise\Script` namespace (no `Co
 
 - `jQuery` — declared as a Webpack external; loaded via CDN in the admin templates
 
-### Webpack Entry Points
+### Vite Entry Points
 
 | Entry | Output JS | Output CSS |
 |-------|-----------|------------|

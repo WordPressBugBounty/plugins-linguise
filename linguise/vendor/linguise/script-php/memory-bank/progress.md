@@ -8,6 +8,7 @@ _(none)_
 
 | Date | Task | Notes |
 |------|------|-------|
+| 2026-06-16 | Webpack → Vite 8 migration | Upgraded to Vite 8 (Rolldown), Node 24.14.1. Multi-entry config for admin+login, CSSCodeSplit disabled, jQuery external. |
 | 2026-04-06 | Initial memory bank and AGENTS.md created | Bootstrapped from codebase exploration |
 | 2026-07-20 | Moodle session/`sesskey` fix (Plan Mode) | Updated CurlRequest, Response, SetCookie; added tests; all root tests pass |
 | 2026-08-10 | Compressed response decoding + re-compression (Plan Mode) | CurlRequest decodes gzip/deflate/br/zstd and tracks encoding; Response::end() re-compresses (compress_response config); CurlStub request/response header separation |

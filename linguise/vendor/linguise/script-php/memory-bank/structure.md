@@ -10,8 +10,8 @@ ui-config.php              # Generated at runtime; holds OOBE state + login secr
                            #   ⚠ Never edit manually
 index.php / index.html     # Directory listing blockers
 composer.json              # PHP dependency manifest
-package.json               # Node/Webpack dependency manifest
-webpack.config.js          # Frontend build config (admin + login bundles)
+package.json               # Node/Vite dependency manifest
+vite.config.mjs            # Frontend build config (admin + login bundles)
 phpunit.xml                # PHPUnit 9 test configuration
 serial.php                 # Utility: reads/writes serialized PHP config
 ui-config.php              # Wrote by OobeManager (LINGUISE_OOBE_DONE, LINGUISE_LOGIN_SECRET, …)
