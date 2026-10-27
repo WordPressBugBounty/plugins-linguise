@@ -146,12 +146,21 @@ class Translation {
     public function _translate(&$ch, &$boundary) {
         $request =  Request::getInstance();
 
+        $translation_connect_timeout = (int)Configuration::getInstance()->get('translation_connect_timeout');
+        if ($translation_connect_timeout <= 0) {
+            $translation_connect_timeout = 20;
+        }
+        $translation_timeout = (int)Configuration::getInstance()->get('translation_timeout');
+        if ($translation_timeout <= 0) {
+            $translation_timeout = 300;
+        }
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http' . ((int)Configuration::getInstance()->get('port')===443?'s':''). '://'.Configuration::getInstance()->get('host').':'.Configuration::getInstance()->get('port'));
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_REFERER, $request->getBaseUrl());
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 300);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $translation_connect_timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $translation_timeout);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $boundary->getContent());
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -196,12 +205,21 @@ class Translation {
 
         Hook::trigger('onBeforeJsonTranslationRequest');
 
+        $translation_connect_timeout = (int)Configuration::getInstance()->get('translation_connect_timeout');
+        if ($translation_connect_timeout <= 0) {
+            $translation_connect_timeout = 20;
+        }
+        $translation_timeout = (int)Configuration::getInstance()->get('translation_timeout');
+        if ($translation_timeout <= 0) {
+            $translation_timeout = 300;
+        }
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'http' . ((int)Configuration::getInstance()->get('port')===443?'s':''). '://'.Configuration::getInstance()->get('host').':'.Configuration::getInstance()->get('port'));
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_REFERER, $request->getBaseUrl());
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 300);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $translation_connect_timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $translation_timeout);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $boundary->getContent());
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(

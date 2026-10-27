@@ -34,9 +34,13 @@ This is the only file site owners should edit. It declares a class `\Linguise\Sc
 | `$cache_time_check` | `int` | `3600` | Cache entry TTL in seconds |
 | `$debug` | `int` | `0` | Debug verbosity (0 = off, 1–5 = increasing detail) |
 | `$debug_ip` | `string` | `''` | Restrict debug logging to this IP (empty = all IPs) |
-| `$server_ip` | `string` | `''` | Override translation server IP |
-| `$server_port` | `int` | `443` | Override translation server port |
-| `$compress_response` | `bool` | `true` | Re-compress translated responses with the origin's `Content-Encoding` (gzip/deflate/br/zstd) before sending |
+| `$compress_response` | `bool` | `false` | Re-compress translated responses with the origin's `Content-Encoding` (gzip/deflate/br/zstd) before sending |
+| `$server_ip` | `string|null` | `null` | Override origin server IP for the same-site proxy request |
+| `$server_port` | `int` | `443` | Origin server port used with `$server_ip` |
+| `$origin_connect_timeout` | `int` | `5` | Maximum origin connection time in seconds; non-positive values use 5 |
+| `$origin_timeout` | `int` | `15` | Maximum complete origin request time in seconds; non-positive values use 15 |
+| `$translation_connect_timeout` | `int` | `20` | Maximum translation-server connection time in seconds; non-positive values use 20 |
+| `$translation_timeout` | `int` | `300` | Maximum complete translation request time in seconds; non-positive values use 300 |
 | `$force_ipv4` | `bool` | `false` | Force IPv4 name resolution for curl requests (`CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4`). Enable when the origin resolves to an unreachable IPv6 address |
 
 ### Hook Methods (on* prefix)

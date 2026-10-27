@@ -18,13 +18,15 @@
 - Fixed `CurlHandleStub` to separate request headers from response headers and emit a simulated HTTP status line
 
 ## Current State
-Root suite: 613 tests, 5 pre-existing failures/errors unrelated to this change (`compress_response` default/expectation mismatch in `ConfigurationTest` + 3 `ResponseTest` cases, `SqliteTest` file-lock error) and 1 skipped (mbstring). All platform tests pass (41). No public API signatures changed. Compressed origin responses are decoded for translation and re-compressed with the same `Content-Encoding` before being sent to the browser (configurable via `compress_response`). Curl requests can optionally be pinned to IPv4 via `force_ipv4` (default `false` = current behaviour).
+Root suite: 619 tests, 4 pre-existing failures/errors unrelated to this change (3 `ResponseTest` cases, 1 `SqliteTest` file-lock error) and 1 skipped (mbstring). All platform tests pass (41). No public API signatures changed. Compressed origin responses are decoded for translation and re-compressed with the same `Content-Encoding` before being sent to the browser (configurable via `compress_response`, currently `false` by default). Curl requests can optionally be pinned to IPv4 via `force_ipv4` (default `false` = current behaviour). Origin timeouts default to 5s connect / 15s total; translation-server timeouts default to 20s connect / 300s total and are configurable.
 
 ## Key Things to Know
 - The WordPress and Joomla plugins call `Processor::run()` directly — it is a shared public API
 - `ui-config.php` is generated — never edit manually
 - There is no database migration system — schema DDL is embedded in `src/Databases/*.php`
 - Any change to public method signatures in `Processor`, `CurlRequest`, or `Translation` requires Plan Mode
+- Origin request timeouts use `origin_connect_timeout` and `origin_timeout`; non-positive values fall back to 5s and 15s
+- Translation server timeouts use `translation_connect_timeout` and `translation_timeout`; non-positive values fall back to 20s and 300s
 - OOBE has two modes: with-token (migration of existing customers) and without-token (new installs)
 - The PrestaShop adapter is the most complex — it uses `JsonWalker` for translating JSON AJAX responses
 - `CurlRequest::makeRequest()` now preserves the origin CMS session; only `LINGSESSION` is explicitly closed
@@ -33,4 +35,5 @@ Root suite: 613 tests, 5 pre-existing failures/errors unrelated to this change (
 - `CurlRequest` decodes `Content-Encoding` (gzip/deflate/br/zstd) so translated content is plain text; `Response::end()` re-compresses with the tracked encoding unless `compress_response` is `false`
 
 ## Next Steps
-_(none pending)_
+- Coordinate new timeout keys into vendored WordPress/Joomla releases and customer expert-mode configuration
+- Evaluate a WordPress architecture change that removes the same-site origin loopback instead of only bounding it

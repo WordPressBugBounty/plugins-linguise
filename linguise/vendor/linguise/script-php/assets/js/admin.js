@@ -96,21 +96,13 @@ jQuery(document).ready(($) => {
     function updateConfigDemoScript(newConfig) {
         const previewContent = document.getElementById('dashboard-live-preview');
         previewContent.innerHTML = '';
+        newConfig.demo_mode = true;
     
         const existingScript = document.querySelector('script#config-script');
         existingScript.textContent = `var linguise_configs = {vars: {configs: ${JSON.stringify(newConfig)}}}`;
 
         const instance = new LinguiseSwitcher();
-        instance.setConfigs();
-        instance.getCurrentLanguage();
-        instance.getPath();
-        instance.demo_mode = true;
-        instance.is_joomla = false;
-        instance.is_wp = false;
-        if (typeof instance.injectCustomCSS === 'function') {
-            instance.injectCustomCSS();
-        }
-        instance.addFlag(instance.language_settings);
+        instance.initialize();
     }
 
     // Inject custom CSS

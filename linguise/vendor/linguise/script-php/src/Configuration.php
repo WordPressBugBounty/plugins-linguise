@@ -36,6 +36,14 @@ class Configuration {
     private $server_ip = null;
     /** The server port */
     private $server_port = null;
+    /** Maximum time allowed to connect to the origin server, in seconds */
+    private $origin_connect_timeout = 5;
+    /** Maximum time allowed for the complete origin request, in seconds */
+    private $origin_timeout = 15;
+    /** Maximum time allowed to connect to the translation server, in seconds */
+    private $translation_connect_timeout = 20;
+    /** Maximum time allowed for the complete translation request, in seconds */
+    private $translation_timeout = 300;
     /** Enable debug */
     private $debug = false;
     /** Debug IP */

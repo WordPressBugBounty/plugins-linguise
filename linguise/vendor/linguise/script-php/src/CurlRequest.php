@@ -196,8 +196,17 @@ class CurlRequest
         if (Configuration::getInstance()->get('server_ip') !== null) {
             curl_setopt($ch, CURLOPT_CONNECT_TO, [Request::getInstance()->getHostname() . ':' . Configuration::getInstance()->get('server_port') . ':' . Configuration::getInstance()->get('server_ip') . ':' . Configuration::getInstance()->get('server_port')]); // fixme: only available from php 7.0
         }
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        $origin_connect_timeout = (int)Configuration::getInstance()->get('origin_connect_timeout');
+        if ($origin_connect_timeout <= 0) {
+            $origin_connect_timeout = 5;
+        }
+        $origin_timeout = (int)Configuration::getInstance()->get('origin_timeout');
+        if ($origin_timeout <= 0) {
+            $origin_timeout = 15;
+        }
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $origin_connect_timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $origin_timeout);
+        curl_setopt($ch, CURLOPT_NOSIGNAL, true);
         curl_setopt($ch, CURLOPT_HEADER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -221,6 +230,14 @@ class CurlRequest
         $time_start = microtime(true);
         $curl_response = curl_exec($ch);
         Debug::timing('Curl website request took %s', $time_start);
+        $curl_info = curl_getinfo($ch);
+        Debug::log(
+            'Origin request details: primary IP ' . ($curl_info['primary_ip'] ?? 'unknown')
+            . ', connect time ' . ($curl_info['connect_time'] ?? 'unknown')
+            . ', start transfer time ' . ($curl_info['starttransfer_time'] ?? 'unknown')
+            . ', total time ' . ($curl_info['total_time'] ?? 'unknown'),
+            2
+        );
         $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $headers = substr($curl_response, 0, $header_size);
         $body = substr($curl_response, $header_size);

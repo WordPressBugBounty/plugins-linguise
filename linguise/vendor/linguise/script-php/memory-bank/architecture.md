@@ -55,7 +55,7 @@ Orchestrator for all translation requests. Sequences: open output buffer → `Cu
 
 ### src/CurlRequest.php
 
-Performs the proxy curl to the origin server, forwarding all incoming headers, cookies, POST fields (including JSON multipart bodies and file uploads). Correctly re-streams `php://input` for JSON POST bodies (PHP bug #9441 workaround). Response headers and body are written into the `Response` singleton.
+Performs the blocking proxy curl to the origin server, forwarding all incoming headers, cookies, POST fields (including JSON multipart bodies and file uploads). Correctly re-streams `php://input` for JSON POST bodies (PHP bug #9441 workaround). Response headers and body are written into the `Response` singleton. Origin connection and total timeouts are configured through `origin_connect_timeout` and `origin_timeout`, defaulting to 5 and 15 seconds. Non-positive values fall back to those defaults. Debug level 2 records resolved origin IP and curl connection, start-transfer, and total timings.
 
 If the origin response is compressed (`Content-Encoding: gzip/deflate/br/zstd`), the body is decoded before content-type detection/translation, and the encoding is recorded on the `Response` singleton so it can be re-applied before sending.
 
@@ -63,7 +63,7 @@ Response headers and body are written into the `Response` singleton.
 
 ### src/Translation.php
 
-Sends the buffered HTML to `translate.linguise.com` using a `Boundary` (multipart/form-data) POST that includes the token, URL, requested language, client IP, user-agent, and optional editor/AI tokens. On success, decodes the JSON response, persists translated URL mappings (via `Defer`), and updates `Response`. On failure, issues a 307 redirect back to the non-translated page.
+Sends the buffered HTML to `translate.linguise.com` using a `Boundary` (multipart/form-data) POST that includes the token, URL, requested language, client IP, user-agent, and optional editor/AI tokens. On success, decodes the JSON response, persists translated URL mappings (via `Defer`), and updates `Response`. On failure, issues a 307 redirect back to the non-translated page. Translation calls use `translation_connect_timeout` and `translation_timeout` (defaults 20 and 300 seconds; non-positive values fall back to those defaults) in both `_translate()` and `translateJson()`.
 
 ### src/Configuration.php (singleton)
 
