@@ -86,6 +86,9 @@ function make_nonce_url($action, $nonce_key = '_linguise_nonce_') {
 }
 
 $global_options = Database::getInstance()->retrieveOtherParam('linguise_options');
+$global_options['panel_border_radius'] = isset($global_options['panel_border_radius'])
+    ? max(0, (int)$global_options['panel_border_radius'])
+    : 10;
 $has_api_key = !empty($global_options['token']);
 
 $global_site_url = Request::getInstance(true)->getBaseUrl();

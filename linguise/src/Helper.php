@@ -370,6 +370,59 @@ class Helper
     }
 
     /**
+     * Parse a CSS color (HEX, RGB, or RGBA) into its RGBA components.
+     *
+     * @param string $color The CSS color to parse
+     *
+     * @return array|null The parsed color as an array with 'r', 'g', 'b', and 'a' keys, or null if invalid
+     */
+    public static function parseColorToRgba($color)
+    {
+        if (!is_string($color)) {
+            return null;
+        }
+
+        $color = trim($color);
+
+        if (preg_match('/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+)\s*)?\)$/i', $color, $matches)) {
+            $r = (int) $matches[1];
+            $g = (int) $matches[2];
+            $b = (int) $matches[3];
+            $a = (isset($matches[4]) && $matches[4] !== '') ? (float) $matches[4] : 1.0;
+
+            if ($r > 255 || $g > 255 || $b > 255 || $a < 0 || $a > 1) {
+                return null;
+            }
+
+            return ['r' => $r, 'g' => $g, 'b' => $b, 'a' => $a];
+        }
+
+        $rgb = self::parseHexColor($color);
+        if ($rgb === null) {
+            return null;
+        }
+
+        return ['r' => $rgb['r'], 'g' => $rgb['g'], 'b' => $rgb['b'], 'a' => 1.0];
+    }
+
+    /**
+     * Sanitize a CSS color, allowing only HEX, RGB, and RGBA values.
+     *
+     * @param string $color    The CSS color to sanitize
+     * @param string $fallback The value to return when the color is invalid
+     *
+     * @return string The sanitized color or the fallback
+     */
+    public static function sanitizeCssColor($color, $fallback = '')
+    {
+        if (self::parseColorToRgba($color) === null) {
+            return $fallback;
+        }
+
+        return trim($color);
+    }
+
+    /**
      * Check if the array is an actual object or not.
      *
      * @param array|object $arrOrObject The array or object to be checked
@@ -396,6 +449,56 @@ class Helper
         $keys = array_keys($arrOrObject);
         return implode('', $keys) !== implode(range(0, count($keys) - 1));
         // @codeCoverageIgnoreEnd
+    }
+
+    /**
+     * Recommend a switcher dropdown mode for the number of selectable languages.
+     *
+     * @param string       $defaultLanguage  The site's default language.
+     * @param array|object $enabledLanguages Enabled language codes or language objects.
+     *
+     * @return string
+     */
+    public static function getRecommendedFlagDisplayType($defaultLanguage, $enabledLanguages)
+    {
+        $languageCodes = [];
+        $defaultLanguage = is_string($defaultLanguage) ? strtolower(trim($defaultLanguage)) : '';
+        if ($defaultLanguage !== '') {
+            $languageCodes[] = $defaultLanguage;
+        }
+
+        foreach ((array) $enabledLanguages as $language) {
+            if (is_object($language)) {
+                $language = isset($language->code) ? $language->code : '';
+            } elseif (is_array($language)) {
+                $language = isset($language['code']) ? $language['code'] : '';
+            }
+
+            if (is_string($language) && trim($language) !== '') {
+                $languageCodes[] = strtolower(trim($language));
+            }
+        }
+
+        return count(array_unique($languageCodes)) < 10 ? 'dropdown' : 'dropdown_search';
+    }
+
+    /**
+     * Determine whether a saved display mode should be treated as user-managed.
+     *
+     * Legacy installations with existing switcher configuration are kept on
+     * their current mode; an explicit marker takes precedence over inference.
+     *
+     * @param array $options Stored Linguise options.
+     *
+     * @return integer
+     */
+    public static function isFlagDisplayTypeCustomized($options)
+    {
+        if (array_key_exists('flag_display_type_customized', $options)) {
+            return in_array($options['flag_display_type_customized'], [true, 1, '1'], true) ? 1 : 0;
+        }
+
+        return (array_key_exists('flag_display_type', $options) || !empty($options['token']) || !empty($options['enabled_languages'])) ? 1 : 0;
     }
 
     /**

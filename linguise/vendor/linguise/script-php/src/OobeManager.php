@@ -134,6 +134,8 @@ class OobeManager
             'language_name_hover_color' => '#222',
             'popup_language_name_color' => '#222',
             'popup_language_name_hover_color' => '#222',
+            'popup_background_color' => 'rgba(24, 14, 80, 0.42)',
+            'popup_flag_tint_background_color' => '#f1eefe',
             'flag_shadow_h' => 2,
             'flag_shadow_v' => 2,
             'flag_shadow_blur' => 12,

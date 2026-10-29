@@ -236,6 +236,52 @@ class Helper {
     }
 
     /**
+     * Recommend the switcher display type based on the number of distinct languages.
+     * The default language counts as a language even if it is not in the enabled list.
+     *
+     * @param mixed $default_language
+     * @param array $enabled_languages
+     * @return string
+     */
+    public static function getRecommendedFlagDisplayType($default_language, $enabled_languages)
+    {
+        $languages = [];
+        $enabled_languages = is_array($enabled_languages) ? $enabled_languages : [];
+
+        foreach (array_merge([$default_language], $enabled_languages) as $language) {
+            if (is_array($language) && isset($language['code'])) {
+                $language = $language['code'];
+            }
+            if (!is_scalar($language)) {
+                continue;
+            }
+
+            $language_code = self::sanitizeKey($language);
+            if ($language_code !== '') {
+                $languages[$language_code] = true;
+            }
+        }
+
+        return count($languages) >= 10 ? 'dropdown_search' : 'dropdown';
+    }
+
+    /**
+     * Resolve whether the display type has been customized, including migration
+     * behavior for installations created before the local marker existed.
+     *
+     * @param array $options
+     * @return bool
+     */
+    public static function isFlagDisplayTypeCustomized($options)
+    {
+        if (array_key_exists('flag_display_type_customized', $options)) {
+            return in_array($options['flag_display_type_customized'], [true, 1, '1'], true);
+        }
+
+        return !empty($options['token']) || !empty($options['enabled_languages']);
+    }
+
+    /**
      * Transform remote configuration to local configuration
      *
      * @param array $local_config local configuration
@@ -266,6 +312,9 @@ class Helper {
         $local_config['flag_pt_type'] = $language_settings['flag_pt_type'];
         $local_config['flag_tw_type'] = $language_settings['flag_tw_type'];
         $local_config['flag_border_radius'] = $language_settings['flag_border_radius'];
+        if (isset($language_settings['panel_border_radius'])) {
+            $local_config['panel_border_radius'] = max(0, (int)$language_settings['panel_border_radius']);
+        }
         $local_config['flag_width'] = $language_settings['flag_width'];
         $local_config['pre_text'] = $language_settings['pre_text'];
         $local_config['post_text'] = $language_settings['post_text'];
@@ -274,6 +323,12 @@ class Helper {
         $local_config['language_name_hover_color'] = $language_settings['language_name_hover_color'];
         $local_config['popup_language_name_color'] = $language_settings['popup_language_name_color'];
         $local_config['popup_language_name_hover_color'] = $language_settings['popup_language_name_hover_color'];
+        if (isset($language_settings['popup_background_color'])) {
+            $local_config['popup_background_color'] = $language_settings['popup_background_color'];
+        }
+        if (isset($language_settings['popup_flag_tint_background_color'])) {
+            $local_config['popup_flag_tint_background_color'] = $language_settings['popup_flag_tint_background_color'];
+        }
         $local_config['flag_shadow_h'] = $language_settings['flag_shadow_h'];
         $local_config['flag_shadow_v'] = $language_settings['flag_shadow_v'];
         $local_config['flag_shadow_blur'] = $language_settings['flag_shadow_blur'];
@@ -289,6 +344,69 @@ class Helper {
         $local_config['language_flag_order'] = $language_settings['language_flag_order'];
 
         return $local_config;
+    }
+
+    /**
+     * Parse a CSS color (HEX, RGB, or RGBA) into its RGBA components.
+     *
+     * @param string $color The CSS color to parse
+     *
+     * @return array|null The parsed color as an array with 'r', 'g', 'b', and 'a' keys, or null if invalid
+     */
+    public static function parseColorToRgba($color)
+    {
+        if (!is_string($color)) {
+            return null;
+        }
+
+        $color = trim($color);
+
+        if (preg_match('/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+)\s*)?\)$/i', $color, $matches)) {
+            $r = (int) $matches[1];
+            $g = (int) $matches[2];
+            $b = (int) $matches[3];
+            $a = (isset($matches[4]) && $matches[4] !== '') ? (float) $matches[4] : 1.0;
+
+            if ($r > 255 || $g > 255 || $b > 255 || $a < 0 || $a > 1) {
+                return null;
+            }
+
+            return ['r' => $r, 'g' => $g, 'b' => $b, 'a' => $a];
+        }
+
+        // Script-PHP has no parseHexColor() helper, so the HEX branch is handled inline
+        $hex = ltrim($color, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+
+        if (strlen($hex) !== 6 || !ctype_xdigit($hex)) {
+            return null;
+        }
+
+        return [
+            'r' => (int) hexdec(substr($hex, 0, 2)),
+            'g' => (int) hexdec(substr($hex, 2, 2)),
+            'b' => (int) hexdec(substr($hex, 4, 2)),
+            'a' => 1.0,
+        ];
+    }
+
+    /**
+     * Sanitize a CSS color, allowing only HEX, RGB, and RGBA values.
+     *
+     * @param string $color    The CSS color to sanitize
+     * @param string $fallback The value to return when the color is invalid
+     *
+     * @return string The sanitized color or the fallback
+     */
+    public static function sanitizeCssColor($color, $fallback = '')
+    {
+        if (self::parseColorToRgba($color) === null) {
+            return $fallback;
+        }
+
+        return trim($color);
     }
 
     /**

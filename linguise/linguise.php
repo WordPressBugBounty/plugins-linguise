@@ -4,7 +4,7 @@
  * Plugin Name: Linguise
  * Plugin URI: https://www.linguise.com/
  * Description: Linguise translation plugin
- * Version:2.2.73
+ * Version:2.2.74
  * Text Domain: linguise
  * Domain Path: /languages
  * Author: Linguise
@@ -74,6 +74,7 @@ function linguiseGetOptions()
         'default_language' => 'en',
         'enabled_languages' => array(),
         'flag_display_type' => 'popup',
+        'flag_display_type_customized' => 0,
         'display_position' => 'bottom_right',
         'enable_flag' => 1,
         'enable_language_name' => 1,
@@ -86,6 +87,7 @@ function linguiseGetOptions()
         'flag_pt_type' => 'pt',
         'flag_tw_type' => 'zh-tw',
         'flag_border_radius' => 0,
+        'panel_border_radius' => 10,
         'flag_width' => 24,
         'browser_redirect' => 0,
         'ukraine_redirect' => 0,
@@ -104,6 +106,8 @@ function linguiseGetOptions()
         'language_name_hover_color' => '#222',
         'popup_language_name_color' => '#222',
         'popup_language_name_hover_color' => '#222',
+        'popup_background_color' => 'rgba(24, 14, 80, 0.42)',
+        'popup_flag_tint_background_color' => '#f1eefe',
         'flag_shadow_h' => 2,
         'flag_shadow_v' => 2,
         'flag_shadow_blur' => 12,
@@ -130,9 +134,10 @@ function linguiseGetOptions()
     // Switch to main site
     linguiseSwitchMainSite();
 
-    $options = get_option('linguise_options');
-    if (!empty($options) && is_array($options)) {
-        $options = array_merge($defaults, $options);
+    $stored_options = get_option('linguise_options');
+    if (!empty($stored_options) && is_array($stored_options)) {
+        $options = array_merge($defaults, $stored_options);
+        $options['flag_display_type_customized'] = \Linguise\WordPress\Helper::isFlagDisplayTypeCustomized($stored_options);
     } else {
         $options = $defaults;
     }

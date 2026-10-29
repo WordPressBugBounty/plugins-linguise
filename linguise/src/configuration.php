@@ -270,7 +270,6 @@ class LinguiseConfiguration
                 ) {
                     $dynamic_translations['enabled'] = (int)$result->dynamic_translations->enabled;
                 }
-
             } else {
                 if (!empty($old_options['enabled_languages'])) {
                     $translate_languages = $old_options['enabled_languages'];
@@ -312,6 +311,14 @@ class LinguiseConfiguration
         $alternate_link = isset($_POST['linguise_options']['alternate_link']) && $_POST['linguise_options']['alternate_link'] === '1' ? 1 : 0;
         $enable_flag = isset($_POST['linguise_options']['enable_flag']) && $_POST['linguise_options']['enable_flag'] === '1' ? 1 : 0;
         $enable_language_name = isset($_POST['linguise_options']['enable_language_name']) && $_POST['linguise_options']['enable_language_name'] === '1' ? 1 : 0;
+        if ($enable_flag === 0 && $enable_language_name === 0) {
+            // Keep one visible switcher element enabled, including for direct POST requests.
+            if (!empty($old_options['enable_flag']) || empty($old_options['enable_language_name'])) {
+                $enable_flag = 1;
+            } else {
+                $enable_language_name = 1;
+            }
+        }
         $enable_language_name_popup = isset($_POST['linguise_options']['enable_language_name_popup']) && $_POST['linguise_options']['enable_language_name_popup'] === '1' ? 1 : 0;
         $short_name_input = isset($_POST['linguise_options']['enable_language_short_name']) ? $_POST['linguise_options']['enable_language_short_name'] : '0';
         $enable_language_short_name = ($short_name_input === '1' || $short_name_input === 'short') ? 1 : 0;
@@ -326,6 +333,18 @@ class LinguiseConfiguration
         $woocommerce_emails_translation = isset($_POST['linguise_options']['woocommerce_emails_translation']) && $_POST['linguise_options']['woocommerce_emails_translation'] === '1' ? 1 : 0;
         $debug = isset($_POST['linguise_options']['debug']) && $_POST['linguise_options']['debug'] === '1' ? 1 : 0;
 
+        $old_flag_display_type = isset($old_options['flag_display_type']) ? $old_options['flag_display_type'] : 'popup';
+        $flag_display_type = isset($_POST['linguise_options']['flag_display_type'])
+            ? sanitize_key($_POST['linguise_options']['flag_display_type'])
+            : $old_flag_display_type;
+        $flag_display_type_customized = Helper::isFlagDisplayTypeCustomized($old_options);
+        if (isset($_POST['linguise_options']['flag_display_type']) && $flag_display_type !== $old_flag_display_type) {
+            $flag_display_type_customized = 1;
+        }
+        if ($token_changed && $flag_display_type_customized === 0) {
+            $flag_display_type = Helper::getRecommendedFlagDisplayType($default_language, $translate_languages);
+        }
+
         $linguise_options = array(
             'token' => $token,
             'default_language' => $default_language,
@@ -339,7 +358,8 @@ class LinguiseConfiguration
             'enable_language_short_name' => $enable_language_short_name,
             'add_flag_automatically' => $add_flag_automatically,
             'custom_css' => isset($_POST['linguise_options']['custom_css']) ? $_POST['linguise_options']['custom_css'] : '',
-            'flag_display_type' => isset($_POST['linguise_options']['flag_display_type']) ? $_POST['linguise_options']['flag_display_type'] : 'popup',
+            'flag_display_type' => $flag_display_type,
+            'flag_display_type_customized' => $flag_display_type_customized,
             'display_position' => isset($_POST['linguise_options']['display_position']) ? $_POST['linguise_options']['display_position'] : 'no',
             'language_name_display' => isset($_POST['linguise_options']['language_name_display']) ? $_POST['linguise_options']['language_name_display'] : 'en',
             'flag_shape' => isset($_POST['linguise_options']['flag_shape']) ? $_POST['linguise_options']['flag_shape'] : 'rounded',
@@ -349,11 +369,14 @@ class LinguiseConfiguration
             'flag_pt_type' => isset($_POST['linguise_options']['flag_pt_type']) ? $_POST['linguise_options']['flag_pt_type'] : 'pt',
             'flag_tw_type' => isset($_POST['linguise_options']['flag_tw_type']) ? $_POST['linguise_options']['flag_tw_type'] : 'zh-tw',
             'flag_border_radius' => isset($_POST['linguise_options']['flag_border_radius']) ? (int)$_POST['linguise_options']['flag_border_radius'] : 0,
+            'panel_border_radius' => isset($_POST['linguise_options']['panel_border_radius']) ? max(0, (int)$_POST['linguise_options']['panel_border_radius']) : 10,
             'flag_width' => isset($_POST['linguise_options']['flag_width']) ? (int)$_POST['linguise_options']['flag_width'] : 24,
             'language_name_color' => isset($_POST['linguise_options']['language_name_color']) ? $_POST['linguise_options']['language_name_color'] : '#222',
             'language_name_hover_color' => isset($_POST['linguise_options']['language_name_hover_color']) ? $_POST['linguise_options']['language_name_hover_color'] : '#222',
             'popup_language_name_color' => isset($_POST['linguise_options']['popup_language_name_color']) ? $_POST['linguise_options']['popup_language_name_color'] : '#222',
             'popup_language_name_hover_color' => isset($_POST['linguise_options']['popup_language_name_hover_color']) ? $_POST['linguise_options']['popup_language_name_hover_color'] : '#222',
+            'popup_background_color' => isset($_POST['linguise_options']['popup_background_color']) ? Helper::sanitizeCssColor($_POST['linguise_options']['popup_background_color'], 'rgba(24, 14, 80, 0.42)') : 'rgba(24, 14, 80, 0.42)',
+            'popup_flag_tint_background_color' => isset($_POST['linguise_options']['popup_flag_tint_background_color']) ? Helper::sanitizeCssColor($_POST['linguise_options']['popup_flag_tint_background_color'], '#f1eefe') : '#f1eefe',
             'flag_shadow_h' => isset($_POST['linguise_options']['flag_shadow_h']) ? (int)$_POST['linguise_options']['flag_shadow_h'] : 2,
             'flag_shadow_v' => isset($_POST['linguise_options']['flag_shadow_v']) ? (int)$_POST['linguise_options']['flag_shadow_v'] : 2,
             'flag_shadow_blur' => isset($_POST['linguise_options']['flag_shadow_blur']) ? (int)$_POST['linguise_options']['flag_shadow_blur'] : 12,

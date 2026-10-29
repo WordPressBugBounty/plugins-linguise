@@ -81,7 +81,7 @@ class WCSearchaniseIntegration extends LinguiseBaseIntegrations
     /**
      * Translate selected Searchanise export text using the fragment pipeline.
      *
-     * @param array  $content Searchanise export data
+     * @param array  $content  Searchanise export data
      * @param string $language Linguise destination language
      *
      * @return array
@@ -136,7 +136,7 @@ class WCSearchaniseIntegration extends LinguiseBaseIntegrations
     /**
      * Return a Linguise URL for a Searchanise catalog entry.
      *
-     * @param string $url Catalog URL
+     * @param string $url      Catalog URL
      * @param string $language Linguise destination language
      *
      * @return string
@@ -149,9 +149,9 @@ class WCSearchaniseIntegration extends LinguiseBaseIntegrations
     /**
      * Return translated base URL used by Searchanise frontend widgets.
      *
-     * @param string $url Site URL
+     * @param string $url      Site URL
      * @param string $language Linguise destination language
-     * @param array  $params Searchanise frontend parameters
+     * @param array  $params   Searchanise frontend parameters
      *
      * @return string
      */

@@ -320,6 +320,12 @@ jQuery(document).ready(($) => {
         const targetName = ev.currentTarget.dataset.linguiseRadio;
         if (targetName) {
             globalConfig[targetName] = ev.currentTarget.value;
+            if (targetName === 'flag_display_type' && ev.originalEvent && ev.originalEvent.isTrusted) {
+                const customizedMarker = document.querySelector('[data-flag-display-type-customized]');
+                if (customizedMarker) {
+                    customizedMarker.value = '1';
+                }
+            }
             if (radioInputRerenderLanguages.includes(targetName)) {
                 rerenderLanguagesList();
             }
@@ -331,10 +337,19 @@ jQuery(document).ready(($) => {
         const targetHideIs = ev.currentTarget.dataset.hideableIs;
         if (targetHideable && targetHideIs) {
             const $target = $(`[data-hideable="${targetHideable}"]`);
-            if (ev.currentTarget.value === targetHideIs) {
+            const targetHideValues = targetHideIs.split(',').map((value) => value.trim());
+            if (targetHideValues.includes(ev.currentTarget.value)) {
                 $target.show();
             } else {
                 $target.hide();
+            }
+        }
+    });
+    $('[data-linguise-radio="flag_display_type"]').on('click', (ev) => {
+        if (ev.originalEvent && ev.originalEvent.isTrusted) {
+            const customizedMarker = document.querySelector('[data-flag-display-type-customized]');
+            if (customizedMarker) {
+                customizedMarker.value = '1';
             }
         }
     });
@@ -350,7 +365,15 @@ jQuery(document).ready(($) => {
     // Input checkbox with number
     $("[data-int-checkbox]").on('change', (ev) => {
         const targetName = ev.currentTarget.dataset.intCheckbox;
-        const checked = ev.currentTarget.checked;
+        let checked = ev.currentTarget.checked;
+        if (!checked && (targetName === 'enable_flag' || targetName === 'enable_language_name')) {
+            const otherTargetName = targetName === 'enable_flag' ? 'enable_language_name' : 'enable_flag';
+            const otherTarget = document.querySelector(`[data-int-checkbox="${otherTargetName}"]`);
+            if (otherTarget && !otherTarget.checked) {
+                ev.currentTarget.checked = true;
+                checked = true;
+            }
+        }
         if (targetName) {
             globalConfig[targetName] = checked ? 1 : 0;
             updateConfigDemoScript(globalConfig);
@@ -408,19 +431,79 @@ jQuery(document).ready(($) => {
     }
 
     /**
+     * Clamp a color component between 0 and 255
+     * @param {number|string} component the component value
+     * @returns {number} the clamped component
+     */
+    function clampComponent(component) {
+        return Math.min(255, Math.max(0, Math.round(Number(component) || 0)));
+    }
+
+    /**
+     * Clamp an alpha value between 0 and 1
+     * @param {number|string} alpha the alpha value
+     * @returns {number} the clamped alpha
+     */
+    function clampAlpha(alpha) {
+        const parsed = Number(alpha);
+        if (!Number.isFinite(parsed)) {
+            return 1;
+        }
+        return Math.min(1, Math.max(0, parsed));
+    }
+
+    /**
+     * Parse a CSS color (HEX, RGB, or RGBA) into its RGBA components
+     * @param {string} value the CSS color
+     * @returns {{r: number, g: number, b: number, a: number} | null} the parsed color or null
+     */
+    function parseRgbaColor(value) {
+        if (typeof value !== 'string') {
+            return null;
+        }
+
+        const color = value.trim().toLowerCase();
+        const rgbaMatch = color.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*([\d.]+)\s*)?\)$/);
+
+        if (rgbaMatch) {
+            return {
+                r: clampComponent(rgbaMatch[1]),
+                g: clampComponent(rgbaMatch[2]),
+                b: clampComponent(rgbaMatch[3]),
+                a: rgbaMatch[4] === undefined ? 1 : clampAlpha(rgbaMatch[4]),
+            };
+        }
+
+        const rgb = parseHexColor(color);
+        if (rgb) {
+            return { ...rgb, a: 1 };
+        }
+
+        return null;
+    }
+
+    /**
+     * Combine RGBA components into a single rgba() color string
+     * @param {{r: number, g: number, b: number, a: number}} color the color components
+     * @returns {string} rgba color string
+     */
+    function toRgbaColor({ r, g, b, a }) {
+        return `rgba(${clampComponent(r)}, ${clampComponent(g)}, ${clampComponent(b)}, ${Math.round(clampAlpha(a) * 100) / 100})`;
+    }
+
+    /**
      * Combine color and alpha transparency
-     * @param {string} color hex color string
+     * @param {string} color hex, rgb, or rgba color string
      * @param {number} alpha float number from 0 to 1
      * @returns {string | null} rgba color string
      */
     function mixinColorAndAlpha(color, alpha) {
-        const rgb = parseHexColor(color);
-        if (!rgb) {
+        const rgba = parseRgbaColor(color);
+        if (!rgba) {
             return null;
         }
-        const { r, g, b } = rgb;
 
-        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        return toRgbaColor({ ...rgba, a: alpha });
     }
 
     function setAlpharamaInput(targetElement, hexColor, alphaValue) {
@@ -441,6 +524,8 @@ jQuery(document).ready(($) => {
         const parent = elem.parentElement;
         const alpharamaInput = parent.querySelector('[data-alpharama]');
         const alpharamaBadge = parent.querySelector('[data-alpharama-target]');
+        // Iris normalizes the input value to HEX on init, which drops the alpha channel
+        const initialColor = parseRgbaColor(elem.value);
 
         if (alpharamaInput && alpharamaBadge) {
             setAlpharamaInput(alpharamaBadge, elem.value, alpharamaInput.value);
@@ -451,13 +536,27 @@ jQuery(document).ready(($) => {
             change: function (event, ui) {
                 const targetName = $(this).data('colorama');
                 const target = $(`[data-colorama-target="${targetName}"]`);
-                target.css('background-color', ui.color.toString());
-                globalConfig[targetName] = ui.color.toString();
+                const hexColor = ui.color.toString();
+                target.css('background-color', hexColor);
+                globalConfig[targetName] = hexColor;
                 if (alpharamaInput && alpharamaBadge) {
-                    const withAlpha = setAlpharamaInput(alpharamaBadge, ui.color.toString(), alpharamaInput.value);
+                    const withAlpha = setAlpharamaInput(alpharamaBadge, hexColor, alpharamaInput.value);
                     if (withAlpha) {
                         globalConfig[targetName] = withAlpha;
                     }
+                }
+                if (elem.dataset.coloramaRgba !== undefined) {
+                    // Single-value RGBA option: keep the alpha channel in the stored value.
+                    // Iris writes the HEX value back to the input after this callback, so
+                    // re-apply the RGBA value on the next tick.
+                    const applyRgba = () => {
+                        const alpha = alpharamaInput ? clampAlpha(alpharamaInput.value) : 1;
+                        const rgba = toRgbaColor({ ...(parseRgbaColor(hexColor) || { r: 0, g: 0, b: 0, a: 1 }), a: alpha });
+                        elem.value = rgba;
+                        globalConfig[targetName] = rgba;
+                    };
+                    applyRgba();
+                    setTimeout(applyRgba, 0);
                 }
                 // Dispatch event to trigger validation changes
                 this.dispatchEvent(new Event('input', { bubbles: true }));
@@ -465,6 +564,14 @@ jQuery(document).ready(($) => {
             }
         });
         globalState.coloramaSupported.push(elem);
+
+        // Restore the alpha channel iris dropped while normalizing the value
+        if (elem.dataset.coloramaRgba !== undefined && initialColor && initialColor.a < 1) {
+            const alpha = alpharamaInput ? clampAlpha(alpharamaInput.value) : initialColor.a;
+            const rgba = toRgbaColor({ ...(parseRgbaColor(elem.value) || initialColor), a: alpha });
+            elem.value = rgba;
+            globalConfig[elem.dataset.colorama] = rgba;
+        }
 
         const picker = parent.querySelector('.iris-picker');
 
@@ -491,6 +598,15 @@ jQuery(document).ready(($) => {
             if (withAlpha) {
                 globalConfig[target.replace('_alpha', '')] = withAlpha;
             }
+
+            if (coloramaInput.dataset.coloramaRgba !== undefined) {
+                // Single-value RGBA option: store the combined color in the color input
+                const rgba = toRgbaColor({ ...(parseRgbaColor(hexValue) || { r: 0, g: 0, b: 0, a: 1 }), a: value });
+                coloramaInput.value = rgba;
+                globalConfig[coloramaInput.dataset.colorama] = rgba;
+                coloramaInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
             updateConfigDemoScript(globalConfig);
         })
     });

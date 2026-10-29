@@ -1,6 +1,7 @@
 <?php
 
 use Linguise\Vendor\Linguise\Script\Core\Database;
+use Linguise\Vendor\Linguise\Script\Core\Helper;
 use Linguise\Vendor\Linguise\Script\Core\Request;
 use Linguise\Vendor\Linguise\Script\Core\Templates\Helper as AdminHelper;
 
@@ -50,6 +51,7 @@ $translation_strings = [
         'help' => __('Display flag and/or language names. Language switcher default position could be anywhere in the content or in a fixed position that stays fixed or moves on scroll', 'linguise'),
         'mode-sbs' => __('Side by side', 'linguise'),
         'mode-dropdown' => __('Dropdown', 'linguise'),
+        'mode-dropdown-search' => __('Searchable dropdown', 'linguise'),
         'mode-popup' => __('Popup', 'linguise'),
     ],
     'position' => [
@@ -69,8 +71,8 @@ $translation_strings = [
         'label' => __('Show language names', 'linguise'),
         'full' => __('Full names (English, Spanish...)', 'linguise'),
         'short' => __('Short names (EN, ES...)', 'linguise'),
-        'label_popup' => __('Show language names in Popup', 'linguise'),
-        'help_popup' => __('Display the language names in the popup box when clicking on the language switcher, "%1s" will take priority over this!', 'linguise'),
+        'label_popup' => __('Show language names in Popup/Dropdown', 'linguise'),
+        'help_popup' => __('Display the language names in the popup/dropdown box when clicking on the language switcher, "%1s" will take priority over this!', 'linguise'),
     ],
     'language_prefer' => [
         'label' => __('Language names display', 'linguise'),
@@ -123,6 +125,10 @@ $translation_strings = [
         'title' => __('Flag border radius', 'linguise'),
         'help' => __('If you\'re using the rectangle flag shape you can apply a custom border radius in pixels', 'linguise'),
     ],
+    'panel_border' => [
+        'title' => __('Panel border radius', 'linguise'),
+        'help' => __('Apply a custom border radius in pixels to popup, dropdown, or searchable dropdown panels', 'linguise'),
+    ],
     'flag_size' => [
         'title' => __('Flag size', 'linguise'),
         'help' => __('Adjust flag size in pixels. That doesn\'t change the image weight as it\'s a .svg format', 'linguise'),
@@ -139,14 +145,21 @@ $translation_strings = [
     ],
     'popup' => __('Popup settings', 'linguise'),
     'popup_text_color' => [
-        'title' => __('Popup text color', 'linguise'),
-        'name_title' => __('Popup language color', 'linguise'),
-        'name_help' => __('Select the default text color for your language names in popup box', 'linguise'),
-        'hover_title' => __('Popup language hover color', 'linguise'),
-        'hover_help' => __('Select the mouse hover text color for your language names in popup box', 'linguise'),
+        'title' => __('Item text color', 'linguise'),
+        'name_title' => __('Item text color', 'linguise'),
+        'name_help' => __('Select the default text color for language items in popup, dropdown, or searchable dropdown areas', 'linguise'),
+        'hover_title' => __('Item text hover color', 'linguise'),
+        'hover_help' => __('Select a hover text color for language items in popup, dropdown, or searchable dropdown areas', 'linguise'),
         // unused currently
         'inherit' => __('Inherit from parent', 'linguise'),
         'inherit_help' => __('Inherit the text color from the parent element rather than selecting here', 'linguise'),
+    ],
+    'popup_background' => [
+        'title' => __('Popup background', 'linguise'),
+        'background_title' => __('Popup background color', 'linguise'),
+        'background_help' => __('Select the background color of the popup panel. Use the opacity value for a semi-transparent background', 'linguise'),
+        'flag_tint_title' => __('Popup flag tint background color', 'linguise'),
+        'flag_tint_help' => __('Select the background color displayed behind the flags in the popup. Use the opacity value for a semi-transparent background', 'linguise'),
     ],
     'flag_shadow' => [
         'title' => __('Flag box shadow', 'linguise'),
@@ -176,6 +189,10 @@ $language_display_mode = [
     [
         'value' => 'dropdown',
         'label' => $translation_strings['language_display']['mode-dropdown'],
+    ],
+    [
+        'value' => 'dropdown_search',
+        'label' => $translation_strings['language_display']['mode-dropdown-search'],
     ],
     [
         'value' => 'popup',
@@ -367,6 +384,38 @@ function renderColorTranslucentToggle($attr, $current, $alpha, $title, $help, $f
     );
 };
 
+function renderColorToggleRGBA($attr, $current, $title, $help, $fallback = 'rgba(255, 255, 255, 1)') {
+    $color = $current ? $current : $fallback;
+    $parsed = \Linguise\Script\Core\Helper::parseColorToRgba($color);
+    if ($parsed === null) {
+        $parsed = \Linguise\Script\Core\Helper::parseColorToRgba($fallback);
+    }
+    $alpha = $parsed !== null ? $parsed['a'] : 1.0;
+
+    return (
+        '<div class="m-0 text-base text-neutral phone-only-flex mb-2">'
+            . esc_html($title) .
+            '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+        '</div>' .
+        '<div class="flex flex-row gap-2 items-center">'.
+            '<div class="flex flex-row gap-0 linguise-color-group with-transparency">' .
+                '<span class="color-block" data-colorama-target="' . esc_attr($attr) . '" style="background-color: ' . esc_attr($color) . '"></span>' .
+                '<span class="color-block alpha-block" data-alpharama-target="' . esc_attr($attr) . '_alpha"></span>' .
+                '<input type="text" pattern="^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$|^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*(0|1|0?\.\d+)\s*)?\)$" value="' . esc_attr($color) . '" class="linguise-input rounder" name="linguise_options[' . esc_attr($attr) . ']" data-colorama="' . esc_attr($attr) . '" data-colorama-rgba="1" data-validate-target="' . esc_attr($attr) . '" />' .
+                '<input type="number" min="0" max="1" step="0.01" value="' . esc_attr($alpha) . '" class="linguise-input rounder alpha-input" data-alpharama="' . esc_attr($attr) . '_alpha" aria-label="' . esc_attr($title) . '" />' .
+            '</div>' .
+            '<div class="m-0 text-base text-neutral large-only">'
+                . esc_html($title) .
+                '<span class="material-icons help-tooltip align-bottom ml-1" data-tippy="' . esc_attr($help) . '">help_outline</span>' .
+            '</div>' .
+        '</div>' .
+        '<label ' .
+            'data-validate-warn="' . esc_attr($attr) . '"' .
+            'data-prefix="[' . esc_attr($title) . ']">' .
+        '</label>'
+    );
+};
+
 $site_url = Request::getInstance()->getBaseUrl();
 
 ?>
@@ -483,6 +532,11 @@ $site_url = Request::getInstance()->getBaseUrl();
                         help_outline
                     </span>
                 </h3>
+                <input
+                    type="hidden"
+                    name="linguise_options[flag_display_type_customized]"
+                    value="<?php echo Helper::isFlagDisplayTypeCustomized($options) ? '1' : '0'; ?>"
+                    data-flag-display-type-customized />
                 <div class="mt-4 flex flex-row gap-2 flex-wrap">
                     <?php foreach ($language_display_mode as $mode) : ?>
                         <label class="linguise-radio rounder">
@@ -492,7 +546,7 @@ $site_url = Request::getInstance()->getBaseUrl();
                                 value="<?php echo esc_attr($mode['value']); ?>"
                                 data-linguise-radio="flag_display_type"
                                 data-target-hideable="enable_language_name_popup"
-                                data-hideable-is="popup"
+                                data-hideable-is="popup,dropdown_search"
                                 <?php AdminHelper::checked($options['flag_display_type'], $mode['value']) ?> />
                             <span class="material-icons no-select">check</span>
                             <span class="text-label font-semibold"><?php echo esc_html($mode['label']); ?></span>
@@ -527,7 +581,7 @@ $site_url = Request::getInstance()->getBaseUrl();
                         <span class="slider-label font-semibold"><?php echo esc_html($translation_strings['language_names']['label']); ?></span>
                     </label>
                 </div>
-                <div class="mt-2" data-hideable="enable_language_name_popup"<?php if (isset($options['flag_display_type']) && $options['flag_display_type'] !== 'popup') echo ' style="display: none;"'; ?>>
+                <div class="mt-2" data-hideable="enable_language_name_popup"<?php if (isset($options['flag_display_type']) && !in_array($options['flag_display_type'], ['popup', 'dropdown_search'], true)) echo ' style="display: none;"'; ?>>
                     <label class="linguise-slider-checkbox">
                         <input type="checkbox" class="slider-input" data-int-checkbox="enable_language_name_popup" name="linguise_options[enable_language_name_popup]" value="1" <?php echo isset($options['enable_language_name_popup']) ? (AdminHelper::checked($options['enable_language_name_popup'], 1)) : (''); ?> />
                         <span class="slider"></span>
@@ -768,6 +822,26 @@ $site_url = Request::getInstance()->getBaseUrl();
             <div class="flex flex-row gap-2">
                 <div>
                     <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                        <?php echo esc_html($translation_strings['panel_border']['title']); ?>
+                        <small class="text-muted">(px)</small>
+                        <span
+                            class="material-icons help-tooltip"
+                            data-tippy="<?php echo esc_attr($translation_strings['panel_border']['help']) ?>"
+                        >
+                            help_outline
+                        </span>
+                    </h3>
+                    <input
+                        type="number"
+                        class="linguise-input rounder mt-2"
+                        name="linguise_options[panel_border_radius]"
+                        value="<?php echo esc_attr(max(0, (int)($options['panel_border_radius'] ?? 10))); ?>"
+                        min="0" step="1"
+                        data-linguise-int="panel_border_radius"
+                        data-validate-target="panel-border-radius">
+                </div>
+                <div>
+                    <h3 class="m-0 text-base text-neutral-deep font-semibold">
                         <?php echo esc_html($translation_strings['flag_border']['title']); ?>
                         <small class="text-muted">(px)</small>
                         <span
@@ -809,6 +883,10 @@ $site_url = Request::getInstance()->getBaseUrl();
                 </div>
             </div>
             <label
+                data-validate-warn="panel-border-radius"
+                data-prefix="[<?php echo esc_attr($translation_strings['panel_border']['title']); ?>]">
+            </label>
+            <label
                 data-validate-warn="flag-border-radius"
                 data-prefix="[<?php echo esc_attr($translation_strings['flag_border']['title']); ?>]">
             </label>
@@ -830,6 +908,13 @@ $site_url = Request::getInstance()->getBaseUrl();
                 </h3>
                 <?php echo renderColorToggle('popup_language_name_color', $options['popup_language_name_color'], $translation_strings['popup_text_color']['name_title'], $translation_strings['popup_text_color']['name_help']); ?>
                 <?php echo renderColorToggle('popup_language_name_hover_color', $options['popup_language_name_hover_color'], $translation_strings['popup_text_color']['hover_title'], $translation_strings['popup_text_color']['hover_help']); ?>
+            </div>
+            <div class="flex flex-col gap-2 mt-4">
+                <h3 class="m-0 text-base text-neutral-deep font-semibold">
+                    <?php echo esc_html($translation_strings['popup_background']['title']); ?>
+                </h3>
+                <?php echo renderColorToggleRGBA('popup_background_color', $options['popup_background_color'] ?? 'rgba(24, 14, 80, 0.42)', $translation_strings['popup_background']['background_title'], $translation_strings['popup_background']['background_help'], 'rgba(24, 14, 80, 0.42)'); ?>
+                <?php echo renderColorToggleRGBA('popup_flag_tint_background_color', $options['popup_flag_tint_background_color'] ?? '#f1eefe', $translation_strings['popup_background']['flag_tint_title'], $translation_strings['popup_background']['flag_tint_help'], '#f1eefe'); ?>
             </div>
         </div>
         <div class="flex flex-col mt-4 linguise-inner-options">

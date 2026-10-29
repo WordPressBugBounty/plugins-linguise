@@ -26,6 +26,7 @@ class Management
         'enabled_lang_name_popup' => 'enable_language_name_popup',
         'enabled_lang_short_name' => 'enable_language_short_name',
         'lang_name_display' => 'language_name_display',
+        'panel_border_radius' => 'panel_border_radius',
     ];
 
     private function __construct()
@@ -92,7 +93,23 @@ class Management
             $linguise_options = $_POST['linguise_options'];
 
             $old_options = $db->retrieveOtherParam('linguise_options');
+            if (!is_array($old_options)) {
+                $old_options = [];
+            }
             $expert_mode_conf = isset($old_options['expert_mode']) ? $old_options['expert_mode'] : [];
+
+            $submitted_flag_display_type = isset($linguise_options['flag_display_type'])
+                ? $linguise_options['flag_display_type']
+                : (isset($old_options['flag_display_type']) ? $old_options['flag_display_type'] : 'popup');
+            $old_flag_display_type = isset($old_options['flag_display_type']) ? $old_options['flag_display_type'] : 'popup';
+            $flag_display_type_customized = Helper::isFlagDisplayTypeCustomized($old_options);
+            if (isset($linguise_options['flag_display_type_customized']) && in_array($linguise_options['flag_display_type_customized'], [true, 1, '1'], true)) {
+                $flag_display_type_customized = true;
+            }
+            // A changed radio value is a manual choice even when the admin JS did not set the marker.
+            if ($submitted_flag_display_type !== $old_flag_display_type) {
+                $flag_display_type_customized = true;
+            }
 
             $token = $linguise_options['token'];
             $dynamic_translations = [
@@ -106,7 +123,8 @@ class Management
 
             $queried_api = false;
             $token_changed = false;
-            if ($old_options['token'] !== $token && $token !== '') {
+            $old_token = isset($old_options['token']) ? $old_options['token'] : '';
+            if ($old_token !== $token && $token !== '') {
                 $api_result = $this->getRemoteData($token);
                 $queried_api = true;
                 if ($api_result !== false && isset($api_result['data'])) {
@@ -193,10 +211,25 @@ class Management
                 }
             }
 
+            if ($flag_display_type_customized) {
+                // Local user preference wins over API hydration of language settings.
+                $linguise_options['flag_display_type'] = $submitted_flag_display_type;
+            } elseif ($token_changed) {
+                $linguise_options['flag_display_type'] = Helper::getRecommendedFlagDisplayType($default_language, $translate_languages);
+            }
+
             $pre_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($linguise_options['pre_text']));
             $post_text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', stripslashes($linguise_options['post_text']));
             $enable_flag = isset($linguise_options['enable_flag']) && $linguise_options['enable_flag'] === '1' ? 1 : 0;
             $enable_language_name = isset($linguise_options['enable_language_name']) && $linguise_options['enable_language_name'] === '1' ? 1 : 0;
+            if ($enable_flag === 0 && $enable_language_name === 0) {
+                // Keep one visible switcher element enabled, including for direct POST requests.
+                if (!empty($old_options['enable_flag']) || empty($old_options['enable_language_name'])) {
+                    $enable_flag = 1;
+                } else {
+                    $enable_language_name = 1;
+                }
+            }
             $enable_language_name_popup = isset($_POST['linguise_options']['enable_language_name_popup']) && $_POST['linguise_options']['enable_language_name_popup'] === '1' ? 1 : 0;
             $short_name_input = $linguise_options['enable_language_short_name'];
             $enable_language_short_name = ($short_name_input === '1' || $short_name_input === 'short') ? 1 : 0;
@@ -207,6 +240,9 @@ class Management
             $cache_params_always_included = isset($linguise_options['cache_params_always_included']) ? trim($linguise_options['cache_params_always_included']) : '';
             $search_translation = isset($linguise_options['search_translation']) && $linguise_options['search_translation'] === '1' ? 1 : 0;
             $debug = isset($linguise_options['debug']) && $linguise_options['debug'] === '1' ? 1 : 0;
+            $panel_border_radius = isset($linguise_options['panel_border_radius'])
+                ? max(0, (int)$linguise_options['panel_border_radius'])
+                : (isset($old_options['panel_border_radius']) ? max(0, (int)$old_options['panel_border_radius']) : 10);
 
             $linguise_options = [
                 'token' => $token,
@@ -225,6 +261,7 @@ class Management
                 // Flag related
                 'display_position' => isset($linguise_options['display_position']) ? $linguise_options['display_position'] : 'no',
                 'flag_display_type' => isset($linguise_options['flag_display_type']) ? $linguise_options['flag_display_type'] : 'popup',
+                'flag_display_type_customized' => $flag_display_type_customized ? 1 : 0,
                 'enable_flag' => Helper::boolInt($enable_flag),
                 'enable_language_name' => Helper::boolInt($enable_language_name),
                 'enable_language_name_popup' => Helper::boolInt($enable_language_name_popup),
@@ -237,6 +274,7 @@ class Management
                 'flag_pt_type' => isset($linguise_options['flag_pt_type']) ? $linguise_options['flag_pt_type'] : 'pt',
                 'flag_tw_type' => isset($linguise_options['flag_tw_type']) ? $linguise_options['flag_tw_type'] : 'zh-tw',
                 'flag_border_radius' => isset($linguise_options['flag_border_radius']) ? (int)$linguise_options['flag_border_radius'] : 0,
+                'panel_border_radius' => $panel_border_radius,
                 'flag_width' => isset($linguise_options['flag_width']) ? (int)$linguise_options['flag_width'] : 24,
                 'pre_text' => $pre_text,
                 'post_text' => $post_text,
@@ -245,6 +283,8 @@ class Management
                 'language_name_hover_color' => isset($linguise_options['language_name_hover_color']) ? $linguise_options['language_name_hover_color'] : '#222',
                 'popup_language_name_color' => isset($linguise_options['popup_language_name_color']) ? $linguise_options['popup_language_name_color'] : '#222',
                 'popup_language_name_hover_color' => isset($linguise_options['popup_language_name_hover_color']) ? $linguise_options['popup_language_name_hover_color'] : '#222',
+                'popup_background_color' => isset($linguise_options['popup_background_color']) ? Helper::sanitizeCssColor($linguise_options['popup_background_color'], 'rgba(24, 14, 80, 0.42)') : 'rgba(24, 14, 80, 0.42)',
+                'popup_flag_tint_background_color' => isset($linguise_options['popup_flag_tint_background_color']) ? Helper::sanitizeCssColor($linguise_options['popup_flag_tint_background_color'], '#f1eefe') : '#f1eefe',
                 'flag_shadow_h' => isset($linguise_options['flag_shadow_h']) ? (int)$linguise_options['flag_shadow_h'] : 2,
                 'flag_shadow_v' => isset($linguise_options['flag_shadow_v']) ? (int)$linguise_options['flag_shadow_v'] : 2,
                 'flag_shadow_blur' => isset($linguise_options['flag_shadow_blur']) ? (int)$linguise_options['flag_shadow_blur'] : 12,
@@ -286,6 +326,7 @@ class Management
                         'flag_pt_type' => $linguise_options['flag_pt_type'],
                         'flag_tw_type' => $linguise_options['flag_tw_type'],
                         'flag_border_radius' => $linguise_options['flag_border_radius'],
+                        'panel_border_radius' => $linguise_options['panel_border_radius'],
                         'flag_width' => $linguise_options['flag_width'],
                         'pre_text' => $pre_text,
                         'post_text' => $post_text,
@@ -294,6 +335,8 @@ class Management
                         'language_name_hover_color' => $linguise_options['language_name_hover_color'],
                         'popup_language_name_color' => $linguise_options['popup_language_name_color'],
                         'popup_language_name_hover_color' => $linguise_options['popup_language_name_hover_color'],
+                        'popup_background_color' => $linguise_options['popup_background_color'],
+                        'popup_flag_tint_background_color' => $linguise_options['popup_flag_tint_background_color'],
                         'flag_shadow_h' => $linguise_options['flag_shadow_h'],
                         'flag_shadow_v' => $linguise_options['flag_shadow_v'],
                         'flag_shadow_blur' => $linguise_options['flag_shadow_blur'],
@@ -382,6 +425,9 @@ class Management
         $data = $_POST['config'];
         $db = Database::getInstance()->ensureConnection();
         $options = $db->retrieveOtherParam('linguise_options');
+        if (!is_array($options)) {
+            $options = [];
+        }
 
         // Check if all required fields are present
         $required_fields = [
@@ -398,9 +444,26 @@ class Management
             }
         }
 
+        $previous_flag_display_type = isset($options['flag_display_type']) ? $options['flag_display_type'] : 'popup';
+        $submitted_flag_display_type = isset($data['flag_display_type'])
+            ? $data['flag_display_type']
+            : $previous_flag_display_type;
+        $flag_display_type_customized = Helper::isFlagDisplayTypeCustomized($options);
+        if (isset($data['flag_display_type_customized']) && in_array($data['flag_display_type_customized'], [true, 1, '1'], true)) {
+            $flag_display_type_customized = true;
+        }
+        // Also recognize a direct/manual radio value if the browser did not update the hidden marker.
+        if ($submitted_flag_display_type !== $previous_flag_display_type) {
+            $flag_display_type_customized = true;
+        }
+
         $options['token'] = $data['token'];
         $options['default_language'] = $data['language'];
         $options['enabled_languages'] = $data['allowed_languages'];
+        $options['flag_display_type'] = $flag_display_type_customized
+            ? $submitted_flag_display_type
+            : Helper::getRecommendedFlagDisplayType($data['language'], $data['allowed_languages']);
+        $options['flag_display_type_customized'] = $flag_display_type_customized ? 1 : 0;
 
         $dynamic_translations = $options['dynamic_translations'];
         if (isset($data['dynamic_translations'])) {
@@ -428,7 +491,10 @@ class Management
         }
 
         $db->saveOtherParam('linguise_options', $options);
-        HttpResponse::successJSON(true, 'Configuration updated successfully', 200);
+        HttpResponse::successJSON([
+            'flag_display_type' => $options['flag_display_type'],
+            'flag_display_type_customized' => $options['flag_display_type_customized'],
+        ], 'Configuration updated successfully', 200);
     }
 
     /**
@@ -482,11 +548,17 @@ class Management
 
         if (!empty($input_data['language_settings'])) {
             foreach ($input_data['language_settings'] as $flag_key => $flag_value) {
+                if ($flag_key === 'flag_display_type_customized') {
+                    // This marker is local-only and must never be controlled by API sync.
+                    continue;
+                }
                 $flag_real_key = $flag_key;
                 if (isset(self::$flag_options_map[$flag_key])) {
                     $flag_real_key = self::$flag_options_map[$flag_key];
                 }
-                $options[$flag_real_key] = Helper::boolInt($flag_value);
+                $options[$flag_real_key] = $flag_real_key === 'panel_border_radius'
+                    ? max(0, (int)$flag_value)
+                    : Helper::boolInt($flag_value);
             }
         }
 

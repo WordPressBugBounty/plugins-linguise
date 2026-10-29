@@ -1,7 +1,7 @@
 # Script-PHP — Active Context
 
 ## Last Updated
-2026-09-14
+2026-09-30
 
 ## What Was Done
 - **2026-06-16**: Migrated build system from Webpack 5 to Vite 8 (Rolldown). Upgraded Node from 18 to 24.14.1. Single multi-entry config (`vite.config.mjs`) for admin + login bundles. jQuery kept as external. CSSCodeSplit disabled for proper CSS extraction. Output stays in `assets/` (same as source).
@@ -33,6 +33,8 @@ Root suite: 619 tests, 4 pre-existing failures/errors unrelated to this change (
 - `Response::end()` emits `SameSite` cookie attributes on PHP 7.3+
 - `CurlRequest::makeRequest()` prefers raw `php://input` for url-encoded POSTs
 - `CurlRequest` decodes `Content-Encoding` (gzip/deflate/br/zstd) so translated content is plain text; `Response::end()` re-compresses with the tracked encoding unless `compress_response` is `false`
+- `popup_background_color` / `popup_flag_tint_background_color` are single-value RGBA tokens — the opacity input in `renderColorToggleRGBA()` is a scratch control and must never be named `linguise_options[...]`
+- iris normalises a colour input to HEX on `_init()` and after every change, so any single-value RGBA input must be re-applied after `$elem.iris()` and again via `setTimeout(..., 0)` inside the `change` callback; `data-colorama-rgba="1"` is the marker the JS keys off
 
 ## Next Steps
 - Coordinate new timeout keys into vendored WordPress/Joomla releases and customer expert-mode configuration

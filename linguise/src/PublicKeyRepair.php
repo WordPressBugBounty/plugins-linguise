@@ -48,7 +48,7 @@ class PublicKeyRepair
      *
      * @param mixed $public_key Public key value.
      *
-     * @return bool
+     * @return boolean
      */
     public static function hasPublicKey($public_key)
     {
@@ -85,8 +85,8 @@ class PublicKeyRepair
     /**
      * Schedule repair for an options snapshot.
      *
-     * @param array $options Current plugin options.
-     * @param bool  $immediate Whether first attempt may run immediately.
+     * @param array   $options   Current plugin options.
+     * @param boolean $immediate Whether first attempt may run immediately.
      *
      * @return void
      */
@@ -239,10 +239,10 @@ class PublicKeyRepair
     /**
      * Persist only the public key into the latest option snapshot.
      *
-     * @param string $token     Token used for the remote request.
+     * @param string $token      Token used for the remote request.
      * @param string $public_key Public key returned by the API.
      *
-     * @return bool Whether the key was written for the same token.
+     * @return boolean Whether the key was written for the same token.
      */
     private static function persistPublicKey($token, $public_key)
     {
@@ -266,6 +266,13 @@ class PublicKeyRepair
         return (bool)update_option('linguise_options', $options);
     }
 
+    /**
+     * Acquire a claim to perform a repair.
+     *
+     * @param integer $now Current timestamp.
+     *
+     * @return string|false
+     */
     private static function acquireClaim($now)
     {
         $claim_id = function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : uniqid('linguise-', true);
@@ -292,6 +299,13 @@ class PublicKeyRepair
         return $claim_id;
     }
 
+    /**
+     * Release a claim to perform a repair.
+     *
+     * @param string $claim_id Claim ID.
+     *
+     * @return void
+     */
     private static function releaseClaim($claim_id)
     {
         $claim = get_option(self::CLAIM_OPTION, array());
@@ -304,6 +318,13 @@ class PublicKeyRepair
         }
     }
 
+    /**
+     * Schedule the next repair attempt.
+     *
+     * @param array $state Current repair state.
+     *
+     * @return void
+     */
     private static function scheduleAfterAttempt($state)
     {
         update_option(self::STATE_OPTION, $state, false);
@@ -314,6 +335,11 @@ class PublicKeyRepair
         }
     }
 
+    /**
+     * Clear all repair state.
+     *
+     * @return void
+     */
     private static function clearState()
     {
         if (function_exists('delete_option')) {

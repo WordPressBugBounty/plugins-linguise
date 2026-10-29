@@ -57,16 +57,17 @@ class Synchronization
     /**
      * Converts the params coming from the Linguise API to the format understood by WordPress options.
      *
-     * @param array $params The params coming from the Linguise API as an associative array.
+     * @param array $params  The params coming from the Linguise API as an associative array.
+     * @param array $current The current dynamic translations as an associative array.
      *
      * @return array The converted params as an associative array.
      */
-    public function convertparamsToWPOptions($params, $current_dynamic_translations = null)
+    public function convertparamsToWPOptions($params, $current = null)
     {
         $options = [
             'default_language' => $params['language'],
             'enabled_languages' => $params['allowed_languages'],
-            'dynamic_translations' => PublicKeyRepair::normalizeDynamicTranslations($current_dynamic_translations),
+            'dynamic_translations' => PublicKeyRepair::normalizeDynamicTranslations($current),
         ];
 
         $options['dynamic_translations']['enabled'] = $this->intBool($params['dynamic_translations']);

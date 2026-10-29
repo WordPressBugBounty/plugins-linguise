@@ -278,7 +278,20 @@ function registerIframe() {
             },
             success: function (response) {
                 if (!response.success) {
-                    console.error('Error updating config:', response.data);   
+                    console.error('Error updating config:', response.data);
+                    return;
+                }
+
+                const flagDisplayType = response.data?.flag_display_type;
+                if (flagDisplayType) {
+                    globalConfig.flag_display_type = flagDisplayType;
+                    const displayTypeInput = document.querySelector(
+                        `input[name="linguise_options[flag_display_type]"][value="${flagDisplayType}"]`,
+                    );
+                    if (displayTypeInput) {
+                        displayTypeInput.checked = true;
+                        displayTypeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
                 }
             },
             error: function (error) {

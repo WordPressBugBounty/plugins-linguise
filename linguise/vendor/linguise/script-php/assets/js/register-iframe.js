@@ -257,7 +257,26 @@ function registerIframe() {
             },
             success: function (response) {
                 if (response.error) {
-                    console.error('Error updating config:', response);   
+                    console.error('Error updating config:', response);
+                    return;
+                }
+
+                const finalDisplayType = response.data && response.data.flag_display_type;
+                if (finalDisplayType) {
+                    globalConfig.flag_display_type = finalDisplayType;
+
+                    const customizedMarker = document.querySelector('[data-flag-display-type-customized]');
+                    if (customizedMarker && response.data.flag_display_type_customized !== undefined) {
+                        customizedMarker.value = String(response.data.flag_display_type_customized);
+                    }
+
+                    const displayTypeInputs = document.querySelectorAll('input[name="linguise_options[flag_display_type]"]');
+                    displayTypeInputs.forEach((input) => {
+                        input.checked = input.value === finalDisplayType;
+                        if (input.checked) {
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
                 }
             },
             error: function (error) {
@@ -328,7 +347,17 @@ function registerIframe() {
         const dynamicTl = document.querySelector('input[name="linguise_options[dynamic_translations]"]');
         dynamicTl.checked = data.dynamicContent;
 
-        updateConfigToPlugin(data);
+        const pluginConfig = Object.assign({}, data);
+        const selectedDisplayType = document.querySelector('input[name="linguise_options[flag_display_type]"]:checked');
+        const customizedMarker = document.querySelector('[data-flag-display-type-customized]');
+        if (selectedDisplayType) {
+            pluginConfig.flag_display_type = selectedDisplayType.value;
+        }
+        if (customizedMarker) {
+            pluginConfig.flag_display_type_customized = customizedMarker.value;
+        }
+
+        updateConfigToPlugin(pluginConfig);
     }
 
     function updateTranslateButton(enabled = true) {

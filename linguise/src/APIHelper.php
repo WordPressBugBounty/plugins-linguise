@@ -38,7 +38,7 @@ class APIHelper
     /**
      * Request remote configuration with the authenticated CMS contract.
      *
-     * @param string $token API token.
+     * @param string $token   API token.
      * @param string $api_url Configuration endpoint.
      *
      * @return array{data: object|false, code: int, empty: bool}

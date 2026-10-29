@@ -62,10 +62,18 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         }
     }
 
+    $flag_display_type_customized = \Linguise\WordPress\Helper::isFlagDisplayTypeCustomized($options);
     $old_token = isset($options['token']) ? trim((string)$options['token']) : '';
     $options['token'] = trim((string)$data['token']);
     $options['default_language'] = $data['language'];
     $options['enabled_languages'] = $data['allowed_languages'];
+    $options['flag_display_type_customized'] = $flag_display_type_customized;
+    if ($options['flag_display_type_customized'] === 0) {
+        $options['flag_display_type'] = \Linguise\WordPress\Helper::getRecommendedFlagDisplayType(
+            $data['language'],
+            $data['allowed_languages']
+        );
+    }
 
     $dynamic_translations = \Linguise\WordPress\PublicKeyRepair::normalizeDynamicTranslations(
         isset($options['dynamic_translations']) ? $options['dynamic_translations'] : null
@@ -110,7 +118,8 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
     }
     \Linguise\WordPress\PublicKeyRepair::scheduleForOptions($options);
     wp_send_json_success(array(
-        'message' => __('Linguise settings saved!', 'linguise')
+        'message' => __('Linguise settings saved!', 'linguise'),
+        'flag_display_type' => $options['flag_display_type'],
     ));
 });
 

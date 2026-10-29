@@ -2,14 +2,14 @@
 # This file is distributed under the GPL2.
 msgid ""
 msgstr ""
-"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.73\n"
+"Project-Id-Version: Linguise - AI Automatic Multilingual Translation 2.2.74\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/linguise\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-09T16:10:13+07:00\n"
+"POT-Creation-Date: 2026-10-29T09:25:08+07:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: linguise\n"
@@ -32,30 +32,30 @@ msgid "Linguise translation plugin"
 msgstr ""
 
 #. translators: %s: Name of the conflicting translation plugin
-#: linguise.php:491
+#: linguise.php:403
 #, php-format
 msgid "We've detected that %s translation plugin is installed. Please disable it before using Linguise to avoid conflict with translated URLs mainly"
 msgstr ""
 
 #. translators: %1$s: GTranslate %2$s: GTranslate
-#: linguise.php:506
+#: linguise.php:418
 #, php-format
 msgid "It looks like you have %1$s extension that hasn't been properly uninstalled and prevents Linguise from working properly, please contact our support team or remove %2$s code from your .htaccess file."
 msgstr ""
 
-#: linguise.php:520
+#: linguise.php:432
 msgid "Linguise debug mode is currently enabled."
 msgstr ""
 
-#: linguise.php:523
+#: linguise.php:435
 msgid "This mode is intended for debugging purposes only and will generate a ton of logs that will consume a lot of space."
 msgstr ""
 
-#: linguise.php:525
+#: linguise.php:437
 msgid "Please disable it when you are done."
 msgstr ""
 
-#: linguise.php:530
+#: linguise.php:442
 msgid "Disable debug!"
 msgstr ""
 
@@ -494,307 +494,336 @@ msgid "Dropdown"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:52
+msgid "Searchable dropdown"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:53
 msgid "Popup"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:55
+#: src/admin/views/tpl/main-settings.php:56
 msgid "Position"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:56
+#: src/admin/views/tpl/main-settings.php:57
 msgid "Top left"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:57
+#: src/admin/views/tpl/main-settings.php:58
 msgid "Top right"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:58
+#: src/admin/views/tpl/main-settings.php:59
 msgid "Bottom left"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:59
+#: src/admin/views/tpl/main-settings.php:60
 msgid "Bottom right"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:60
+#: src/admin/views/tpl/main-settings.php:61
 msgid "Top left (no-scroll)"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:61
+#: src/admin/views/tpl/main-settings.php:62
 msgid "Top right (no-scroll)"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:62
+#: src/admin/views/tpl/main-settings.php:63
 msgid "Bottom left (no-scroll)"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:63
+#: src/admin/views/tpl/main-settings.php:64
 msgid "Bottom right (no-scroll)"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:64
+#: src/admin/views/tpl/main-settings.php:65
 msgid "In place"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:66
+#: src/admin/views/tpl/main-settings.php:67
 msgid "Show flag"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:68
+#: src/admin/views/tpl/main-settings.php:69
 msgid "Show language names"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:69
+#: src/admin/views/tpl/main-settings.php:70
 msgid "Full names (English, Spanish...)"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:70
+#: src/admin/views/tpl/main-settings.php:71
 msgid "Short names (EN, ES...)"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:71
-msgid "Show language names in Popup"
+#: src/admin/views/tpl/main-settings.php:72
+msgid "Show language names in Popup/Dropdown"
 msgstr ""
 
 #. translators: %1$s: A link to documentation about displaying flags via shortcode or PHP
-#: src/admin/views/tpl/main-settings.php:73
+#: src/admin/views/tpl/main-settings.php:74
 #, php-format
-msgid "Display the language names in the popup box when clicking on the language switcher, \"%1$s\" will take priority over this!"
-msgstr ""
-
-#: src/admin/views/tpl/main-settings.php:76
-msgid "Language names display"
+msgid "Display the language names in the popup/dropdown box when clicking on the language switcher, \"%1$s\" will take priority over this!"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:77
-msgid "In the language switcher, display the language names in English or in the original language, i.e. French or Français"
+msgid "Language names display"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:78
-msgid "English"
+msgid "In the language switcher, display the language names in English or in the original language, i.e. French or Français"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:79
+msgid "English"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:80
 msgid "Native language"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:82
+#: src/admin/views/tpl/main-settings.php:83
 msgid "Flag style"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:83
+#: src/admin/views/tpl/main-settings.php:84
 msgid "Select the flag style you want to use for the language switcher"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:84
+#: src/admin/views/tpl/main-settings.php:85
 msgid "Round"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:85
+#: src/admin/views/tpl/main-settings.php:86
 msgid "Rectangular"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:88
+#: src/admin/views/tpl/main-settings.php:89
 msgid "Flag type settings"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:90
+#: src/admin/views/tpl/main-settings.php:91
 msgid "English flag type"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:91
+#: src/admin/views/tpl/main-settings.php:92
 msgid "Select the preferred flags for the English languages"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:92
+#: src/admin/views/tpl/main-settings.php:93
 msgid "USA"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:93
+#: src/admin/views/tpl/main-settings.php:94
 msgid "Great Britain"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:96
+#: src/admin/views/tpl/main-settings.php:97
 msgid "German flag type"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:97
+#: src/admin/views/tpl/main-settings.php:98
 msgid "Select the preferred flags for the German languages"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:98
+#: src/admin/views/tpl/main-settings.php:99
 msgid "Germany"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:99
+#: src/admin/views/tpl/main-settings.php:100
 msgid "Austria"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:102
+#: src/admin/views/tpl/main-settings.php:103
 msgid "Portuguese flag type"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:103
+#: src/admin/views/tpl/main-settings.php:104
 msgid "Select the preferred flags for the Portuguese languages"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:104
+#: src/admin/views/tpl/main-settings.php:105
 msgid "Portugal"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:105
+#: src/admin/views/tpl/main-settings.php:106
 msgid "Brazil"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:108
+#: src/admin/views/tpl/main-settings.php:109
 msgid "Taiwanese flag type"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:109
+#: src/admin/views/tpl/main-settings.php:110
 msgid "Select the preferred flags for the Taiwanese languages"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:110
+#: src/admin/views/tpl/main-settings.php:111
 msgid "China"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:111
+#: src/admin/views/tpl/main-settings.php:112
 msgid "Taiwan"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:114
+#: src/admin/views/tpl/main-settings.php:115
 msgid "Spanish flag type"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:115
+#: src/admin/views/tpl/main-settings.php:116
 msgid "Select the preferred flags for the Spanish languages"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:116
+#: src/admin/views/tpl/main-settings.php:117
 msgid "Spain"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:117
+#: src/admin/views/tpl/main-settings.php:118
 msgid "Mexico"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:118
+#: src/admin/views/tpl/main-settings.php:119
 msgid "Peru"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:121
+#: src/admin/views/tpl/main-settings.php:122
 msgid "Appearance"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:123
+#: src/admin/views/tpl/main-settings.php:124
 msgid "Flag border radius"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:124
+#: src/admin/views/tpl/main-settings.php:125
 msgid "If you're using the rectangle flag shape you can apply a custom border radius in pixels"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:127
-msgid "Flag size"
-msgstr ""
-
 #: src/admin/views/tpl/main-settings.php:128
-msgid "Adjust flag size in pixels. That doesn't change the image weight as it's a .svg format"
+msgid "Panel border radius"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:131
-msgid "Text color"
+#: src/admin/views/tpl/main-settings.php:129
+msgid "Apply a custom border radius in pixels to popup, dropdown, or searchable dropdown panels"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:132
-msgid "Language name color"
+msgid "Flag size"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:133
-msgid "Select the default text color for your language names"
+msgid "Adjust flag size in pixels. That doesn't change the image weight as it's a .svg format"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:134
-msgid "Language name hover color"
-msgstr ""
-
-#: src/admin/views/tpl/main-settings.php:135
-msgid "Select the mouse hover text color for your language names"
+#: src/admin/views/tpl/main-settings.php:136
+msgid "Text color"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:137
-#: src/admin/views/tpl/main-settings.php:148
-msgid "Inherit from parent"
+msgid "Language name color"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:138
-#: src/admin/views/tpl/main-settings.php:149
-msgid "Inherit the text color from the parent element rather than selecting here"
+msgid "Select the default text color for your language names"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:139
+msgid "Language name hover color"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:140
-msgid "Popup settings"
+msgid "Select the mouse hover text color for your language names"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:142
-msgid "Popup text color"
+#: src/admin/views/tpl/main-settings.php:153
+msgid "Inherit from parent"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:143
-msgid "Popup language color"
-msgstr ""
-
-#: src/admin/views/tpl/main-settings.php:144
-msgid "Select the default text color for your language names in popup box"
+#: src/admin/views/tpl/main-settings.php:154
+msgid "Inherit the text color from the parent element rather than selecting here"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:145
-msgid "Popup language hover color"
+msgid "Popup settings"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:146
-msgid "Select the mouse hover text color for your language names in popup box"
+#: src/admin/views/tpl/main-settings.php:147
+#: src/admin/views/tpl/main-settings.php:148
+msgid "Item text color"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:152
-msgid "Flag box shadow"
+#: src/admin/views/tpl/main-settings.php:149
+msgid "Select the default text color for language items in popup, dropdown, or searchable dropdown areas"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:153
-msgid "Adjust the color and shadow size of the language flags"
+#: src/admin/views/tpl/main-settings.php:150
+msgid "Item text hover color"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:154
-#: src/admin/views/tpl/main-settings.php:163
-msgid "X offset"
-msgstr ""
-
-#: src/admin/views/tpl/main-settings.php:155
-#: src/admin/views/tpl/main-settings.php:164
-msgid "Y offset"
-msgstr ""
-
-#: src/admin/views/tpl/main-settings.php:156
-#: src/admin/views/tpl/main-settings.php:165
-msgid "Blur"
+#: src/admin/views/tpl/main-settings.php:151
+msgid "Select a hover text color for language items in popup, dropdown, or searchable dropdown areas"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:157
-#: src/admin/views/tpl/main-settings.php:166
-msgid "Spread"
+msgid "Popup background"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:158
-#: src/admin/views/tpl/main-settings.php:167
-msgid "Shadow color"
+msgid "Popup background color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:159
+msgid "Select the background color of the popup panel. Use the opacity value for a semi-transparent background"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:160
+msgid "Popup flag tint background color"
 msgstr ""
 
 #: src/admin/views/tpl/main-settings.php:161
+msgid "Select the background color displayed behind the flags in the popup. Use the opacity value for a semi-transparent background"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:164
+msgid "Flag box shadow"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:165
+msgid "Adjust the color and shadow size of the language flags"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:166
+#: src/admin/views/tpl/main-settings.php:175
+msgid "X offset"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:167
+#: src/admin/views/tpl/main-settings.php:176
+msgid "Y offset"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:168
+#: src/admin/views/tpl/main-settings.php:177
+msgid "Blur"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:169
+#: src/admin/views/tpl/main-settings.php:178
+msgid "Spread"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:170
+#: src/admin/views/tpl/main-settings.php:179
+msgid "Shadow color"
+msgstr ""
+
+#: src/admin/views/tpl/main-settings.php:173
 msgid "Flag box shadow on hover"
 msgstr ""
 
-#: src/admin/views/tpl/main-settings.php:162
+#: src/admin/views/tpl/main-settings.php:174
 msgid "Adjust the color and shadow size when hovering the language flags"
 msgstr ""
 
@@ -878,105 +907,105 @@ msgstr ""
 msgid "Settings will be available after registration."
 msgstr ""
 
-#: src/config-iframe.php:8
-#: src/config-iframe.php:105
-#: src/configuration.php:219
-#: src/configuration.php:394
+#: src/config-iframe.php:10
+#: src/config-iframe.php:130
+#: src/configuration.php:223
+#: src/configuration.php:428
 msgid "Nonce verification failed"
 msgstr ""
 
-#: src/config-iframe.php:17
-#: src/config-iframe.php:115
+#: src/config-iframe.php:19
+#: src/config-iframe.php:140
 msgid "User is not logged in"
 msgstr ""
 
-#: src/config-iframe.php:25
-#: src/config-iframe.php:124
+#: src/config-iframe.php:27
+#: src/config-iframe.php:149
 msgid "User does not have permission to manage options"
 msgstr ""
 
-#: src/config-iframe.php:34
+#: src/config-iframe.php:36
 msgid "No data to update"
 msgstr ""
 
 #. translators: %s: Missing required field name
-#: src/config-iframe.php:55
+#: src/config-iframe.php:57
 #, php-format
 msgid "Missing required field: %s"
 msgstr ""
 
-#: src/config-iframe.php:97
-#: src/configuration.php:380
-#: src/configuration.php:438
+#: src/config-iframe.php:121
+#: src/configuration.php:414
+#: src/configuration.php:472
 msgid "Linguise settings saved!"
 msgstr ""
 
-#: src/config-iframe.php:105
-#: src/config-iframe.php:115
-#: src/config-iframe.php:124
-#: src/configuration.php:219
-#: src/configuration.php:394
+#: src/config-iframe.php:130
+#: src/config-iframe.php:140
+#: src/config-iframe.php:149
+#: src/configuration.php:223
+#: src/configuration.php:428
 msgid "Unauthorized"
 msgstr ""
 
-#: src/config-iframe.php:142
+#: src/config-iframe.php:167
 msgid "Request Headers"
 msgstr ""
 
-#: src/configuration.php:99
+#: src/configuration.php:103
 msgid "Disabled debug!"
 msgstr ""
 
-#: src/configuration.php:109
+#: src/configuration.php:113
 msgid "`xml` extension is not loaded, some Linguise features might not works properly!"
 msgstr ""
 
-#: src/configuration.php:117
+#: src/configuration.php:121
 msgid "`DOMDocument` class is not available, some Linguise features might not works properly!"
 msgstr ""
 
-#: src/configuration.php:127
+#: src/configuration.php:131
 msgid "PHP version is lower than 7.0.0, some Linguise features might not works properly!"
 msgstr ""
 
-#: src/configuration.php:160
+#: src/configuration.php:164
 msgid "Htaccess file doesn't exist. This may be a problem is you are under an Apache server. Please check the documentation to finish the installation manually: <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>"
 msgstr ""
 
-#: src/configuration.php:198
+#: src/configuration.php:202
 msgid "Htaccess file is not writable, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
 msgstr ""
 
-#: src/configuration.php:203
+#: src/configuration.php:207
 msgid "Failed to write to htaccess file, please make sure to allow the current script to update the .htaccess file to make linguise work as expected. You can also check our online documentation to read <a href=\"https://www.linguise.com/documentation/linguise-installation/install-linguise-on-wordpress/\" target=\"_blank\">how to configure Linguise</a>."
 msgstr ""
 
-#: src/configuration.php:468
+#: src/configuration.php:494
 msgid "API returns empty data when querying configuration. Please try again later or contact our support team if the problem persist."
 msgstr ""
 
 #. translators: %s: Site domain name
-#: src/configuration.php:478
+#: src/configuration.php:501
 #, php-format
 msgid "The API Key provided has been rejected, please make sure you use the right key associated with the domain %s"
 msgstr ""
 
-#: src/configuration.php:485
+#: src/configuration.php:508
 msgid "Configuration has not been loaded from Linguise website. Please try again later or contact our support team if the problem persist."
 msgstr ""
 
-#: src/install.php:74
+#: src/install.php:78
 msgid "You're using Linguise for 2 months now. We hope you enjoyed our service. If you have 2 minutes to help us to grow, please drop us a quick review. We'd really appreciate."
 msgstr ""
 
-#: src/install.php:76
+#: src/install.php:80
 msgid "Thanks again for using Linguise"
 msgstr ""
 
-#: src/install.php:79
+#: src/install.php:83
 msgid "I already left a review"
 msgstr ""
 
-#: src/install.php:80
+#: src/install.php:84
 msgid "Leave a review"
 msgstr ""
