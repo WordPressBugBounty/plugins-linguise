@@ -1,4 +1,5 @@
 <?php
+
 use Linguise\Vendor\Linguise\Script\Core\Management;
 use Linguise\WordPress\Synchronization;
 use Linguise\Vendor\Linguise\Script\Core\Debug;
@@ -28,12 +29,12 @@ add_action('updated_option', function ($option, $old_value, $value) {
         $synchronization = Synchronization::getInstance();
         $configs = $synchronization->buildPayload($options);
         $token = $options['token'];
-        
+
         if (!empty($token)) {
             $management = Management::getInstance();
             $api_url = $synchronization->getApiRoot($options, '/api/sync/domain');
             $result = $management->pushRemoteSync($configs, $token, $api_url);
-    
+
             if (!$result) {
                 Debug::saveError('configuration synchronization to Linguise failed:'. $token);
             }
@@ -59,16 +60,22 @@ function linguise_synchronize_update_config($request)
 
     $params = $request->get_json_params();
     $token = isset($params['token']) ? $params['token'] : null;
-    
+
     $management = Management::getInstance();
     $synchronization = Synchronization::getInstance();
     $api_url = $synchronization->getApiRoot($options, '/api/sync/verify');
     // Verify hash data
-    $management->verifyRemoteToken($jwt_token, $api_url);
+    try {
+        if (!$management->verifyRemoteToken($jwt_token, $api_url)) {
+            return new WP_Error('unauthorized', 'Invalid Token', array('status' => 401));
+        }
+    } catch (Exception $e) {
+        return new WP_Error('unauthorized', 'Invalid Token', array('status' => 401));
+    }
 
-    // Validate token
-    if ($token !== $options['token']) {
-        return new WP_Error('unauthorized', 'Invalid Token', array( 'status' => 401 ));
+    // Validate token, timing safe
+    if (!hash_equals($token, $options['token'])) {
+        return new WP_Error('unauthorized', 'Invalid Token', array('status' => 401));
     }
 
     try {
@@ -78,7 +85,7 @@ function linguise_synchronize_update_config($request)
         );
         $merged_config = array_merge($options, $config);
     } catch (Exception $e) {
-        return new WP_Error('error', $e->getMessage(), array( 'status' => 500 ));
+        return new WP_Error('error', $e->getMessage(), array('status' => 500));
     }
 
     update_option('linguise_options', $merged_config);

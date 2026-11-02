@@ -195,11 +195,24 @@ class Mysql
     public function saveUrls($urls)
     {
         $this->reconnectIfNeeded();
+        if (empty($urls)) {
+            return;
+        }
+
+        $language = mysqli_real_escape_string($this->_database, Request::getInstance()->getLanguage());
+        $conflicts = array();
         $query = 'INSERT INTO '.mysqli_real_escape_string($this->_database, $this->_database_table_urls).' (language, source, translation, hash_source, hash_translation) VALUES ';
         $elements = array();
         foreach ($urls as $translation => $source) {
-            $elements[] = '("'.mysqli_real_escape_string($this->_database, Request::getInstance()->getLanguage()).'", "'.mysqli_real_escape_string($this->_database, $source).'", "'.mysqli_real_escape_string($this->_database, $translation).'", "'.md5($source).'", "'.md5($translation).'")';
+            $source_hash = md5($source);
+            $translation_hash = md5($translation);
+            $conflicts[] = '(hash_translation="'.$translation_hash.'" AND hash_source<>"'.$source_hash.'")';
+            $elements[] = '("'.$language.'", "'.mysqli_real_escape_string($this->_database, $source).'", "'.mysqli_real_escape_string($this->_database, $translation).'", "'.$source_hash.'", "'.$translation_hash.'")';
         }
+
+        $delete_query = 'DELETE FROM '.mysqli_real_escape_string($this->_database, $this->_database_table_urls).' WHERE language="'.$language.'" AND ('.implode(' OR ', $conflicts).')';
+        $this->_database->query($delete_query);
+
         $query .= implode(',', $elements);
         $query .= ' ON DUPLICATE KEY UPDATE source=VALUES(source), translation=VALUES(translation), hash_source=VALUES(hash_source), hash_translation=VALUES(hash_translation)';
         $this->_database->query($query);
