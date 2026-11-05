@@ -59,7 +59,7 @@ b`.split(/\n/).length==3?function(e){return e.split(/\r\n?|\n/)}:function(e){for
                     </svg>
                 </button>
             </div>
-            <ul>
+            <ul class="linguise_popup_list">
                 ${i.map((t,n)=>{let i=e.current_language===t.code,a=ni.getLanguageAccessibleName(t.code,t.name,t.original_name);return`
                             <li class="linguise_popup_item${i?` linguise_popup_current`:``}" style="--linguise-item-index: ${n}">
                                 <a href="${$r.getLanguageUrl(e,t.code)}" data-ling-lang="${t.code}" aria-label="Switch language to ${a}"${t.code===e.current_language?` aria-current="page"`:``}>
