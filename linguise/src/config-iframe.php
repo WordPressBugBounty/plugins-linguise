@@ -91,7 +91,13 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
     ) {
         $dynamic_translations['public_key'] = trim((string)$data['public_key']);
     }
-    $expert_mode = isset($data['expert_mode']) ? $data['expert_mode'] : [];
+    $expert_mode = isset($options['expert_mode']) && is_array($options['expert_mode'])
+        ? $options['expert_mode']
+        : [];
+    $has_expert_mode_data = isset($data['expert_mode']) && is_array($data['expert_mode']);
+    if ($has_expert_mode_data) {
+        $expert_mode = array_merge($expert_mode, $data['expert_mode']);
+    }
     if (isset($data['api_host'])) {
         $expert_mode['api_host'] = $data['api_host'];
         // Extract the port from the host if it is set
@@ -104,7 +110,8 @@ add_action('wp_ajax_linguise_update_config_iframe', function () {
         } else {
             $expert_mode['api_port'] = 443; // Default port
         }
-
+    }
+    if ($has_expert_mode_data || isset($data['api_host'])) {
         $options['expert_mode'] = $expert_mode;
     }
     $options['dynamic_translations'] = $dynamic_translations;
