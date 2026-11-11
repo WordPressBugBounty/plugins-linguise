@@ -60,7 +60,7 @@
             "version_normalized": "1.3.72.0",
             "source": {
                 "type": "git",
-                "url": "git@bitbucket.org:linguise/script-php.git",
+                "url": "git@ssh.bitbucket.org:linguise/script-php.git",
                 "reference": "ff02432cc94882854ac63f94606054bd55c36e54"
             },
             "require": {

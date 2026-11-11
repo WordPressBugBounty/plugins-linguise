@@ -42,7 +42,7 @@
     {
       "name": "script-php",
       "type": "vcs",
-      "url" : "git@bitbucket.org:linguise/script-php.git"
+      "url" : "git@ssh.bitbucket.org:linguise/script-php.git"
     }
   ],
   "scripts": {

@@ -65,6 +65,7 @@ class ThirdPartyLoader
         'ninja-forms' => 'NinjaFormsIntegration',
         'page-scroll-to-id' => 'PageScrollToIdIntegration',
         'popup-maker' => 'PopupMakerIntegration',
+        'siteground-optimizer' => 'SiteGroundOptimizerIntegration',
         'surecart' => 'SurecartIntegration',
         'wc/woocommerce' => 'WooCommerceIntegration',
         'wc/emails' => 'WooCommerceEmailsIntegration',
