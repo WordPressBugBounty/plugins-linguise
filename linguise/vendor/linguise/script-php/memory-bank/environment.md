@@ -36,6 +36,7 @@ This is the only file site owners should edit. It declares a class `\Linguise\Sc
 | `$debug_ip` | `string` | `''` | Restrict debug logging to this IP (empty = all IPs) |
 | `$compress_response` | `bool` | `false` | Re-compress translated responses with the origin's `Content-Encoding` (gzip/deflate/br/zstd) before sending |
 | `$server_ip` | `string|null` | `null` | Override origin server IP for the same-site proxy request |
+| `$site_url` | `string|null` | `null` | URL visitors use to reach the site (`https://www.example.com`). Validates the request `Host` header and builds the origin fetch URL; `null`/empty = auto-detect from CMS/web server. Recommended for custom (non WordPress/Joomla) setups |
 | `$server_port` | `int` | `443` | Origin server port used with `$server_ip` |
 | `$origin_connect_timeout` | `int` | `5` | Maximum origin connection time in seconds; non-positive values use 5 |
 | `$origin_timeout` | `int` | `15` | Maximum complete origin request time in seconds; non-positive values use 15 |

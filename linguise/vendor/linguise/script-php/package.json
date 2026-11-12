@@ -19,7 +19,7 @@
   "dependencies": {
     "codemirror": "^5.61.0",
     "rangeslider-js": "^3.2.5",
-    "script-js": "git+ssh://git@bitbucket.org/linguise/script-js.git",
+    "script-js": "git+ssh://git@ssh.bitbucket.org/linguise/script-js.git",
     "tippy.js": "^6.3.1"
   },
   "devDependencies": {

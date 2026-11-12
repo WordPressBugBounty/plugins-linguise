@@ -32,6 +32,8 @@ class Configuration {
     /** Advanced configuration **/
     /** The CMS used by the website */
     private $cms = '';
+    /** The URL visitors use to reach the website, used to validate the request Host header. Empty means auto-detect */
+    private $site_url = null;
     /** The server IP */
     private $server_ip = null;
     /** The server port */

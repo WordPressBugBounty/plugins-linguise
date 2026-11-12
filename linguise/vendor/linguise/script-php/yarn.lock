@@ -2352,7 +2352,7 @@ __metadata:
     material-design-icons: "npm:^3.0.1"
     rangeslider-js: "npm:^3.2.5"
     sass: "npm:^1.98.0"
-    script-js: "git+ssh://git@bitbucket.org/linguise/script-js.git"
+    script-js: "git+ssh://git@ssh.bitbucket.org/linguise/script-js.git"
     tippy.js: "npm:^6.3.1"
     url-polyfill: "npm:^1.1.12"
     vite: "npm:^8.0.16"
@@ -2787,9 +2787,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"script-js@git+ssh://git@bitbucket.org/linguise/script-js.git":
+"script-js@git+ssh://git@ssh.bitbucket.org/linguise/script-js.git":
   version: 1.1.0
-  resolution: "script-js@git+ssh://git@bitbucket.org/linguise/script-js.git#commit=f3492046c7e230aed7d476f59c894b1f3984fa1e"
+  resolution: "script-js@git+ssh://git@ssh.bitbucket.org/linguise/script-js.git#commit=f3492046c7e230aed7d476f59c894b1f3984fa1e"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     regex-escape: "npm:3.4.10"

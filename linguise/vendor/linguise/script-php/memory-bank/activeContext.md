@@ -1,7 +1,7 @@
 # Script-PHP — Active Context
 
 ## Last Updated
-2026-09-30
+2026-11-06
 
 ## What Was Done
 - **2026-06-16**: Migrated build system from Webpack 5 to Vite 8 (Rolldown). Upgraded Node from 18 to 24.14.1. Single multi-entry config (`vite.config.mjs`) for admin + login bundles. jQuery kept as external. CSSCodeSplit disabled for proper CSS extraction. Output stays in `assets/` (same as source).
@@ -16,12 +16,14 @@
 - Added Content-Encoding handling: `CurlRequest` decodes compressed origin bodies (gzip/deflate/br/zstd) before translation and records the encoding; `Response::end()` re-compresses before sending (Plan Mode — CurlRequest/Configuration)
 - Added `compress_response` config option (root `Configuration.php` + `src/Configuration.php` default `true`)
 - Fixed `CurlHandleStub` to separate request headers from response headers and emit a simulated HTTP status line
+- Fixed **Host header SSRF** (2026-11-05 report) in `src/Request.php`: the constructor no longer uses `$_SERVER['HTTP_HOST']` as-is. `resolveHostname()` keeps the requested host only when it matches a known authority of the installation (`LINGUISE_SITE_URL` constant / `site_url` config, WP `home_url()`/`site_url()`, Joomla `JConfig::$live_site` or `Joomla\CMS\Factory::getConfig()`/`JFactory::getConfig()` (never `Uri::root()`/`JUri::root()`, both are built from `HTTP_HOST`), PrestaShop `PS_SHOP_DOMAIN_SSL`/`PS_SHOP_DOMAIN`, OpenCart/Zen Cart `HTTP_SERVER`/`HTTPS_SERVER`, Laravel `app.url`, then `SERVER_NAME`/`SERVER_ADDR`); otherwise the site's own host is used and `isHostTrusted()` returns `false`. `normalizeAuthority()` rejects paths/userinfo/whitespace/control chars and normalises default ports; `isInternalHostname()` identifies loopback/private/link-local/CGNAT targets. New `site_url` option (root `Configuration.php` + `src/Configuration.php`, default `null` = auto-detect) lets non-WordPress/Joomla installs pin the site host explicitly. 38 new tests in `RequestTest` (98 total) plus `ConfigurationTest` cases.
 
 ## Current State
-Root suite: 619 tests, 4 pre-existing failures/errors unrelated to this change (3 `ResponseTest` cases, 1 `SqliteTest` file-lock error) and 1 skipped (mbstring). All platform tests pass (41). No public API signatures changed. Compressed origin responses are decoded for translation and re-compressed with the same `Content-Encoding` before being sent to the browser (configurable via `compress_response`, currently `false` by default). Curl requests can optionally be pinned to IPv4 via `force_ipv4` (default `false` = current behaviour). Origin timeouts default to 5s connect / 15s total; translation-server timeouts default to 20s connect / 300s total and are configurable.
+Root suite: 677 tests, 4 pre-existing failures/errors unrelated to this change (3 `ResponseTest` cases, 1 `SqliteTest` file-lock error) and 1 skipped (mbstring). All platform tests pass (41). No public API signatures changed. Compressed origin responses are decoded for translation and re-compressed with the same `Content-Encoding` before being sent to the browser (configurable via `compress_response`, currently `false` by default). Curl requests can optionally be pinned to IPv4 via `force_ipv4` (default `false` = current behaviour). Origin timeouts default to 5s connect / 15s total; translation-server timeouts default to 20s connect / 300s total and are configurable.
 
 ## Key Things to Know
 - The WordPress and Joomla plugins call `Processor::run()` directly — it is a shared public API
+- The origin host comes from `Request::getHostname()`, never from `$_SERVER['HTTP_HOST']` directly — the Host header is client-controlled and was an SSRF vector; use `Request::isHostTrusted()` to detect a mismatching host
 - `ui-config.php` is generated — never edit manually
 - There is no database migration system — schema DDL is embedded in `src/Databases/*.php`
 - Any change to public method signatures in `Processor`, `CurlRequest`, or `Translation` requires Plan Mode
