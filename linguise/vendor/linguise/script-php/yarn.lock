@@ -2789,12 +2789,12 @@ __metadata:
 
 "script-js@git+ssh://git@ssh.bitbucket.org/linguise/script-js.git":
   version: 1.1.0
-  resolution: "script-js@git+ssh://git@ssh.bitbucket.org/linguise/script-js.git#commit=f3492046c7e230aed7d476f59c894b1f3984fa1e"
+  resolution: "script-js@git+ssh://git@ssh.bitbucket.org/linguise/script-js.git#commit=22fd122d92860732d68c3613ea9d682ab1e7ba4a"
   dependencies:
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     regex-escape: "npm:3.4.10"
     spark-md5: "npm:3.0.1"
-  checksum: 10c0/f84802a52efa16b469297dcb3257502541709fd74dd23ff261c3e891e57d11e86f6ea8b273582195eb0cd3fa278f0cab329cf9e052a664d3097883795594399b
+  checksum: 10c0/cd6d4188950d606ad5085dc28ee6d6eaaa59a2b9b7ac977dc795ef7629390547c2b4150c995acfdd88007e81a5bdf21f568ba69f38e7e00e155e920e2feee59a
   languageName: node
   linkType: hard
 
