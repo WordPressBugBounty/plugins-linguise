@@ -85,14 +85,25 @@ class Mysql
 
         $this->_config = $config;
 
-        $port = !empty($config->db_port) ? $config->db_port : 3306;
+        // WordPress DB_HOST supports both host:port and host:/path/to/socket.
+        // mysqli_real_connect() requires an integer port (or null), so keep
+        // socket paths out of that argument.
+        $port = !empty($config->db_port) ? $config->db_port : ($config->dbport ?? 3306);
+        $socket = null;
         $host = $config->host;
 
         $parts = explode(':', $host, 2);
 
         if (count($parts) === 2) {
             $host = $parts[0];
-            $port = $parts[1];
+            if (ctype_digit($parts[1])) {
+                $port = (int) $parts[1];
+            } else {
+                $socket = $parts[1];
+                $port = null;
+            }
+        } elseif ($port !== null) {
+            $port = (int) $port;
         }
 
         $database = mysqli_init();
@@ -100,7 +111,7 @@ class Mysql
             return false;
         }
 
-        mysqli_real_connect($database, $host, $config->user, $config->password, $config->db, $port, null, $config->flags);
+        mysqli_real_connect($database, $host, $config->user, $config->password, $config->db, $port, $socket, $config->flags);
         if ($database->connect_errno) {
             return false;
         }

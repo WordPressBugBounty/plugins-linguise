@@ -8,6 +8,7 @@ _(none)_
 
 | Date | Task | Notes |
 |------|------|-------|
+| 2026-09-07 | MySQL Unix-socket DB_HOST handling | `Mysql::connect()` now supports `localhost:/run/mysqld/mysqld.sock`, casts numeric ports, and has focused regression coverage |
 | 2026-06-16 | Webpack → Vite 8 migration | Upgraded to Vite 8 (Rolldown), Node 24.14.1. Multi-entry config for admin+login, CSSCodeSplit disabled, jQuery external. |
 | 2026-04-06 | Initial memory bank and AGENTS.md created | Bootstrapped from codebase exploration |
 | 2026-07-20 | Moodle session/`sesskey` fix (Plan Mode) | Updated CurlRequest, Response, SetCookie; added tests; all root tests pass |

@@ -4,6 +4,7 @@
 2026-11-06
 
 ## What Was Done
+- Fixed MySQL connection handling for WordPress `DB_HOST` Unix-socket values such as `localhost:/run/mysqld/mysqld.sock`; numeric ports are normalized to integers and legacy `dbport` config is supported
 - **2026-06-16**: Migrated build system from Webpack 5 to Vite 8 (Rolldown). Upgraded Node from 18 to 24.14.1. Single multi-entry config (`vite.config.mjs`) for admin + login bundles. jQuery kept as external. CSSCodeSplit disabled for proper CSS extraction. Output stays in `assets/` (same as source).
 - **2026-04-06**: Created `memory-bank/` directory and `AGENTS.md` from codebase exploration.
 - Added `force_ipv4` config option (Plan Mode approved): root `Configuration.php` + `src/Configuration.php` default `false`; `CurlRequest::makeRequest()` sets `CURLOPT_IPRESOLVE = CURL_IPRESOLVE_V4` only when enabled and the constants exist (PHP 5.5+/curl 7.10.8+)
@@ -33,6 +34,7 @@ Root suite: 677 tests, 4 pre-existing failures/errors unrelated to this change (
 - The PrestaShop adapter is the most complex — it uses `JsonWalker` for translating JSON AJAX responses
 - `CurlRequest::makeRequest()` now preserves the origin CMS session; only `LINGSESSION` is explicitly closed
 - `Response::end()` emits `SameSite` cookie attributes on PHP 7.3+
+- `Mysql::connect()` separates `host:port` from `host:/socket/path` and passes socket paths via mysqli socket argument
 - `CurlRequest::makeRequest()` prefers raw `php://input` for url-encoded POSTs
 - `CurlRequest` decodes `Content-Encoding` (gzip/deflate/br/zstd) so translated content is plain text; `Response::end()` re-compresses with the tracked encoding unless `compress_response` is `false`
 - `popup_background_color` / `popup_flag_tint_background_color` are single-value RGBA tokens — the opacity input in `renderColorToggleRGBA()` is a scratch control and must never be named `linguise_options[...]`
